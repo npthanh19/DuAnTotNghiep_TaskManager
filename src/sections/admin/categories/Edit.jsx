@@ -25,8 +25,8 @@ export const Edit = () => {
                     description: `Description ${id}`,
                     status: 'Active',
                     image: 'https://via.placeholder.com/50',
-                    email: 'example@example.com',  // Sample email
-                    password: 'password123'       // Sample password
+                    email: 'example@example.com', // Sample email
+                    password: 'password123', // Sample password
                };
                setCategory(fetchedCategory);
                reset(fetchedCategory);
@@ -47,14 +47,14 @@ export const Edit = () => {
           <div className="card my-4">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span className="marquee">{t('Cập nhật danh mục')}</span>
+                         <span className="marquee">{t('Update Category')}</span>
                     </h3>
                </div>
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
                               <label htmlFor="categoryName" className="form-label">
-                                   {t('Tên danh mục')}
+                                   {t('Name Category')}
                               </label>
                               <input
                                    type="text"
@@ -67,7 +67,7 @@ export const Edit = () => {
 
                          <div className="mb-3">
                               <label htmlFor="categoryDescription" className="form-label">
-                                   {t('Mô tả danh mục')}
+                                   {t('Description')}
                               </label>
                               <textarea
                                    id="categoryDescription"
@@ -79,13 +79,12 @@ export const Edit = () => {
 
                          <div className="mb-3">
                               <label htmlFor="categoryStatus" className="form-label">
-                                   {t('Trạng thái')}
+                                   {t('Status')}
                               </label>
                               <select
                                    id="categoryStatus"
                                    className={`form-select ${errors.status ? 'is-invalid' : ''}`}
-                                   {...register('status', { required: t('Trạng thái không được để trống!') })}
-                              >
+                                   {...register('status', { required: t('Trạng thái không được để trống!') })}>
                                    <option value="Active">{t('Hoạt động')}</option>
                                    <option value="Inactive">{t('Không hoạt động')}</option>
                               </select>
@@ -94,7 +93,7 @@ export const Edit = () => {
 
                          <div className="mb-3">
                               <label htmlFor="categoryImage" className="form-label">
-                                   {t('Hình ảnh')}
+                                   {t('Image')}
                               </label>
                               <input
                                    type="text"
@@ -113,12 +112,12 @@ export const Edit = () => {
                                    type="email"
                                    id="categoryEmail"
                                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                                   {...register('email', { 
+                                   {...register('email', {
                                         required: t('Email không được để trống!'),
-                                        pattern: { 
-                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, 
-                                             message: t('Email không hợp lệ') 
-                                        } 
+                                        pattern: {
+                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                             message: t('Email không hợp lệ'),
+                                        },
                                    })}
                               />
                               {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
@@ -126,7 +125,7 @@ export const Edit = () => {
 
                          <div className="mb-3">
                               <label htmlFor="categoryPassword" className="form-label">
-                                   {t('Mật khẩu')}
+                                   {t('Password')}
                               </label>
                               <input
                                    type="password"

@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export const Add = () => {
      const { t } = useTranslation();
+     const [description, setDescription] = useState('');
      const navigate = useNavigate();
      const {
           register,
@@ -17,7 +20,7 @@ export const Add = () => {
 
      const onSubmit = (data) => {
           toast.success(t('Thêm mới thành công!'));
-          console.log(data);  // Bạn có thể xử lý logic gửi dữ liệu ở đây
+          console.log(data); // Bạn có thể xử lý logic gửi dữ liệu ở đây
           reset();
           setTimeout(() => {
                navigate('/admin/categories');
@@ -28,14 +31,14 @@ export const Add = () => {
           <div className="card my-4">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span className="marquee">{t('Thêm mới')}</span>
+                         <span className="marquee">{t('Add new')}</span>
                     </h3>
                </div>
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
                               <label htmlFor="categoryName" className="form-label">
-                                   {t('Tên danh mục')}
+                                   {t('Name Category')}
                               </label>
                               <input
                                    type="text"
@@ -48,25 +51,24 @@ export const Add = () => {
 
                          <div className="mb-3">
                               <label htmlFor="categoryDescription" className="form-label">
-                                   {t('Mô tả')}
+                                   {t('Description')}
                               </label>
-                              <textarea
-                                   id="categoryDescription"
+                              <ReactQuill
+                                   value={description}
+                                   onChange={setDescription}
                                    className={`form-control ${errors.description ? 'is-invalid' : ''}`}
-                                   {...register('description', { required: t('Mô tả không được để trống') })}
                               />
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
 
                          <div className="mb-3">
                               <label htmlFor="categoryStatus" className="form-label">
-                                   {t('Trạng thái')}
+                                   {t('Status')}
                               </label>
                               <select
                                    id="categoryStatus"
                                    className={`form-select ${errors.status ? 'is-invalid' : ''}`}
-                                   {...register('status', { required: t('Trạng thái không được để trống') })}
-                              >
+                                   {...register('status', { required: t('Trạng thái không được để trống') })}>
                                    <option value="Active">{t('Active')}</option>
                                    <option value="Inactive">{t('Inactive')}</option>
                               </select>
@@ -75,7 +77,7 @@ export const Add = () => {
 
                          <div className="mb-3">
                               <label htmlFor="categoryCreatedAt" className="form-label">
-                                   {t('Ngày tạo')}
+                                   {t('Created At')}
                               </label>
                               <input
                                    type="date"
@@ -88,7 +90,7 @@ export const Add = () => {
 
                          <div className="mb-3">
                               <label htmlFor="categoryImage" className="form-label">
-                                   {t('Hình ảnh')}
+                                   {t('Image')}
                               </label>
                               <input
                                    type="file"
@@ -107,14 +109,17 @@ export const Add = () => {
                                    type="email"
                                    id="categoryEmail"
                                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                                   {...register('email', { required: t('Email không được để trống'), pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('Email không hợp lệ') } })}
+                                   {...register('email', {
+                                        required: t('Email không được để trống'),
+                                        pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('Email không hợp lệ') },
+                                   })}
                               />
                               {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
                          </div>
 
                          <div className="mb-3">
                               <label htmlFor="categoryPassword" className="form-label">
-                                   {t('Mật khẩu')}
+                                   {t('Password')}
                               </label>
                               <input
                                    type="password"

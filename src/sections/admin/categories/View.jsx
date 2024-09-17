@@ -70,14 +70,14 @@ export const View = () => {
                          <thead>
                               <tr>
                                    <th className="col-1">ID</th>
-                                   <th className="col-2">Name</th>
-                                   <th className="col-2">Email</th>
-                                   <th className="col-2">Password</th>
-                                   <th className="col-2">Description</th>
-                                   <th className="col-1">Status</th>
-                                   <th className="col-2">Created At</th>
-                                   <th className="col-1">Image</th>
-                                   <th className="col-1">Actions</th>
+                                   <th className="col-2">{t('Name')}</th>
+                                   <th className="col-2">{t('Email')}</th>
+                                   <th className="col-2">{t('Password')}</th>
+                                   <th className="col-2">{t('Description')}</th>
+                                   <th className="col-1">{t('Status')}</th>
+                                   <th className="col-2">{t('Created At')}</th>
+                                   <th className="col-1">{t('Image')}</th>
+                                   <th className="col-1">{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>

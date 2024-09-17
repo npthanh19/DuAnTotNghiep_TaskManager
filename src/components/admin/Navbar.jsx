@@ -21,9 +21,14 @@ const Navbar = ({ onToggleSidebar }) => {
           document.body.className = isDarkMode ? 'dark-mode' : '';
      }, [isDarkMode]);
 
+     const truncateText = (text, maxLength) => {
+          if (text.length <= maxLength) return text;
+          return text.slice(0, maxLength) + '...';
+     };
+
      return (
           <nav
-               className={`layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme ${
+               className={`layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme ${
                     isDarkMode ? 'dark-mode' : ''
                }`}
                id="layout-navbar">
@@ -40,6 +45,42 @@ const Navbar = ({ onToggleSidebar }) => {
                          </div>
                     </div>
                     <ul className="navbar-nav flex-row align-items-center ms-auto">
+                         <li className="nav-item dropdown me-3">
+                              <div className="d-flex align-items-center">
+                                   <button
+                                        className="btn btn-link dropdown-toggle border-0 shadow-none"
+                                        id="notificationDropdown"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i className="bi bi-bell"></i>
+                                   </button>
+
+                                   <ul className="dropdown-menu dropdown-menu-end border-0 shadow-none" aria-labelledby="notificationDropdown">
+                                        <li>
+                                             <a className="dropdown-item" href="#">
+                                                  <i className="bi bi-star-fill me-2 text-warning"></i>
+                                                  {truncateText(
+                                                       'NHDT đã giao cho bạn 1 nhiệm vụ cực kì quan trọng bạn nên xem mau không nên bỏ lở',
+                                                       50,
+                                                  )}
+                                             </a>
+                                        </li>
+                                        <li>
+                                             <a className="dropdown-item" href="#">
+                                                  <i className="bi bi-info-circle me-2 text-primary"></i>
+                                                  {truncateText('Đã có nhiệm vụ mới bạn vui lòng xem qua!', 50)}
+                                             </a>
+                                        </li>
+                                        <li>
+                                             <a className="dropdown-item" href="#">
+                                                  <i className="bi bi-check-circle me-2 text-success"></i>
+                                                  {truncateText('Nhiệm vụ mới vui lòng xem!!!', 50)}
+                                             </a>
+                                        </li>
+                                   </ul>
+                              </div>
+                         </li>
+
                          <li className="nav-item dropdown me-3">
                               <div className="language-switcher">
                                    <button
@@ -93,7 +134,7 @@ const Navbar = ({ onToggleSidebar }) => {
                                    <li>
                                         <div className="dropdown-divider"></div>
                                    </li>
-                                   <Link className="dropdown-item" to="/admin/update_profile">
+                                   <Link className="dropdown-item" to="/taskmaneger/update_profile">
                                         <i className="ri-user-3-line ri-22px me-2"></i>
                                         <span className="align-middle">{t('Thông tin cá nhân')}</span>
                                    </Link>

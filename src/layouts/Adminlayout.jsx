@@ -17,7 +17,9 @@ const AdminLayout = ({ children }) => {
                     <div className={`layout-page ${isSidebarOpen ? 'sidebar-open' : ''}`}>
                          <Navbar onToggleSidebar={toggleSidebar} />
                          <div className="content-wrapper">
-                              <div className="container-xxl flex-grow-1 container-p-y">{children}</div>
+                              <div className="container-fluid flex-grow-1 container-p-y" style={{ paddingLeft: '10px' }}>
+                                   {children}
+                              </div>
                               <Footer />
                               <div className="content-backdrop fade" />
                          </div>

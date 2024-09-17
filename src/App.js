@@ -10,7 +10,7 @@ function App() {
      return (
           <Routes>
                <Route path="/*" element={<ClientRoutes />} />
-               <Route path="admin/*" element={<AdminRoutes />} />
+               <Route path="taskmaneger/*" element={<AdminRoutes />} />
           </Routes>
      );
 }
