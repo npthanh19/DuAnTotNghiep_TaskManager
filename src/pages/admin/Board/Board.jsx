@@ -1,12 +1,13 @@
+// src/components/Board.js
 import React from 'react';
-import { View } from '../../../sections/admin/board/View';
+import {View} from '../../../sections/admin/board/View';
 
 const Board = () => {
-     return (
-          <div>
-               <View />
-          </div>
-     );
+  return (
+    <div>
+      <View />
+    </div>
+  );
 };
 
 export default Board;
