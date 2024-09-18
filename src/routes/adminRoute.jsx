@@ -52,12 +52,12 @@ export const AdminRoutes = () => (
           />
 
           <Route
-               path="board"
-               element={
-                    <AdminLayout>
-                         <ViewBoard />
-                    </AdminLayout>
-               }
-          />
-     </Routes>
+            path="board"
+            element={
+                <AdminLayout>
+                    <ViewBoard /> {/* Sử dụng component ViewBoard */}
+                </AdminLayout>
+            }
+        />
+    </Routes>
 );
