@@ -25,7 +25,7 @@ export const View = () => {
      };
 
      const handleEdit = (id) => {
-          navigate(`/admin/categories/edit/${id}`);
+          navigate(`/taskmaneger/categories/edit/${id}`);
      };
 
      const handleStatusChange = (id, newStatus) => {
@@ -61,7 +61,7 @@ export const View = () => {
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
                          <span className="marquee">Categories</span>
                     </h3>
-                    <Link to="/admin/categories/add" className="btn btn-primary">
+                    <Link to="/taskmaneger/categories/add" className="btn btn-primary">
                          <i className="bi bi-plus me-2"></i> {t('Add new')}
                     </Link>
                </div>
