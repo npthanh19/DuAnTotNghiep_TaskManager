@@ -32,6 +32,12 @@ const Sidebar = ({ isOpen }) => {
                               <span>{t('Projects')}</span>
                          </Link>
                     </li>
+                    <li className={`menu-item ${isActive('/taskmaneger/tasks')}`}>
+                         <Link to="/taskmaneger/tasks" className="menu-link text-decoration-none">
+                              <i className="bi bi-grid menu-icon"></i> {/* Updated icon */}
+                              <span>{t('Tasks')}</span>
+                         </Link>
+                    </li>
                     <li className="menu-header fw-medium mt-4">
                          <span className="menu-header-text">{t('Admin')}</span>
                     </li>

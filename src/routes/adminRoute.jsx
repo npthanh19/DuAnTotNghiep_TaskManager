@@ -16,6 +16,10 @@ import ViewBoard from '../pages/admin/Board/Board';
 import ViewProjects from '../pages/admin/Projects/List';
 import AddProjects from '../pages/admin/Projects/Add';
 import EditProjects from '../pages/admin/Projects/Edit';
+//Admin Tasks
+import ViewTasks from '../pages/admin/Tasks/List';
+import AddTasks from '../pages/admin/Tasks/Add';
+import EditTasks from '../pages/admin/Tasks/Edit';
 // Admin Routes
 export const AdminRoutes = () => (
     <Routes>
@@ -34,5 +38,9 @@ export const AdminRoutes = () => (
         <Route path="projects" element={<AdminLayout><ViewProjects /></AdminLayout>} />
         <Route path="projects/add" element={<AdminLayout><AddProjects /></AdminLayout>} />
         <Route path="projects/edit/:id" element={<AdminLayout><EditProjects /></AdminLayout>} />
+        {/* Tasks */}
+        <Route path="tasks" element={<AdminLayout><ViewTasks /></AdminLayout>} />
+        <Route path="tasks/add" element={<AdminLayout><AddTasks /></AdminLayout>} />
+        <Route path="tasks/edit/:id" element={<AdminLayout><EditTasks /></AdminLayout>} />
     </Routes>
 );
