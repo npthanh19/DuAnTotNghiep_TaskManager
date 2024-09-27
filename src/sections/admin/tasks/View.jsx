@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
+import { CommentForm } from '../comment/View';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -13,11 +14,16 @@ export const View = () => {
 
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedTaskId, setSelectedTaskId] = useState(null);
+<<<<<<< HEAD
+=======
+     const [showCommentForm, setShowCommentForm] = useState(false);
+>>>>>>> origin/WE-10
 
      const handleDeleteClick = (id) => {
           setSelectedTaskId(id);
           setShowDeleteModal(true);
      };
+<<<<<<< HEAD
 
      const handleCloseModal = () => {
           setShowDeleteModal(false);
@@ -75,6 +81,66 @@ export const View = () => {
           setCurrentPage(pageNumber);
      };
 
+=======
+
+     const handleCloseModal = () => {
+          setShowDeleteModal(false);
+          setSelectedTaskId(null);
+     };
+
+     const deleteTask = async (id) => {
+          console.log(`Task ID ${id} deleted.`);
+     };
+
+     const handleEdit = (id) => {
+          navigate(`/taskmaneger/tasks/edit/${id}`);
+     };
+
+     const handleStatusChange = (id, newStatus) => {
+          console.log(`Task ID ${id} status changed to ${newStatus}`);
+     };
+
+     const handleCommentClick = (id) => {
+          setSelectedTaskId(id);
+          setShowCommentForm(true);
+     };
+
+     const handleCloseCommentForm = () => {
+          setShowCommentForm(false);
+          setSelectedTaskId(null);
+     };
+
+     const tasks = [
+          {
+               id: 1,
+               task_name: 'Task 1',
+               description: 'Description 1',
+               start_date: '2024-01-01',
+               end_date: '2024-12-31',
+               status: 'Active',
+               project_id: 1,
+          },
+          {
+               id: 2,
+               task_name: 'Task 2',
+               description: 'Description 2',
+               start_date: '2024-02-01',
+               end_date: '2024-11-30',
+               status: 'Inactive',
+               project_id: 2,
+          },
+     ];
+
+     const indexOfLastItem = currentPage * itemsPerPage;
+     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+     const currentTasks = tasks.slice(indexOfFirstItem, indexOfLastItem);
+     const totalPages = Math.ceil(tasks.length / itemsPerPage);
+
+     const handlePageChange = (pageNumber) => {
+          setCurrentPage(pageNumber);
+     };
+
+>>>>>>> origin/WE-10
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
@@ -129,8 +195,15 @@ export const View = () => {
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${task.id}`}>
                                                        <li>
+<<<<<<< HEAD
                                                             <button className="dropdown-item text-primary" onClick={() => handleDetails(task.id)}>
                                                                  <i className="bi bi-info-circle me-2"></i> {t('Details')}
+=======
+                                                            <button
+                                                                 className="dropdown-item text-primary"
+                                                                 onClick={() => handleCommentClick(task.id)}>
+                                                                 <i className="bi bi-chat me-2"></i> {t('Comment')}
+>>>>>>> origin/WE-10
                                                             </button>
                                                        </li>
                                                        <li>
@@ -176,8 +249,13 @@ export const View = () => {
                          </ul>
                     </nav>
                </div>
+<<<<<<< HEAD
 
                {showDeleteModal && <Delete taskId={selectedTaskId} onClose={handleCloseModal} deleteTask={deleteTask} />}
+=======
+               {showDeleteModal && <Delete onClose={handleCloseModal} taskId={selectedTaskId} deleteTask={deleteTask} />}
+               {showCommentForm && <CommentForm taskId={selectedTaskId} showModal={showCommentForm} handleCloseModal={handleCloseCommentForm} />}
+>>>>>>> origin/WE-10
           </div>
      );
 };
