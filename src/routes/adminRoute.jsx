@@ -24,7 +24,6 @@ import EditRoles from '../pages/admin/Roles/Edit';
 // admin activity_log
 import ViewActivity_log from '../pages/admin/Activity_log/List'
 // Admin Drag & Drop
-
 import ViewBoard from '../pages/admin/Board/Board';
 //Admin Projects
 import ViewProjects from '../pages/admin/Projects/List';
@@ -34,6 +33,9 @@ import EditProjects from '../pages/admin/Projects/Edit';
 import ViewTasks from '../pages/admin/Tasks/List';
 import AddTasks from '../pages/admin/Tasks/Add';
 import EditTasks from '../pages/admin/Tasks/Edit';
+
+// recentlydelete
+import ViewRecentlydelete from '../pages/admin/Recentlydelete/List'
 // Admin Routes
 export const AdminRoutes = () => (
     <Routes>
@@ -66,6 +68,9 @@ export const AdminRoutes = () => (
         <Route path="roles/add" element={<AdminLayout><AddRoles /></AdminLayout>} />
         <Route path="roles/edit/:id" element={<AdminLayout><EditRoles /></AdminLayout>} /> 
 
+        {/* recentlydelete */}
+        <Route path="recentlydelete" element={<AdminLayout><ViewRecentlydelete /></AdminLayout>} />
+        
         {/* Activity_log */}
         <Route path="log" element={<AdminLayout><ViewActivity_log /></AdminLayout>} />
 

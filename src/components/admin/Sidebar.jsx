@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 const Sidebar = ({ isOpen }) => {
      const location = useLocation();
      const { pathname } = location;
-     const { t } = useTranslation(); // Lấy hàm `t` từ `useTranslation`
+     const { t } = useTranslation();
 
      const isActive = (path) => (pathname === path ? 'active' : '');
 
@@ -22,53 +22,60 @@ const Sidebar = ({ isOpen }) => {
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/log')}`}>
                          <Link to="/taskmaneger/log" className="menu-link text-decoration-none">
-                              <i className="bi bi-clock-history menu-icon"></i>
+                              <i className="bi bi-file-earmark-text menu-icon"></i>
                               <span>{t('Activity Log')}</span>
                          </Link>
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/board')}`}>
                          <Link to="/taskmaneger/board" className="menu-link text-decoration-none">
-                              <i className="bi bi-grid menu-icon"></i> {/* Updated icon */}
+                              <i className="bi bi-kanban menu-icon"></i>
                               <span>{t('Board')}</span>
                          </Link>
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/projects')}`}>
                          <Link to="/taskmaneger/projects" className="menu-link text-decoration-none">
-                              <i className="bi bi-grid menu-icon"></i> {/* Updated icon */}
+                              <i className="bi bi-folder2 menu-icon"></i>
                               <span>{t('Projects')}</span>
                          </Link>
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/tasks')}`}>
                          <Link to="/taskmaneger/tasks" className="menu-link text-decoration-none">
-                              <i className="bi bi-grid menu-icon"></i> {/* Updated icon */}
+                              <i className="bi bi-list-task menu-icon"></i>
                               <span>{t('Tasks')}</span>
                          </Link>
                     </li>
+                    <li className={`menu-item ${isActive('/taskmaneger/recentlydelete')}`}>
+                         <Link to="/taskmaneger/recentlydelete" className="menu-link text-decoration-none">
+                              <i className="bi bi-trash menu-icon"></i>
+                              <span>{t('trash')}</span>
+                         </Link>
+                    </li>
+
                     <li className="menu-header fw-medium mt-4">
                          <span className="menu-header-text">{t('Admin')}</span>
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger')}`}>
                          <Link to="/taskmaneger" className="menu-link text-decoration-none">
-                              <i className="bi bi-bar-chart menu-icon"></i>
+                              <i className="bi bi-house-door menu-icon"></i>
                               <span>{t('Dashboard')}</span>
                          </Link>
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/categories')}`}>
                          <Link to="/taskmaneger/categories" className="menu-link text-decoration-none">
                               <i className="bi bi-tags menu-icon"></i>
-                              <div>{t('Categories')}</div>
+                              <span>{t('Categories')}</span>
                          </Link>
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/users')}`}>
                          <Link to="/taskmaneger/users" className="menu-link text-decoration-none">
-                              <i className="bi bi-person menu-icon"></i>
-                              <div>{t('Account')}</div>
+                              <i className="bi bi-person-circle menu-icon"></i>
+                              <span>{t('Account')}</span>
                          </Link>
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/roles')}`}>
                          <Link to="/taskmaneger/roles" className="menu-link text-decoration-none">
-                              <i className="bi bi-shield-check menu-icon"></i>
-                              <div>{t('Permissions')}</div>
+                              <i className="bi bi-shield-lock menu-icon"></i>
+                              <span>{t('Permissions')}</span>
                          </Link>
                     </li>
                </ul>
