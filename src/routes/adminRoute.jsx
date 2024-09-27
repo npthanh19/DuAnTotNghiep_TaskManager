@@ -10,9 +10,9 @@ import Update_profile from '../components/admin/Update_profile';
 import ViewCategories from '../pages/admin/Categories/List';
 import AddCategory from '../pages/admin/Categories/Add';
 import EditCategory from '../pages/admin/Categories/Edit';
-<<<<<<< HEAD
+
 // Admin DragDrop
-=======
+
 // Admin Users
 import ViewUser from '../pages/admin/Users/List';
 import AddUsers from '../pages/admin/Users/Add';
@@ -24,7 +24,7 @@ import EditRoles from '../pages/admin/Roles/Edit';
 // admin activity_log
 import ViewActivity_log from '../pages/admin/Activity_log/List'
 // Admin Drag & Drop
->>>>>>> origin/WE-7
+
 import ViewBoard from '../pages/admin/Board/Board';
 //Admin Projects
 import ViewProjects from '../pages/admin/Projects/List';
@@ -45,19 +45,6 @@ export const AdminRoutes = () => (
         <Route path="categories" element={<AdminLayout><ViewCategories /></AdminLayout>} />
         <Route path="categories/add" element={<AdminLayout><AddCategory /></AdminLayout>} />
         <Route path="categories/edit/:id" element={<AdminLayout><EditCategory /></AdminLayout>} />
-<<<<<<< HEAD
-        
-        {/* Board */}
-        <Route path="board" element={<AdminLayout><ViewBoard /></AdminLayout>} />
-        {/* Project */}
-        <Route path="projects" element={<AdminLayout><ViewProjects /></AdminLayout>} />
-        <Route path="projects/add" element={<AdminLayout><AddProjects /></AdminLayout>} />
-        <Route path="projects/edit/:id" element={<AdminLayout><EditProjects /></AdminLayout>} />
-        {/* Tasks */}
-        <Route path="tasks" element={<AdminLayout><ViewTasks /></AdminLayout>} />
-        <Route path="tasks/add" element={<AdminLayout><AddTasks /></AdminLayout>} />
-        <Route path="tasks/edit/:id" element={<AdminLayout><EditTasks /></AdminLayout>} />
-=======
 
         {/* Users */}
         <Route path="users" element={<AdminLayout><ViewUser /></AdminLayout>} />
@@ -74,6 +61,5 @@ export const AdminRoutes = () => (
 
         {/* Board */}
         <Route path="board" element={<AdminLayout><ViewBoard /></AdminLayout>} />
->>>>>>> origin/WE-7
     </Routes>
 );
