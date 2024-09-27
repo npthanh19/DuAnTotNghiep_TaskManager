@@ -10,6 +10,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '@fontsource/manrope';
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
      <BrowserRouter basename="/">
