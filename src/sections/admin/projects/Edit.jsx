@@ -37,7 +37,7 @@ export const Edit = () => {
     const onSubmit = (data) => {
         toast.success(t('Cập nhật dự án thành công!'));
         setTimeout(() => {
-            navigate('/admin/projects');
+            navigate('/taskmaneger/projects');
         }, 1000);
     };
 
