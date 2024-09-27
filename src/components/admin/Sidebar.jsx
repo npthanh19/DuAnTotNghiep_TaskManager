@@ -20,6 +20,12 @@ const Sidebar = ({ isOpen }) => {
                     <li className="menu-header fw-medium">
                          <span className="menu-header-text">{t('Task Manager')}</span>
                     </li>
+                    <li className={`menu-item ${isActive('/taskmaneger/log')}`}>
+                         <Link to="/taskmaneger/log" className="menu-link text-decoration-none">
+                              <i className="bi bi-clock-history menu-icon"></i>
+                              <span>{t('Activity Log')}</span>
+                         </Link>
+                    </li>
                     <li className={`menu-item ${isActive('/taskmaneger/board')}`}>
                          <Link to="/taskmaneger/board" className="menu-link text-decoration-none">
                               <i className="bi bi-grid menu-icon"></i> {/* Updated icon */}
@@ -41,14 +47,14 @@ const Sidebar = ({ isOpen }) => {
                               <div>{t('Categories')}</div>
                          </Link>
                     </li>
-                    <li className={`menu-item ${isActive('#')}`}>
-                         <Link to="#" className="menu-link text-decoration-none">
+                    <li className={`menu-item ${isActive('/taskmaneger/users')}`}>
+                         <Link to="/taskmaneger/users" className="menu-link text-decoration-none">
                               <i className="bi bi-person menu-icon"></i>
                               <div>{t('Account')}</div>
                          </Link>
                     </li>
-                    <li className={`menu-item ${isActive('#')}`}>
-                         <Link to="#" className="menu-link text-decoration-none">
+                    <li className={`menu-item ${isActive('/taskmaneger/roles')}`}>
+                         <Link to="/taskmaneger/roles" className="menu-link text-decoration-none">
                               <i className="bi bi-shield-check menu-icon"></i>
                               <div>{t('Permissions')}</div>
                          </Link>

@@ -33,16 +33,106 @@ export const View = () => {
      };
 
      const categories = [
-          { id: 1, name: 'Category 1', description: 'Description 1', status: 'Active', createdAt: '2024-01-01', email: 'email1@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 2, name: 'Category 2', description: 'Description 2', status: 'Inactive', createdAt: '2024-01-02', email: 'email2@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 3, name: 'Category 3', description: 'Description 3', status: 'Active', createdAt: '2024-01-03', email: 'email3@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 4, name: 'Category 4', description: 'Description 4', status: 'Active', createdAt: '2024-01-04', email: 'email4@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 5, name: 'Category 5', description: 'Description 5', status: 'Inactive', createdAt: '2024-01-05', email: 'email5@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 6, name: 'Category 6', description: 'Description 6', status: 'Active', createdAt: '2024-01-06', email: 'email6@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 7, name: 'Category 7', description: 'Description 7', status: 'Inactive', createdAt: '2024-01-07', email: 'email7@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 8, name: 'Category 8', description: 'Description 8', status: 'Active', createdAt: '2024-01-08', email: 'email8@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 9, name: 'Category 9', description: 'Description 9', status: 'Active', createdAt: '2024-01-09', email: 'email9@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
-          { id: 10, name: 'Category 10', description: 'Description 10', status: 'Inactive', createdAt: '2024-01-10', email: 'email10@example.com', password: '******', image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg' },
+          {
+               id: 1,
+               name: 'Category 1',
+               description: 'Description 1',
+               status: 'Active',
+               createdAt: '2024-01-01',
+               email: 'email1@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 2,
+               name: 'Category 2',
+               description: 'Description 2',
+               status: 'Inactive',
+               createdAt: '2024-01-02',
+               email: 'email2@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 3,
+               name: 'Category 3',
+               description: 'Description 3',
+               status: 'Active',
+               createdAt: '2024-01-03',
+               email: 'email3@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 4,
+               name: 'Category 4',
+               description: 'Description 4',
+               status: 'Active',
+               createdAt: '2024-01-04',
+               email: 'email4@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 5,
+               name: 'Category 5',
+               description: 'Description 5',
+               status: 'Inactive',
+               createdAt: '2024-01-05',
+               email: 'email5@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 6,
+               name: 'Category 6',
+               description: 'Description 6',
+               status: 'Active',
+               createdAt: '2024-01-06',
+               email: 'email6@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 7,
+               name: 'Category 7',
+               description: 'Description 7',
+               status: 'Inactive',
+               createdAt: '2024-01-07',
+               email: 'email7@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 8,
+               name: 'Category 8',
+               description: 'Description 8',
+               status: 'Active',
+               createdAt: '2024-01-08',
+               email: 'email8@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 9,
+               name: 'Category 9',
+               description: 'Description 9',
+               status: 'Active',
+               createdAt: '2024-01-09',
+               email: 'email9@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
+          {
+               id: 10,
+               name: 'Category 10',
+               description: 'Description 10',
+               status: 'Inactive',
+               createdAt: '2024-01-10',
+               email: 'email10@example.com',
+               password: '******',
+               image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2023/anh-che-meme1_63.jpg',
+          },
      ];
 
      const indexOfLastItem = currentPage * itemsPerPage;
@@ -65,7 +155,7 @@ export const View = () => {
                          <i className="bi bi-plus me-2"></i> {t('Add new')}
                     </Link>
                </div>
-               <div className="card-body">
+               <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
                               <tr>
@@ -99,7 +189,12 @@ export const View = () => {
                                         </td>
                                         <td>{category.createdAt}</td>
                                         <td>
-                                             <img src={category.image} alt={category.name} className="img-thumbnail" style={{ width: '50px', height: '50px' }} />
+                                             <img
+                                                  src={category.image}
+                                                  alt={category.name}
+                                                  className="img-thumbnail"
+                                                  style={{ width: '50px', height: '50px' }}
+                                             />
                                         </td>
                                         <td>
                                              <div className="dropdown">
