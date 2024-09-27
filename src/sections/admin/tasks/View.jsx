@@ -38,6 +38,10 @@ export const View = () => {
           console.log(`Task ID ${id} status changed to ${newStatus}`);
      };
 
+     const handleDetails = (id) => {
+          navigate(`/taskmaneger/assignments/details/${id}`);
+     };
+
      const handleCommentClick = (id) => {
           setSelectedTaskId(id);
           setShowCommentForm(true);
@@ -133,7 +137,12 @@ export const View = () => {
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${task.id}`}>
                                                        <li>
-                                                       <button
+                                                            <button className="dropdown-item text-primary" onClick={() => handleDetails(task.id)}>
+                                                                 <i className="bi bi-info-circle me-2"></i> {t('Details')}
+                                                            </button>
+                                                       </li>
+                                                       <li>
+                                                            <button
                                                                  className="dropdown-item text-primary"
                                                                  onClick={() => handleCommentClick(task.id)}>
                                                                  <i className="bi bi-chat me-2"></i> {t('Comment')}
@@ -173,7 +182,8 @@ export const View = () => {
                               ))}
                               <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                                    <button
-                                        className="page-link"onClick={() => handlePageChange(currentPage + 1)}
+                                        className="page-link"
+                                        onClick={() => handlePageChange(currentPage + 1)}
                                         disabled={currentPage === totalPages}>
                                         {t('Next')}
                                    </button>
