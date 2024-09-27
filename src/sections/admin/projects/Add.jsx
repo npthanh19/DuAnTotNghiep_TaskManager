@@ -23,7 +23,7 @@ export const Add = () => {
         console.log(data); // Handle project submission logic here
         reset();
         setTimeout(() => {
-            navigate('/admin/projects');
+            navigate('/taskmaneger/projects');
         }, 1000);
     };
 
