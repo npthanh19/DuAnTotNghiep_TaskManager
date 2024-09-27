@@ -1,7 +1,13 @@
-/vendor/
+# Node modules
 node_modules/
 npm-debug.log
 yarn-error.log
+
+# Lockfile
+package-lock.json
+
+# Composer vendor directory
+/vendor/
 
 # Laravel 4 specific
 bootstrap/compiled.php
@@ -15,9 +21,14 @@ public/hot
 public_html/storage
 public_html/hot
 
+# Environment and config files
 storage/*.key
 .env
+
+# Homestead specific files
 Homestead.yaml
 Homestead.json
 /.vagrant
+
+# PHPUnit result cache
 .phpunit.result.cache

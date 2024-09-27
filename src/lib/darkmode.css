@@ -1,0 +1,167 @@
+.dark-mode .layout-page {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+
+.dark-mode .footer {
+    background-color: #28243D;
+    color: #ffffff;
+}
+
+.dark-mode .text-body p {
+    color: #ffffff;
+}
+
+
+
+.dark-mode .app-brand {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+.dark-mode .app-brand span {
+    color: #ffffff;
+}
+
+
+.dark-mode .menu-inner {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+
+.dark-mode .menu-header {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+
+.dark-mode .card-body,
+.dark-mode .card-header:first-child,
+.dark-mode .table tbody tr td,
+.dark-mode .table thead tr th {
+    background-color: #342c4c;
+    color: #e0e0e0;
+}
+
+.dark-mode .form-control {
+    background-color: #28243D;
+    color: #ffffff;
+    border: 1px solid #444;
+}
+
+.dark-mode .form-control::placeholder {
+    color: #a0a0a0;
+}
+
+
+.dark-mode .dropdown-menu {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+
+.dark-mode .btn {
+    color: #ffffff;
+}
+
+.dark-mode .btn-secondary {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+
+.dark-mode {
+    color: #e0e0e0;
+}
+
+.dark-mode .table:not(.table-dark):not(.table-light) thead:not(.table-dark):not(.table-light) tr th {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+
+.pagination {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+
+.page-item {
+    margin: 0;
+}
+
+
+.page-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    color: #007bff;
+    text-decoration: none;
+}
+
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    color: #ffffff;
+    border-color: #007bff;
+}
+
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #e9ecef;
+    border-color: #e9ecef;
+    pointer-events: none;
+}
+
+
+.dark-mode .pagination .page-link {
+    background-color: #343a40;
+    border-color: #495057;
+    color: #e0e0e0;
+}
+
+.dark-mode .pagination .page-link.active {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #ffffff;
+}
+
+.dark-mode .pagination .page-link.disabled {
+    color: #6c757d;
+    background-color: #495057;
+    border-color: #495057;
+}
+
+
+
+
+.dark-mode .dropdown-menu {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+.dark-mode .dropdown-menu .dropdown-item {
+    color: #e0e0e0;
+}
+
+.dark-mode .dropdown-menu .dropdown-item:hover {
+    background-color: #333;
+    color: #ffffff;
+}
+
+.dark-mode .dropdown-menu .dropdown-divider {
+    border-color: #333;
+}
+
+.dark-mode .dropdown-menu .badge {
+    background-color: #ff4d4f;
+    color: #ffffff;
+}
