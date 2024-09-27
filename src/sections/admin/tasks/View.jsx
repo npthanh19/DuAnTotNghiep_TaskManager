@@ -14,74 +14,12 @@ export const View = () => {
 
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedTaskId, setSelectedTaskId] = useState(null);
-<<<<<<< HEAD
-=======
      const [showCommentForm, setShowCommentForm] = useState(false);
->>>>>>> origin/WE-10
 
      const handleDeleteClick = (id) => {
           setSelectedTaskId(id);
           setShowDeleteModal(true);
      };
-<<<<<<< HEAD
-
-     const handleCloseModal = () => {
-          setShowDeleteModal(false);
-          setSelectedTaskId(null);
-     };
-
-     // Mock deleteTask function (replace with actual API call)
-     const deleteTask = async (id) => {
-          // Example API call: await api.delete(`/tasks/${id}`);
-          console.log(`Task ID ${id} deleted.`);
-     };
-
-     const handleEdit = (id) => {
-          navigate(`/taskmaneger/tasks/edit/${id}`);
-     };
-
-     const handleDetails = (id) => {
-        navigate(`/taskmaneger/assignments/details/${id}`); 
-    };
-    
-
-     const handleStatusChange = (id, newStatus) => {
-          console.log(`Task ID ${id} status changed to ${newStatus}`);
-     };
-
-     const tasks = [
-          {
-               id: 1,
-               task_name: 'Task 1',
-               description: 'Description 1',
-               start_date: '2024-01-01',
-               end_date: '2024-12-31',
-               status: 'Active',
-               project_id: 1,
-          },
-          {
-               id: 2,
-               task_name: 'Task 2',
-               description: 'Description 2',
-               start_date: '2024-02-01',
-               end_date: '2024-11-30',
-               status: 'Inactive',
-               project_id: 2,
-          },
-          // Add more tasks as needed
-     ];
-
-     const indexOfLastItem = currentPage * itemsPerPage;
-     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-     const currentTasks = tasks.slice(indexOfFirstItem, indexOfLastItem);
-
-     const totalPages = Math.ceil(tasks.length / itemsPerPage);
-
-     const handlePageChange = (pageNumber) => {
-          setCurrentPage(pageNumber);
-     };
-
-=======
 
      const handleCloseModal = () => {
           setShowDeleteModal(false);
@@ -140,7 +78,6 @@ export const View = () => {
           setCurrentPage(pageNumber);
      };
 
->>>>>>> origin/WE-10
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
@@ -151,6 +88,7 @@ export const View = () => {
                          <i className="bi bi-plus me-2"></i> {t('Add new task')}
                     </Link>
                </div>
+
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
@@ -195,15 +133,10 @@ export const View = () => {
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${task.id}`}>
                                                        <li>
-<<<<<<< HEAD
-                                                            <button className="dropdown-item text-primary" onClick={() => handleDetails(task.id)}>
-                                                                 <i className="bi bi-info-circle me-2"></i> {t('Details')}
-=======
-                                                            <button
+                                                       <button
                                                                  className="dropdown-item text-primary"
                                                                  onClick={() => handleCommentClick(task.id)}>
                                                                  <i className="bi bi-chat me-2"></i> {t('Comment')}
->>>>>>> origin/WE-10
                                                             </button>
                                                        </li>
                                                        <li>
@@ -240,8 +173,7 @@ export const View = () => {
                               ))}
                               <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                                    <button
-                                        className="page-link"
-                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        className="page-link"onClick={() => handlePageChange(currentPage + 1)}
                                         disabled={currentPage === totalPages}>
                                         {t('Next')}
                                    </button>
@@ -249,13 +181,8 @@ export const View = () => {
                          </ul>
                     </nav>
                </div>
-<<<<<<< HEAD
-
-               {showDeleteModal && <Delete taskId={selectedTaskId} onClose={handleCloseModal} deleteTask={deleteTask} />}
-=======
                {showDeleteModal && <Delete onClose={handleCloseModal} taskId={selectedTaskId} deleteTask={deleteTask} />}
                {showCommentForm && <CommentForm taskId={selectedTaskId} showModal={showCommentForm} handleCloseModal={handleCloseCommentForm} />}
->>>>>>> origin/WE-10
           </div>
      );
 };
