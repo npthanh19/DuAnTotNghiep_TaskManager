@@ -1,5 +1,5 @@
 import React from 'react'
-import { Add } from '../../../sections/admin/projects/Add'
+import { Add } from '../../../sections/admin/tasks/Add';
 const AddTasks = () => {
   return (
     <div>

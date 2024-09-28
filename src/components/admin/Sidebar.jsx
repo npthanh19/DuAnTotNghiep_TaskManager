@@ -44,6 +44,13 @@ const Sidebar = ({ isOpen }) => {
                               <span>{t('Tasks')}</span>
                          </Link>
                     </li>
+                    <li className={`menu-item ${isActive('/taskmaneger/departments')}`}>
+                         <Link to="/taskmaneger/departments" className="menu-link text-decoration-none">
+                              <i className="bi bi-building menu-icon"></i> {/* Đổi icon ở đây */}
+                              <span>{t('Departments')}</span>
+                         </Link>
+                    </li>
+
                     <li className={`menu-item ${isActive('/taskmaneger/recentlydelete')}`}>
                          <Link to="/taskmaneger/recentlydelete" className="menu-link text-decoration-none">
                               <i className="bi bi-trash menu-icon"></i>
