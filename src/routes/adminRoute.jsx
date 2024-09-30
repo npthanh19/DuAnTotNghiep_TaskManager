@@ -25,6 +25,7 @@ import EditRoles from '../pages/admin/Roles/Edit';
 import ViewActivity_log from '../pages/admin/Activity_log/List'
 // Admin Drag & Drop
 import ViewBoard from '../pages/admin/Board/Board';
+import ViewBoard_list from '../pages/admin/Board_list/List';
 //Admin Projects
 import ViewProjects from '../pages/admin/Projects/List';
 import AddProjects from '../pages/admin/Projects/Add';
@@ -88,6 +89,7 @@ export const AdminRoutes = () => (
 
         {/* Board */}
         <Route path="board" element={<AdminLayout><ViewBoard /></AdminLayout>} />
+        <Route path="board_list" element={<AdminLayout><ViewBoard_list /></AdminLayout>} />
         {/* Assignments Details */}
         <Route path="assignments/details/:id" element={<AdminLayout><ViewAssignments /></AdminLayout>} />
         <Route path="assignments/edit/:id" element={<AdminLayout><EditAssignments /></AdminLayout>} />
