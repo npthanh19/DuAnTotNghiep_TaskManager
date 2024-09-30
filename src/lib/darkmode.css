@@ -165,3 +165,91 @@
     background-color: #ff4d4f;
     color: #ffffff;
 }
+
+.dark-mode .bi-three-dots-vertical {
+    color: #e0e0e0;
+} 
+
+.dark-mode .bi-info-circle{
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+.dark-mode .bi-trash{
+    color: #e0e0e0;
+}
+
+.dark-mode .column {
+    background-color: #1f1d28;
+    color: #e0e0e0;
+} 
+.dark-mode .card{
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+.dark-mode .form-select,
+.dark-mode .bi-pencil{
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+.dark-mode .bi-chat{
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+.dark-mode .list-group-item {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+.dark-mode .menu-link {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+.dark-mode .bi-kanban,
+.dark-mode .bi-file-earmark-text,
+.dark-mode .bi-folder2,
+.dark-mode .bi-list-task,
+.dark-mode .bi-building,
+.dark-mode .bi-house-door,
+.dark-mode .bi-tags,
+.dark-mode .bi-person-circle,
+.dark-mode .bi-calendar3,
+.dark-mode .bi-sort-alpha-down,
+.dark-mode .bi-sort-alpha-up,
+.dark-mode .bi-check-circle{
+    /* background-color: #28243D; */
+    color: #e0e0e0;
+}
+.dark-mode .bi-x-circle{
+    color: #e0e0e0;
+}
+
+.dark-mode .menu-item,
+.dark-mode .bi-shield-lock {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+.dark-mode .form-label{
+    color: #e0e0e0;
+}
+
+.dark-mode .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='white' d='M1 1L5 5L9 1'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 10px;
+  }
+  
+.dark-mode .ck-editor__top{
+    background-color: #28243D;
+    color: #e0e0e0;
+}
+
+.dark-mode .form-control {
+    background-color: #28243D;
+    color: #e0e0e0;
+}
