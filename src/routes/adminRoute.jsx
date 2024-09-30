@@ -43,6 +43,10 @@ import ViewRecentlydelete from '../pages/admin/Recentlydelete/List'
 import ViewDepartments from '../pages/admin/Departments/List'; 
 import EditDepartments from '../pages/admin/Departments/Edit';
 import AddDepartments from '../pages/admin/Departments/Add';
+// Admin DepartmentUser
+import ViewDepartmentUser from '../pages/admin/Department_user/List'; 
+import EditDepartmentUser from '../pages/admin/Department_user/Edit';
+import AddDepartmentUser from '../pages/admin/Department_user/Add';
 
 // Admin Routes
 export const AdminRoutes = () => (
@@ -92,7 +96,10 @@ export const AdminRoutes = () => (
         <Route path="departments" element={<AdminLayout><ViewDepartments /></AdminLayout>} />
         <Route path="departments/edit/:id" element={<AdminLayout><EditDepartments /></AdminLayout>} /> 
         <Route path="departments/add" element={<AdminLayout><AddDepartments /></AdminLayout>} />
-
+        {/* DepartmentUser */}
+        <Route path="departments_user/details/:id" element={<AdminLayout><ViewDepartmentUser /></AdminLayout>} />
+        <Route path="departments_user/edit/:id" element={<AdminLayout><EditDepartmentUser /></AdminLayout>} />
+        <Route path="departments_user/add" element={<AdminLayout><AddDepartmentUser /></AdminLayout>} />
 
     </Routes>
 );

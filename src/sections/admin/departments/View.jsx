@@ -31,6 +31,10 @@ export const View = () => {
           navigate(`/taskmaneger/departments/edit/${id}`);
      };
 
+     const handleDetails = (id) => {
+          navigate(`/taskmaneger/departments_user/details/${id}`);
+     };
+
      const departments = [
           {
                id: 1,
@@ -91,6 +95,11 @@ export const View = () => {
                                                        <i className="bi bi-three-dots-vertical"></i>
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${department.id}`}>
+                                                       <li>
+                                                            <button className="dropdown-item text-primary" onClick={() => handleDetails(department.id)}>
+                                                                 <i className="bi bi-info-circle me-2"></i> {t('Details')}
+                                                            </button>
+                                                       </li>
                                                        <li>
                                                             <button className="dropdown-item text-warning" onClick={() => handleEdit(department.id)}>
                                                                  <i className="bi bi-pencil me-2"></i> {t('Edit')}
