@@ -32,6 +32,13 @@ const Sidebar = ({ isOpen }) => {
                               <span>{t('Board')}</span>
                          </Link>
                     </li>
+                    <li className={`menu-item ${isActive('/taskmaneger/board_list')}`}>
+                         <Link to="/taskmaneger/board_list" className="menu-link text-decoration-none">
+                              <i className="bi bi-list menu-icon"></i>
+                              <span>{t('Board List')}</span>
+                         </Link>
+                    </li>
+
                     <li className={`menu-item ${isActive('/taskmaneger/projects')}`}>
                          <Link to="/taskmaneger/projects" className="menu-link text-decoration-none">
                               <i className="bi bi-folder2 menu-icon"></i>

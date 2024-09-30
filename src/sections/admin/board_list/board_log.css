@@ -1,0 +1,64 @@
+.board-list {
+  width: 150px !important;
+}
+
+.status-badge {
+  width: 150px;
+  text-align: right !important;
+}
+
+.user-id {
+  width: 80px; 
+  
+}
+
+.users_img {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; 
+  margin-left: 10px;
+  border: 2px solid #fff; 
+  object-fit: cover;
+}
+
+.qty {
+  color: rgb(60, 61, 62);
+  font-size: 15px;
+}
+
+.btn-link {
+  box-shadow: none !important;
+  border: none;
+  background: none; 
+}
+
+.status-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%; 
+}
+
+.dropdown-menu {
+  background-color: white;
+  border: 1px solid #ccc; 
+  border-radius: 0.25rem; 
+}
+
+.dropdown-item {
+  padding: 8px; 
+  cursor: pointer; 
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa; 
+}
