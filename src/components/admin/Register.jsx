@@ -1,8 +1,7 @@
 import React from 'react';
-import './Login.css';
 import { Link } from 'react-router-dom';
 
-const Login = () => {
+function Register() {
      return (
           <section className="vh-100">
                <div className="container-fluid h-custom">
@@ -16,50 +15,71 @@ const Login = () => {
                          </div>
                          <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                               <form>
+                                   {/* Name input */}
+                                   <div data-mdb-input-init className="form-outline mb-4">
+                                        <input
+                                             type="text"
+                                             id="form3Example1"
+                                             className="form-control form-control-lg"
+                                             placeholder="Enter your name"
+                                        />
+                                        <label className="form-label" htmlFor="form3Example1">
+                                             Full Name
+                                        </label>
+                                   </div>
+                                   {/* Email input */}
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="email"
-                                             id="form3Example3"
+                                             id="form3Example2"
                                              className="form-control form-control-lg"
                                              placeholder="Enter a valid email address"
                                         />
-                                        <label className="form-label" htmlFor="form3Example3">
+                                        <label className="form-label" htmlFor="form3Example2">
                                              Email address
                                         </label>
                                    </div>
+                                   {/* Password input */}
+                                   <div data-mdb-input-init className="form-outline mb-4">
+                                        <input
+                                             type="password"
+                                             id="form3Example3"
+                                             className="form-control form-control-lg"
+                                             placeholder="Enter password"
+                                        />
+                                        <label className="form-label" htmlFor="form3Example3">
+                                             Password
+                                        </label>
+                                   </div>
+                                   {/* Confirm Password input */}
                                    <div data-mdb-input-init className="form-outline mb-3">
                                         <input
                                              type="password"
                                              id="form3Example4"
                                              className="form-control form-control-lg"
-                                             placeholder="Enter password"
+                                             placeholder="Confirm password"
                                         />
                                         <label className="form-label" htmlFor="form3Example4">
-                                             Password
+                                             Confirm Password
                                         </label>
                                    </div>
                                    <div className="d-flex justify-content-between align-items-center">
+                                        {/* Checkbox */}
                                         <div className="form-check mb-0">
-                                             <input className="form-check-input me-2" type="checkbox" defaultValue id="form2Example3" />
+                                             <input className="form-check-input me-2" type="checkbox" id="form2Example3" />
                                              <label className="form-check-label" htmlFor="form2Example3">
-                                                  Remember me
+                                                  I agree to the terms and conditions
                                              </label>
                                         </div>
-                                        <a href="#!" className="text-body">
-                                             Forgot password?
-                                        </a>
                                    </div>
                                    <div className="text-center text-lg-start mt-4 pt-2">
-                                        <Link
-                                             to="/taskmaneger"
-                                             className="btn btn-primary btn-lg"
-                                             style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}>
-                                             Login
+                                        <Link to="#" className="btn btn-primary btn-lg" style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}>
+                                             Register
                                         </Link>
                                         <p className="small fw-bold mt-2 pt-1 mb-0">
-                                             Don't have an account?{' '}
-                                             <Link to="/taskmaneger/register" className="link-danger">
-                                                  Register
+                                             Already have an account?{' '}
+                                             <Link to="/taskmaneger/login" className="link-danger">
+                                                  Login
                                              </Link>
                                         </p>
                                    </div>
@@ -84,6 +104,6 @@ const Login = () => {
                </div>
           </section>
      );
-};
+}
 
-export default Login;
+export default Register;

@@ -1,5 +1,6 @@
 import React from 'react';
-import 'bootstrap-icons/font/bootstrap-icons.css'; // Đảm bảo đã thêm dòng này
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
      return (
@@ -10,7 +11,6 @@ export default function Header() {
                               NHĐT
                          </a>
 
-                         {/* Nút toggler cho mobile */}
                          <button
                               className="navbar-toggler ms-auto"
                               type="button"
@@ -40,10 +40,11 @@ export default function Header() {
                                         </a>
                                    </li>
                               </ul>
-                              <div className="d-flex">
-                                   <a href="#login" className="nav-link" style={{ color: '#ffffff', fontSize: '1.25rem' }}>
-                                        <i className="bi bi-box-arrow-in-right" style={{ color: '#ffffff', fontSize: '1.25rem' }}></i> Đăng nhập
-                                   </a>
+                              <div className="d-flex align-items-center">
+                                   <Link to="/taskmaneger" className="nav-link text-white d-flex align-items-center" style={{ fontSize: '1.25rem' }}>
+                                        <i className="bi bi-box-arrow-in-right me-2" style={{ fontSize: '1.25rem' }}></i>
+                                        Đăng nhập
+                                   </Link>
                               </div>
                          </div>
                     </div>
