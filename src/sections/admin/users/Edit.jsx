@@ -4,11 +4,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getUserById, updateUser } from '../../../services/usersService';
+import { getAllRoles } from '../../../services/rolesService';
 
 export const Edit = () => {
      const { id } = useParams();
      const { t } = useTranslation();
      const [user, setUser] = useState(null);
+     const [roles, setRoles] = useState([]);
      const {
           register,
           handleSubmit,
@@ -19,29 +22,42 @@ export const Edit = () => {
 
      useEffect(() => {
           const fetchUser = async () => {
-               const fetchedUser = {
-                    id,
-                    username: 'john_doe',
-                    password: 'password123',
-                    avatar: '/assets/admin/img/avatars/1.png',
-                    email: 'john@example.com',
-                    full_name: 'John Doe',
-                    created_at: '2024-09-24T10:30:00',
-                    updated_at: '2024-09-24T12:00:00',
-                    role_id: 1,
-                    department_id: 101,
-               };
-               setUser(fetchedUser);
-               reset(fetchedUser);
+               try {
+                    const fetchedUser = await getUserById(id);
+                    setUser(fetchedUser);
+                    reset(fetchedUser);
+               } catch (error) {
+                    toast.error(t('Failed to fetch user data'));
+               }
           };
           fetchUser();
-     }, [id, reset]);
+     }, [id, reset, t]);
 
-     const onSubmit = (data) => {
-          toast.success(t('Cập nhật thành công!'));
-          setTimeout(() => {
-               navigate('/taskmaneger/users');
-          }, 1000);
+     useEffect(() => {
+          const fetchRoles = async () => {
+               try {
+                    const fetchedRoles = await getAllRoles();
+                    setRoles(fetchedRoles);
+               } catch (error) {
+                    toast.error(t('Failed to fetch roles'));
+               }
+          };
+          fetchRoles();
+     }, [t]);
+
+     const onSubmit = async (data) => {
+          const updatedData = { ...data };
+          delete updatedData.password;
+
+          try {
+               await updateUser(id, updatedData);
+               toast.success(t('Cập nhật thành công!'));
+               setTimeout(() => {
+                    navigate('/taskmaneger/users');
+               }, 1000);
+          } catch (error) {
+               toast.error(t('Cập nhật thất bại!'));
+          }
      };
 
      if (!user) return <p>{t('Đang tải...')}</p>;
@@ -56,29 +72,16 @@ export const Edit = () => {
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
-                              <label htmlFor="username" className="form-label">
-                                   {t('Username')}
+                              <label htmlFor="name" className="form-label">
+                                   {t('name')}
                               </label>
                               <input
                                    type="text"
-                                   id="username"
-                                   className={`form-control ${errors.username ? 'is-invalid' : ''}`}
-                                   {...register('username', { required: t('Tên đăng nhập không được để trống!') })}
+                                   id="name"
+                                   className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                   {...register('name', { required: t('Tên đăng nhập không được để trống!') })}
                               />
-                              {errors.username && <div className="invalid-feedback">{errors.username.message}</div>}
-                         </div>
-
-                         <div className="mb-3">
-                              <label htmlFor="fullName" className="form-label">
-                                   {t('Full Name')}
-                              </label>
-                              <input
-                                   type="text"
-                                   id="fullName"
-                                   className={`form-control ${errors.full_name ? 'is-invalid' : ''}`}
-                                   {...register('full_name', { required: t('Họ tên không được để trống!') })}
-                              />
-                              {errors.full_name && <div className="invalid-feedback">{errors.full_name.message}</div>}
+                              {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
                          </div>
 
                          <div className="mb-3">
@@ -108,59 +111,26 @@ export const Edit = () => {
                                    type="password"
                                    id="password"
                                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                                   {...register('password', { required: t('Mật khẩu không được để trống!') })}
+                                   {...register('password')}
+                                   disabled
                               />
-                              {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                          </div>
 
                          <div className="mb-3">
-                              <label htmlFor="avatar" className="form-label">
-                                   {t('Avatar')}
-                              </label>
-                              <input
-                                   type="file"
-                                   id="avatar"
-                                   className={`form-control ${errors.avatar ? 'is-invalid' : ''}`}
-                                   {...register('avatar', { required: t('Hình đại diện không được để trống!') })}
-                              />
-                              {user.avatar && (
-                                   <div className="mb-2">
-                                        <img
-                                             src={user.avatar}
-                                             alt={t('Current Avatar')}
-                                             style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                                        />
-                                   </div>
-                              )}
-                              {errors.avatar && <div className="invalid-feedback">{errors.avatar.message}</div>}
-                         </div>
-
-                         <div className="mb-3">
-                              <label htmlFor="roleId" className="form-label">
+                              <label htmlFor="role" className="form-label">
                                    {t('Role')}
                               </label>
                               <select
-                                   id="roleId"
+                                   id="role"
                                    className={`form-select ${errors.role_id ? 'is-invalid' : ''}`}
                                    {...register('role_id', { required: t('Vai trò không được để trống!') })}>
-                                   <option value="1">{t('Admin')}</option>
-                                   <option value="2">{t('User')}</option>
+                                   {roles.map((role) => (
+                                        <option key={role.id} value={role.id}>
+                                             {t(role.name)}
+                                        </option>
+                                   ))}
                               </select>
                               {errors.role_id && <div className="invalid-feedback">{errors.role_id.message}</div>}
-                         </div>
-
-                         <div className="mb-3">
-                              <label htmlFor="departmentId" className="form-label">
-                                   {t('Department')}
-                              </label>
-                              <select
-                                   id="departmentId"
-                                   className={`form-select ${errors.department_id ? 'is-invalid' : ''}`}
-                                   {...register('department_id', { required: t('Phòng ban không được để trống!') })}>
-                                   <option value="101">{t('Sales')}</option>
-                                   <option value="102">{t('Development')}</option>
-                              </select>
-                              {errors.department_id && <div className="invalid-feedback">{errors.department_id.message}</div>}
                          </div>
 
                          <button type="submit" className="btn btn-success">

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
+import { createRole } from '../../../services/rolesService';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const Add = () => {
@@ -15,13 +16,18 @@ export const Add = () => {
           reset,
      } = useForm();
 
-     const onSubmit = (data) => {
-          toast.success(t('Thêm vai trò thành công!'));
-          console.log(data);
-          reset();
-          setTimeout(() => {
-               navigate('/taskmaneger/roles');
-          }, 1000);
+     const onSubmit = async (data) => {
+          try {
+               await createRole(data); 
+               toast.success(t('Thêm vai trò thành công!'));
+               reset();
+               setTimeout(() => {
+                    navigate('/taskmaneger/roles');
+               }, 1000);
+          } catch (error) {
+               toast.error(t('Thêm vai trò thất bại!'));
+               console.error('Failed to add role:', error);
+          }
      };
 
      return (
@@ -34,16 +40,16 @@ export const Add = () => {
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
-                              <label htmlFor="roleName" className="form-label">
+                              <label htmlFor="name" className="form-label">
                                    {t('Name')}
                               </label>
                               <input
                                    type="text"
-                                   id="roleName"
-                                   className={`form-control ${errors.roleName ? 'is-invalid' : ''}`}
-                                   {...register('roleName', { required: t('Tên vai trò không được để trống') })}
+                                   id="name"
+                                   className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                   {...register('name', { required: t('Tên vai trò không được để trống') })}
                               />
-                              {errors.roleName && <div className="invalid-feedback">{errors.roleName.message}</div>}
+                              {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
                          </div>
 
                          <div className="mb-3">

@@ -1,9 +1,53 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { createUser } from '../../services/usersService';
+import { toast, ToastContainer } from 'react-toastify';
+import { useForm } from 'react-hook-form';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Register() {
+     const {
+          register,
+          handleSubmit,
+          formState: { errors },
+     } = useForm();
+     const [loading, setLoading] = useState(false);
+     const [agreeToTerms, setAgreeToTerms] = useState(false);
+     const navigate = useNavigate();
+
+     const handleCheckboxChange = (e) => {
+          setAgreeToTerms(e.target.checked);
+     };
+
+     const onSubmit = async (data) => {
+          if (!agreeToTerms) {
+               toast.error('You must agree to the terms and conditions.');
+               return;
+          }
+
+          try {
+               setLoading(true);
+               const response = await createUser({
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+               });
+               console.log('Registration successful:', response);
+               toast.success('Registration successful!');
+
+               setTimeout(() => {
+                    navigate('/taskmaneger/login');
+               }, 1000);
+          } catch (err) {
+               toast.error(err.message || 'Registration failed.');
+          } finally {
+               setLoading(false);
+          }
+     };
+
      return (
           <section className="vh-100">
+               <ToastContainer position="top-right" autoClose={2000} />
                <div className="container-fluid h-custom">
                     <div className="row d-flex justify-content-center align-items-center h-100">
                          <div className="col-md-9 col-lg-6 col-xl-5">
@@ -14,68 +58,80 @@ function Register() {
                               />
                          </div>
                          <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                              <form>
-                                   {/* Name input */}
+                              <form onSubmit={handleSubmit(onSubmit)}>
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="text"
-                                             id="form3Example1"
+                                             {...register('name', { required: 'Name is required' })}
                                              className="form-control form-control-lg"
                                              placeholder="Enter your name"
                                         />
-                                        <label className="form-label" htmlFor="form3Example1">
-                                             Full Name
+                                        <label className="form-label" htmlFor="form3ExampleName">
+                                             Name
                                         </label>
+                                        {errors.name && <p className="text-danger">{errors.name.message}</p>}
                                    </div>
-                                   {/* Email input */}
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="email"
-                                             id="form3Example2"
+                                             {...register('email', { required: 'Email is required' })}
                                              className="form-control form-control-lg"
                                              placeholder="Enter a valid email address"
                                         />
                                         <label className="form-label" htmlFor="form3Example2">
                                              Email address
                                         </label>
+                                        {errors.email && <p className="text-danger">{errors.email.message}</p>}
                                    </div>
-                                   {/* Password input */}
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="password"
-                                             id="form3Example3"
+                                             {...register('password', {
+                                                  required: 'Password is required',
+                                                  minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                                             })}
                                              className="form-control form-control-lg"
                                              placeholder="Enter password"
                                         />
                                         <label className="form-label" htmlFor="form3Example3">
                                              Password
                                         </label>
+                                        {errors.password && <p className="text-danger">{errors.password.message}</p>}
                                    </div>
-                                   {/* Confirm Password input */}
                                    <div data-mdb-input-init className="form-outline mb-3">
                                         <input
                                              type="password"
-                                             id="form3Example4"
+                                             {...register('confirmPassword', {
+                                                  required: 'Please confirm your password',
+                                                  validate: (value) =>
+                                                       value === document.querySelector('[name="password"]').value || 'Passwords do not match',
+                                             })}
                                              className="form-control form-control-lg"
                                              placeholder="Confirm password"
                                         />
                                         <label className="form-label" htmlFor="form3Example4">
                                              Confirm Password
                                         </label>
+                                        {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>}
                                    </div>
                                    <div className="d-flex justify-content-between align-items-center">
-                                        {/* Checkbox */}
                                         <div className="form-check mb-0">
-                                             <input className="form-check-input me-2" type="checkbox" id="form2Example3" />
+                                             <input
+                                                  className="form-check-input me-2"
+                                                  type="checkbox"
+                                                  id="form2Example3"
+                                                  checked={agreeToTerms}
+                                                  onChange={handleCheckboxChange}
+                                             />
                                              <label className="form-check-label" htmlFor="form2Example3">
                                                   I agree to the terms and conditions
                                              </label>
                                         </div>
                                    </div>
                                    <div className="text-center text-lg-start mt-4 pt-2">
-                                        <Link to="#" className="btn btn-primary btn-lg" style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}>
-                                             Register
-                                        </Link>
+                                        <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
+                                             {loading ? 'Registering...' : 'Register'}
+                                        </button>
                                         <p className="small fw-bold mt-2 pt-1 mb-0">
                                              Already have an account?{' '}
                                              <Link to="/taskmaneger/login" className="link-danger">

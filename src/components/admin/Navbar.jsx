@@ -1,13 +1,12 @@
-import { Darkmode } from '../../lib/Darkmode';
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const Navbar = ({ onToggleSidebar }) => {
      const { t, i18n } = useTranslation();
      const [isDarkMode, setIsDarkMode] = useState(false);
      const [language, setLanguage] = useState('vi');
-
+     const navigate = useNavigate();
      const handleDarkModeToggle = () => {
           setIsDarkMode(!isDarkMode);
      };
@@ -20,6 +19,11 @@ const Navbar = ({ onToggleSidebar }) => {
      useEffect(() => {
           document.body.className = isDarkMode ? 'dark-mode' : '';
      }, [isDarkMode]);
+
+     const handleLogout = () => {
+          localStorage.removeItem('isAuthenticated');
+          navigate('/taskmaneger/login');
+     };
 
      const truncateText = (text, maxLength) => {
           if (text.length <= maxLength) return text;
@@ -160,10 +164,10 @@ const Navbar = ({ onToggleSidebar }) => {
                                    </li>
                                    <li>
                                         <div className="d-grid px-4 pt-2 pb-1">
-                                             <a className="btn btn-danger d-flex" href="#" role="button">
+                                             <button className="btn btn-danger d-flex" onClick={handleLogout}>
                                                   <small className="align-middle">{t('Logout')}</small>
                                                   <i className="ri-logout-box-r-line ms-2 ri-16px"></i>
-                                             </a>
+                                             </button>
                                         </div>
                                    </li>
                               </ul>

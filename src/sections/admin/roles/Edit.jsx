@@ -4,11 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getRoleById, updateRole } from '../../../services/rolesService';
 
 export const Edit = () => {
      const { id } = useParams();
      const { t } = useTranslation();
-     const [roles, setRoles] = useState(null);
+     const [role, setRole] = useState(null);
      const {
           register,
           handleSubmit,
@@ -18,26 +19,40 @@ export const Edit = () => {
      const navigate = useNavigate();
 
      useEffect(() => {
-          const fetchRoles = async () => {
-               const fetchedRoles = {
-                    id,
-                    role_name: `Roles ${id}`,
-                    description: `Description ${id}`,
-               };
-               setRoles(fetchedRoles);
-               reset(fetchedRoles);
+          const fetchRole = async () => {
+               try {
+                    const fetchedRole = await getRoleById(id);
+                    setRole(fetchedRole);
+                    reset(fetchedRole);
+               } catch (error) {
+                    console.error('Error fetching role:', error);
+                    toast.error(t('Failed to fetch role data.'));
+               }
           };
-          fetchRoles();
-     }, [id, reset]);
+          fetchRole();
+     }, [id, reset, t]);
 
-     const onSubmit = (data) => {
-          toast.success(t('Cập nhật thành công!'));
-          setTimeout(() => {
-               navigate('/taskmaneger/roles');
-          }, 1000);
+     const onSubmit = async (data) => {
+          try {
+               await updateRole(id, data);
+               toast.success(t('Cập nhật thành công!'));
+               setTimeout(() => {
+                    navigate('/taskmaneger/roles');
+               }, 1000);
+          } catch (error) {
+               console.error('Failed to update role:', error);
+               toast.error(t('Failed to update role: ') + (error.message || ''));
+          }
      };
 
-     if (!roles) return <p>{t('Đang tải...')}</p>;
+     if (!role)
+          return (
+               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-border" role="status">
+                         <span className="visually-hidden">Loading...</span>
+                    </div>
+               </div>
+          );
 
      return (
           <div className="card my-4">
@@ -49,16 +64,16 @@ export const Edit = () => {
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
-                              <label htmlFor="roleName" className="form-label">
+                              <label htmlFor="name" className="form-label">
                                    {t('Name Roles')}
                               </label>
                               <input
                                    type="text"
-                                   id="roleName"
-                                   className={`form-control ${errors.role_name ? 'is-invalid' : ''}`}
-                                   {...register('role_name', { required: t('Tên danh mục không được để trống!') })}
+                                   id="name"
+                                   className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                   {...register('name', { required: t('Tên danh mục không được để trống!') })}
                               />
-                              {errors.role_name && <div className="invalid-feedback">{errors.role_name.message}</div>}
+                              {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
                          </div>
 
                          <div className="mb-3">
