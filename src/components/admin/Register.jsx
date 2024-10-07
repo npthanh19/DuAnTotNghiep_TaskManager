@@ -4,6 +4,7 @@ import { createUser } from '../../services/usersService';
 import { toast, ToastContainer } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import 'react-toastify/dist/ReactToastify.css';
+import { signInWithGooglePopup } from '../../utils/firebase.utils';
 
 function Register() {
      const {
@@ -42,6 +43,20 @@ function Register() {
                toast.error(err.message || 'Registration failed.');
           } finally {
                setLoading(false);
+          }
+     };
+
+     const logGoogleUser = async () => {
+          try {
+               const response = await signInWithGooglePopup();
+               console.log(response);
+          } catch (error) {
+               if (error.code === 'auth/popup-closed-by-user') {
+                    toast.error('You closed the login popup. Please try again.', { position: 'top-right' });
+               } else {
+                    toast.error('Login failed. Please try again.', { position: 'top-right' });
+               }
+               console.error('Google login error:', error);
           }
      };
 
@@ -145,7 +160,7 @@ function Register() {
                               </div>
                               <div className="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
                                    <p className="lead fw-normal mb-0 me-3">Sign in with</p>
-                                   <button type="button" className="btn btn-lg btn-floating mx-1 social-btn google-btn">
+                                   <button type="button" onClick={logGoogleUser} className="btn btn-lg btn-floating mx-1 social-btn google-btn">
                                         <i className="bi bi-google" />
                                    </button>
                                    <button type="button" className="btn btn-lg btn-floating mx-1 social-btn facebook-btn">

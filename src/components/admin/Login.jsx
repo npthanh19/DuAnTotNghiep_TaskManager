@@ -6,6 +6,8 @@ import './Login.css';
 import { Link } from 'react-router-dom';
 import { axiosi } from '../../config/axios';
 import { login } from '../../services/authService';
+import { auth, signInWithGooglePopup } from '../../utils/firebase.utils';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 const Login = () => {
      const {
@@ -34,6 +36,33 @@ const Login = () => {
           }
      };
 
+     const logGoogleUser = async () => {
+          const provider = new GoogleAuthProvider(); // Tạo provider
+          try {
+              const response = await signInWithPopup(auth, provider); // Sử dụng signInWithPopup
+              const credential = GoogleAuthProvider.credentialFromResult(response);
+              const token = credential.accessToken;
+      
+              // Gửi token đến backend để xác thực
+              const result = await axiosi.post('/api/google-login', { token });
+              if (result && result.data.access_token) {
+                  localStorage.setItem('isAuthenticated', 'true');
+                  localStorage.setItem('token', result.data.access_token);
+                  axiosi.defaults.headers.common['Authorization'] = `Bearer ${result.data.access_token}`;
+                  window.location.href = '/taskmaneger'; // Chuyển hướng đến trang admin
+              } else {
+                  toast.error('Invalid login response', { position: 'top-right' });
+              }
+          } catch (error) {
+              if (error.code === 'auth/popup-closed-by-user') {
+                  toast.error('You closed the login popup. Please try again.', { position: 'top-right' });
+              } else {
+                  toast.error('Login failed. Please try again.', { position: 'top-right' });
+              }
+              console.error('Google login error:', error);
+          }
+      };
+      
      return (
           <section className="vh-100">
                <div className="container-fluid h-custom">
@@ -109,7 +138,7 @@ const Login = () => {
 
                               <div className="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
                                    <p className="lead fw-normal mb-0 me-3">Sign in with</p>
-                                   <button type="button" className="btn btn-lg btn-floating mx-1 social-btn google-btn">
+                                   <button type="button" onClick={logGoogleUser} className="btn btn-lg btn-floating mx-1 social-btn google-btn">
                                         <i className="bi bi-google" />
                                    </button>
                                    <button type="button" className="btn btn-lg btn-floating mx-1 social-btn facebook-btn">
