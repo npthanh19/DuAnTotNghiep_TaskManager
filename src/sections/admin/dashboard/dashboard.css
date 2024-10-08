@@ -1,0 +1,152 @@
+body {
+    font-size: .875rem;
+    background-color: #f8f9fa; /* Màu nền sáng cho toàn bộ trang */
+  }
+  
+  .feather {
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
+  }
+  
+  /*
+  * Sidebar
+  */
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100; /* Phía sau navbar */
+    padding: 48px 0 0; /* Chiều cao của navbar */
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    background-color: #343a40; /* Màu nền sidebar */
+    color: white; /* Màu chữ trong sidebar */
+  }
+  
+  @media (max-width: 767.98px) {
+    .sidebar {
+        top: 5rem;
+    }
+  }
+  
+  .sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto; /* Nội dung cuộn nếu viewport ngắn hơn nội dung. */
+  }
+  
+  .sidebar .nav-link {
+    font-weight: 500;
+    color: #adb5bd; /* Màu chữ cho các link trong sidebar */
+  }
+  
+  .sidebar .nav-link .feather {
+    margin-right: 4px;
+    color: #ced4da; /* Màu icon trong sidebar */
+  }
+  
+  .sidebar .nav-link.active {
+    color: #ffffff; /* Màu chữ cho link đang hoạt động */
+    background-color: #007bff; /* Màu nền cho link đang hoạt động */
+  }
+  
+  .sidebar .nav-link:hover {
+    color: #ffffff; /* Màu chữ khi hover */
+    background-color: rgba(255, 255, 255, 0.1); /* Màu nền khi hover */
+  }
+  
+  .sidebar-heading {
+    font-size: .75rem;
+    text-transform: uppercase;
+    color: #ffffff; /* Màu chữ cho tiêu đề trong sidebar */
+  }
+  
+  /*
+  * Navbar
+  */
+  
+  .navbar-brand {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    font-size: 1rem;
+    background-color: rgba(0, 0, 0, .25);
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+    color: white; /* Màu chữ cho navbar brand */
+  }
+  
+  .navbar .navbar-toggler {
+    top: .25rem;
+    right: 1rem;
+    background-color: #007bff; /* Màu nền cho nút toggle */
+  }
+  
+  .navbar .form-control {
+    padding: .75rem 1rem;
+    border-width: 0;
+    border-radius: 0;
+  }
+  
+  .form-control-dark {
+    color: #fff;
+    background-color: rgba(255, 255, 255, .1);
+    border-color: rgba(255, 255, 255, .1);
+  }
+  
+  .form-control-dark:focus {
+    border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+  }
+  
+  /*
+  * Card styles
+  */
+  
+  .card {
+    border-radius: 8px; /* Bo góc cho các thẻ */
+    transition: transform 0.3s, box-shadow 0.3s; /* Hiệu ứng khi hover */
+  }
+  
+  .card:hover {
+    transform: translateY(-5px); /* Nâng cao thẻ khi hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Hiệu ứng bóng */
+  }
+  
+  /*
+  * Table styles
+  */
+  
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .table th,
+  .table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6; /* Đường viền dưới cho các ô */
+  }
+  
+  .table th {
+    background-color: #f1f1f1; /* Màu nền cho tiêu đề bảng */
+    color: #495057; /* Màu chữ cho tiêu đề bảng */
+  }
+  
+  .table tr:hover {
+    background-color: rgba(0, 123, 255, 0.1); /* Màu nền khi hover cho hàng */
+  }
+  .bar {
+    height: 30px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    color: white;
+    font-weight: bold;
+    padding-left: 10px;
+  }
+
+  
