@@ -1,145 +1,209 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { createProject } from '../../../services/projectsService';
+import { getAllUsers } from '../../../services/usersService';
+import { getAllDepartments } from '../../../services/deparmentsService';
 
 export const Add = () => {
-    const { t } = useTranslation();
-    const [description, setDescription] = useState('');
-    const navigate = useNavigate();
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm();
+     const { t } = useTranslation();
+     const navigate = useNavigate();
+     const {
+          register,
+          handleSubmit,
+          formState: { errors },
+          reset,
+     } = useForm();
+     const [users, setUsers] = useState([]);
+     const [departments, setDepartments] = useState([]);
 
-    const onSubmit = (data) => {
-        toast.success(t('Project added successfully!'));
-        console.log(data); // Handle project submission logic here
-        reset();
-        setTimeout(() => {
-            navigate('/taskmaneger/projects');
-        }, 1000);
-    };
+     useEffect(() => {
+          const fetchUsers = async () => {
+               try {
+                    const userData = await getAllUsers();
+                    setUsers(userData);
+               } catch (error) {
+                    console.error('Error fetching users:', error);
+                    toast.error(t('Failed to load users'));
+               }
+          };
 
-    return (
-        <div className="card my-4">
-            <div className="card-header d-flex justify-content-between align-items-center">
-                <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                    <span className="marquee">{t('Add new project')}</span>
-                </h3>
-            </div>
-            <div className="card-body">
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="mb-3">
-                        <label htmlFor="projectName" className="form-label">
-                            {t('Project Name')}
-                        </label>
-                        <input
-                            type="text"
-                            id="projectName"
-                            className={`form-control ${errors.projectName ? 'is-invalid' : ''}`}
-                            {...register('projectName', { required: t('Project name is required') })}
-                        />
-                        {errors.projectName && <div className="invalid-feedback">{errors.projectName.message}</div>}
-                    </div>
+          const fetchDepartments = async () => {
+               try {
+                    const departmentData = await getAllDepartments();
+                    setDepartments(departmentData);
+               } catch (error) {
+                    console.error('Error fetching departments:', error);
+                    toast.error(t('Failed to load departments'));
+               }
+          };
 
-                    <div className="mb-3">
-                        <label htmlFor="projectDescription" className="form-label">
-                            {t('Description')}
-                        </label>
-                        <CKEditor
-                            editor={ClassicEditor}
-                            data={description}
-                            onChange={(event, editor) => {
-                                const data = editor.getData();
-                                setDescription(data);
-                            }}
-                            className={`form-control ${errors.description ? 'is-invalid' : ''}`}
-                        />
-                        {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
-                    </div>
+          fetchUsers();
+          fetchDepartments();
+     }, []);
 
-                    <div className="mb-3">
-                        <label htmlFor="projectStatus" className="form-label">
-                            {t('Status')}
-                        </label>
-                        <select
-                            id="projectStatus"
-                            className={`form-select ${errors.status ? 'is-invalid' : ''}`}
-                            {...register('status', { required: t('Status is required') })}>
-                            <option value="Active">{t('Active')}</option>
-                            <option value="Inactive">{t('Inactive')}</option>
-                        </select>
-                        {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
-                    </div>
+     const onSubmit = async (data) => {
+          const mappedData = {
+               project_name: data.projectName,
+               description: data.description,
+               start_date: data.startDate,
+               end_date: data.endDate,
+               status: getStatusValue(data.status),
+               user_id: data.projectManager,
+               department_ids: data.departmentIds.split(',').map((id) => id.trim()),
+          };
 
-                    <div className="mb-3">
-                        <label htmlFor="projectStartDate" className="form-label">
-                            {t('Start Date')}
-                        </label>
-                        <input
-                            type="date"
-                            id="projectStartDate"
-                            className={`form-control ${errors.startDate ? 'is-invalid' : ''}`}
-                            {...register('startDate', { required: t('Start date is required') })}
-                        />
-                        {errors.startDate && <div className="invalid-feedback">{errors.startDate.message}</div>}
-                    </div>
+          try {
+               await createProject(mappedData);
+               toast.success(t('Project added successfully!'));
+               reset();
+               setTimeout(() => {
+                    navigate('/taskmaneger/projects');
+               }, 1000);
+          } catch (error) {
+               console.error('Error adding project:', error.response?.data || error);
+               toast.error(t('Error adding project! Please try again.'));
+          }
+     };
 
-                    <div className="mb-3">
-                        <label htmlFor="projectEndDate" className="form-label">
-                            {t('End Date')}
-                        </label>
-                        <input
-                            type="date"
-                            id="projectEndDate"
-                            className={`form-control ${errors.endDate ? 'is-invalid' : ''}`}
-                            {...register('endDate', { required: t('End date is required') })}
-                        />
-                        {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
-                    </div>
+     const getStatusValue = (status) => {
+          switch (status) {
+               case 'Active':
+                    return 1;
+               case 'Inactive':
+                    return 0;
+               case 'Pending':
+                    return 2;
+               default:
+                    return null;
+          }
+     };
 
-                    <div className="mb-3">
-                        <label htmlFor="projectManagerEmail" className="form-label">
-                            {t('Project Manager Email')}
-                        </label>
-                        <input
-                            type="email"
-                            id="projectManagerEmail"
-                            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                            {...register('email', {
-                                required: t('Email is required'),
-                                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('Invalid email format') },
-                            })}
-                        />
-                        {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
-                    </div>
+     return (
+          <div className="card my-4">
+               <div className="card-header d-flex justify-content-between align-items-center">
+                    <h3 className="fw-bold py-3 mb-4 highlighted-text">
+                         <span className="marquee">{t('Add new project')}</span>
+                    </h3>
+               </div>
+               <div className="card-body">
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                         <div className="mb-3">
+                              <label htmlFor="projectName" className="form-label">
+                                   {t('Project Name')}
+                              </label>
+                              <input
+                                   type="text"
+                                   id="projectName"
+                                   className={`form-control form-control-sm ${errors.projectName ? 'is-invalid' : ''}`}
+                                   {...register('projectName', { required: t('Project name is required') })}
+                              />
+                              {errors.projectName && <div className="invalid-feedback">{errors.projectName.message}</div>}
+                         </div>
 
-                    <div className="mb-3">
-                        <label htmlFor="projectImage" className="form-label">
-                            {t('Image')}
-                        </label>
-                        <input
-                            type="file"
-                            id="projectImage"
-                            className={`form-control ${errors.image ? 'is-invalid' : ''}`}
-                            {...register('image', { required: t('Image is required') })}
-                        />
-                        {errors.image && <div className="invalid-feedback">{errors.image.message}</div>}
-                    </div>
+                         <div className="mb-3">
+                              <label htmlFor="description" className="form-label">
+                                   {t('Description')}
+                              </label>
+                              <textarea
+                                   id="description"
+                                   className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
+                                   {...register('description', { required: t('Description is required') })}
+                              />
+                              {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+                         </div>
 
-                    <button type="submit" className="btn btn-success">
-                        <i className="bi bi-check-circle me-2"></i> {t('Add Project')}
-                    </button>
-                </form>
-            </div>
-            <ToastContainer position="top-right" autoClose={2000} />
-        </div>
-    );
+                         <div className="mb-3">
+                              <label htmlFor="status" className="form-label">
+                                   {t('Status')}
+                              </label>
+                              <select
+                                   id="status"
+                                   className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
+                                   {...register('status', { required: t('Status is required') })}>
+                                   <option value="Active">{t('Active')}</option>
+                                   <option value="Inactive">{t('Inactive')}</option>
+                                   <option value="Pending">{t('Pending')}</option>
+                              </select>
+                              {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
+                         </div>
+
+                         {/* Date Inputs in Horizontal Alignment */}
+                         <div className="row mb-3">
+                              <div className="col">
+                                   <label htmlFor="startDate" className="form-label">
+                                        {t('Start Date')}
+                                   </label>
+                                   <input
+                                        type="date"
+                                        id="startDate"
+                                        className={`form-control form-control-sm ${errors.startDate ? 'is-invalid' : ''}`}
+                                        {...register('startDate', { required: t('Start date is required') })}
+                                   />
+                                   {errors.startDate && <div className="invalid-feedback">{errors.startDate.message}</div>}
+                              </div>
+                              <div className="col">
+                                   <label htmlFor="endDate" className="form-label">
+                                        {t('End Date')}
+                                   </label>
+                                   <input
+                                        type="date"
+                                        id="endDate"
+                                        className={`form-control form-control-sm ${errors.endDate ? 'is-invalid' : ''}`}
+                                        {...register('endDate', { required: t('End date is required') })}
+                                   />
+                                   {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
+                              </div>
+                         </div>
+
+                         <div className="row mb-3">
+                              <div className="col">
+                                   <label htmlFor="projectManager" className="form-label">
+                                        {t('Project Manager')}
+                                   </label>
+                                   <select
+                                        id="projectManager"
+                                        className={`form-select form-select-sm ${errors.projectManager ? 'is-invalid' : ''}`}
+                                        {...register('projectManager', { required: t('Project Manager is required') })}>
+                                        <option value="">{t('Select Project Manager')}</option>
+                                        {users.map((user) => (
+                                             <option key={user.id} value={user.id}>
+                                                  {user.name}
+                                             </option>
+                                        ))}
+                                   </select>
+                                   {errors.projectManager && <div className="invalid-feedback">{errors.projectManager.message}</div>}
+                              </div>
+
+                              {/* Department IDs Dropdown */}
+                              <div className="col">
+                                   <label htmlFor="departmentIds" className="form-label">
+                                        {t('Department IDs')}
+                                   </label>
+                                   <select
+                                        id="departmentIds"
+                                        className={`form-select form-select-sm ${errors.departmentIds ? 'is-invalid' : ''}`}
+                                        {...register('departmentIds', { required: t('Department IDs are required') })}>
+                                        <option value="">{t('Select Department')}</option>
+                                        {departments.map((dept) => (
+                                             <option key={dept.id} value={dept.id}>
+                                                  {dept.department_name}
+                                             </option>
+                                        ))}
+                                   </select>
+                                   {errors.departmentIds && <div className="invalid-feedback">{errors.departmentIds.message}</div>}
+                              </div>
+                         </div>
+
+                         <button type="submit" className="btn btn-success">
+                              <i className="bi bi-check-circle me-2"></i> {t('Add Project')}
+                         </button>
+                    </form>
+               </div>
+               <ToastContainer position="top-right" autoClose={2000} />
+          </div>
+     );
 };

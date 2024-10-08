@@ -10,11 +10,11 @@ export const login = async (email, password) => {
 };
 
 export const register = async (userData) => {
-    try {
-        const response = await axiosi.post('/api/register', userData);
-        return response.data;
-    } catch (error) {
-        console.error('Registration error:', error.response ? error.response.data : 'Network error');
-        throw error.response ? error.response.data : new Error('Network error');
-    }
+     try {
+          const response = await axiosi.post('/api/register', userData);
+          return response.data;
+     } catch (error) {
+          console.error('Registration error:', error.response ? error.response.data : 'Network error');
+          throw error.response ? error.response.data : new Error('Network error');
+     }
 };

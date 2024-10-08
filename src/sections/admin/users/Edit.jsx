@@ -60,7 +60,14 @@ export const Edit = () => {
           }
      };
 
-     if (!user) return <p>{t('Đang tải...')}</p>;
+     if (!user)
+          return (
+               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-border" role="status">
+                         <span className="visually-hidden">Loading...</span>
+                    </div>
+               </div>
+          );
 
      return (
           <div className="card my-4">
@@ -78,7 +85,7 @@ export const Edit = () => {
                               <input
                                    type="text"
                                    id="name"
-                                   className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.name ? 'is-invalid' : ''}`}
                                    {...register('name', { required: t('Tên đăng nhập không được để trống!') })}
                               />
                               {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
@@ -91,7 +98,7 @@ export const Edit = () => {
                               <input
                                    type="email"
                                    id="email"
-                                   className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.email ? 'is-invalid' : ''}`}
                                    {...register('email', {
                                         required: t('Email không được để trống!'),
                                         pattern: {
@@ -110,7 +117,7 @@ export const Edit = () => {
                               <input
                                    type="password"
                                    id="password"
-                                   className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.password ? 'is-invalid' : ''}`}
                                    {...register('password')}
                                    disabled
                               />
@@ -122,7 +129,7 @@ export const Edit = () => {
                               </label>
                               <select
                                    id="role"
-                                   className={`form-select ${errors.role_id ? 'is-invalid' : ''}`}
+                                   className={`form-select from-select-sm ${errors.role_id ? 'is-invalid' : ''}`}
                                    {...register('role_id', { required: t('Vai trò không được để trống!') })}>
                                    {roles.map((role) => (
                                         <option key={role.id} value={role.id}>

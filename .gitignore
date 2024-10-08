@@ -4,7 +4,6 @@ npm-debug.log
 yarn-error.log
 
 # Lockfile
-package-lock.json
 
 # Composer vendor directory
 /vendor/
@@ -23,7 +22,6 @@ public_html/hot
 
 # Environment and config files
 storage/*.key
-.env
 
 # Homestead specific files
 Homestead.yaml
