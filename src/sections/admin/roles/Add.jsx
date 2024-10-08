@@ -18,7 +18,7 @@ export const Add = () => {
 
      const onSubmit = async (data) => {
           try {
-               await createRole(data); 
+               await createRole(data);
                toast.success(t('Thêm vai trò thành công!'));
                reset();
                setTimeout(() => {
@@ -46,7 +46,7 @@ export const Add = () => {
                               <input
                                    type="text"
                                    id="name"
-                                   className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.name ? 'is-invalid' : ''}`}
                                    {...register('name', { required: t('Tên vai trò không được để trống') })}
                               />
                               {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
@@ -58,7 +58,7 @@ export const Add = () => {
                               </label>
                               <textarea
                                    id="roleDescription"
-                                   className={`form-control ${errors.description ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
                                    rows="5"
                                    {...register('description', { required: t('Mô tả không được để trống') })}></textarea>
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}

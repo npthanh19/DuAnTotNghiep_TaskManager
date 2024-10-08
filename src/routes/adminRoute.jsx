@@ -82,9 +82,7 @@ export const AdminRoutes = () => (
                path="update_profile"
                element={
                     <PrivateRoute>
-                         <AdminLayout>
-                              <UpdateProfile />
-                         </AdminLayout>
+                         <UpdateProfile />
                     </PrivateRoute>
                }
           />

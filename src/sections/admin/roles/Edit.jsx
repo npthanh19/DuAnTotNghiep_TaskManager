@@ -70,7 +70,7 @@ export const Edit = () => {
                               <input
                                    type="text"
                                    id="name"
-                                   className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.name ? 'is-invalid' : ''}`}
                                    {...register('name', { required: t('Tên danh mục không được để trống!') })}
                               />
                               {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
@@ -82,7 +82,7 @@ export const Edit = () => {
                               </label>
                               <textarea
                                    id="roleDescription"
-                                   className={`form-control ${errors.description ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
                                    {...register('description', { required: t('Mô tả không được để trống!') })}
                               />
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
