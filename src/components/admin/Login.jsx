@@ -6,7 +6,7 @@ import './Login.css';
 import { Link } from 'react-router-dom';
 import { axiosi } from '../../config/axios';
 import { login } from '../../services/authService';
-import { auth, signInWithGooglePopup } from '../../utils/firebase.utils';
+import { auth, signInWithGooglePopup } from '../../utils/firebase-untils';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 const Login = () => {
@@ -39,30 +39,30 @@ const Login = () => {
      const logGoogleUser = async () => {
           const provider = new GoogleAuthProvider(); // Tạo provider
           try {
-              const response = await signInWithPopup(auth, provider); // Sử dụng signInWithPopup
-              const credential = GoogleAuthProvider.credentialFromResult(response);
-              const token = credential.accessToken;
-      
-              // Gửi token đến backend để xác thực
-              const result = await axiosi.post('/api/google-login', { token });
-              if (result && result.data.access_token) {
-                  localStorage.setItem('isAuthenticated', 'true');
-                  localStorage.setItem('token', result.data.access_token);
-                  axiosi.defaults.headers.common['Authorization'] = `Bearer ${result.data.access_token}`;
-                  window.location.href = '/taskmaneger'; // Chuyển hướng đến trang admin
-              } else {
-                  toast.error('Invalid login response', { position: 'top-right' });
-              }
+               const response = await signInWithPopup(auth, provider); // Sử dụng signInWithPopup
+               const credential = GoogleAuthProvider.credentialFromResult(response);
+               const token = credential.accessToken;
+
+               // Gửi token đến backend để xác thực
+               const result = await axiosi.post('/api/google-login', { token });
+               if (result && result.data.access_token) {
+                    localStorage.setItem('isAuthenticated', 'true');
+                    localStorage.setItem('token', result.data.access_token);
+                    axiosi.defaults.headers.common['Authorization'] = `Bearer ${result.data.access_token}`;
+                    window.location.href = '/taskmaneger'; // Chuyển hướng đến trang admin
+               } else {
+                    toast.error('Invalid login response', { position: 'top-right' });
+               }
           } catch (error) {
-              if (error.code === 'auth/popup-closed-by-user') {
-                  toast.error('You closed the login popup. Please try again.', { position: 'top-right' });
-              } else {
-                  toast.error('Login failed. Please try again.', { position: 'top-right' });
-              }
-              console.error('Google login error:', error);
+               if (error.code === 'auth/popup-closed-by-user') {
+                    toast.error('You closed the login popup. Please try again.', { position: 'top-right' });
+               } else {
+                    toast.error('Login failed. Please try again.', { position: 'top-right' });
+               }
+               console.error('Google login error:', error);
           }
-      };
-      
+     };
+
      return (
           <section className="vh-100">
                <div className="container-fluid h-custom">

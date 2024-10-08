@@ -4,7 +4,7 @@ import { createUser } from '../../services/usersService';
 import { toast, ToastContainer } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import 'react-toastify/dist/ReactToastify.css';
-import { signInWithGooglePopup } from '../../utils/firebase.utils';
+import { signInWithGooglePopup } from '../../utils/firebase-untils';
 
 function Register() {
      const {
