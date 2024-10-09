@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
 import { CommentForm } from '../comment/View';
+import { getAllTasks, deleteTask as deleteTaskService } from '../../../services/tasksService';
+import { getAllProjects } from '../../../services/projectsService';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -15,6 +17,28 @@ export const View = () => {
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedTaskId, setSelectedTaskId] = useState(null);
      const [showCommentForm, setShowCommentForm] = useState(false);
+     const [tasks, setTasks] = useState([]);
+     const [projects, setProjects] = useState([]);
+     const [loading, setLoading] = useState(true);
+     const [error, setError] = useState(null);
+     const [searchTerm, setSearchTerm] = useState('');
+
+     useEffect(() => {
+          const fetchTasksAndProjects = async () => {
+               try {
+                    const tasksData = await getAllTasks();
+                    const projectsData = await getAllProjects();
+                    setTasks(tasksData);
+                    setProjects(projectsData);
+               } catch (err) {
+                    console.error('Failed to fetch tasks or projects:', err);
+                    setError('Failed to fetch tasks or projects');
+               } finally {
+                    setLoading(false);
+               }
+          };
+          fetchTasksAndProjects();
+     }, []);
 
      const handleDeleteClick = (id) => {
           setSelectedTaskId(id);
@@ -27,7 +51,13 @@ export const View = () => {
      };
 
      const deleteTask = async (id) => {
-          console.log(`Task ID ${id} deleted.`);
+          try {
+               await deleteTaskService(id); // Call the delete task service
+               setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id)); // Update the tasks state
+               console.log(`Task ID ${id} deleted.`);
+          } catch (error) {
+               console.error('Error deleting task:', error);
+          }
      };
 
      const handleEdit = (id) => {
@@ -52,34 +82,47 @@ export const View = () => {
           setSelectedTaskId(null);
      };
 
-     const tasks = [
-          {
-               id: 1,
-               task_name: 'Task 1',
-               description: 'Description 1',
-               start_date: '2024-01-01',
-               end_date: '2024-12-31',
-               status: 'Active',
-               project_id: 1,
-          },
-          {
-               id: 2,
-               task_name: 'Task 2',
-               description: 'Description 2',
-               start_date: '2024-02-01',
-               end_date: '2024-11-30',
-               status: 'Inactive',
-               project_id: 2,
-          },
-     ];
+     const getProjectNameById = (projectId) => {
+          const project = projects.find((proj) => proj.id === projectId);
+          return project ? project.project_name : 'Unknown Project';
+     };
+
+     const truncateText = (text, maxLength) => {
+          return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+     };
+
+     const filterTask = tasks.filter((task) => task.task_name.toLowerCase().includes(searchTerm.toLowerCase()));
 
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-     const currentTasks = tasks.slice(indexOfFirstItem, indexOfLastItem);
-     const totalPages = Math.ceil(tasks.length / itemsPerPage);
+     const currentTasks = filterTask.slice(indexOfFirstItem, indexOfLastItem);
+     const totalPages = Math.ceil(filterTask.length / itemsPerPage);
 
      const handlePageChange = (pageNumber) => {
           setCurrentPage(pageNumber);
+     };
+
+     if (loading) {
+          return (
+               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-border" role="status">
+                         <span className="visually-hidden">Loading...</span>
+                    </div>
+               </div>
+          );
+     }
+
+     if (error) {
+          return (
+               <div>
+                    {t('Error fetching tasks or projects:')} {error}
+               </div>
+          );
+     }
+
+     const handleSearchChange = (e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1);
      };
 
      return (
@@ -88,43 +131,46 @@ export const View = () => {
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
                          <span className="marquee">{t('Tasks')}</span>
                     </h3>
-                    <Link to="/taskmaneger/tasks/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add new task')}
-                    </Link>
+                    <div className="d-flex align-items-center">
+                         <input
+                              type="text"
+                              className="form-control form-control-sm me-2"
+                              placeholder={t('Search...')}
+                              value={searchTerm}
+                              onChange={handleSearchChange}
+                         />
+                         <Link to="/taskmaneger/tasks/add" className="btn btn-primary">
+                              <i className="bi bi-plus me-2"></i> {t('Add')}
+                         </Link>
+                    </div>
                </div>
 
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th className="col-1">ID</th>
-                                   <th className="col-2">{t('Task Name')}</th>
-                                   <th className="col-2">{t('Description')}</th>
-                                   <th className="col-2">{t('Start Date')}</th>
-                                   <th className="col-2">{t('End Date')}</th>
-                                   <th className="col-1">{t('Status')}</th>
-                                   <th className="col-1">{t('Project ID')}</th>
-                                   <th className="col-1">{t('Actions')}</th>
+                                   <th className="col">ID</th>
+                                   <th className="col">{t('Task Name')}</th>
+                                   <th className="col">{t('Description')}</th>
+                                   <th className="col">{t('Start Date')}</th>
+                                   <th className="col">{t('End Date')}</th>
+                                   <th className="col">{t('Status')}</th>
+                                   <th className="col">{t('Project')}</th>
+                                   <th className="col">{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
                               {currentTasks.map((task) => (
                                    <tr key={task.id}>
                                         <td>{task.id}</td>
-                                        <td>{task.task_name}</td>
-                                        <td>{task.description}</td>
+                                        <td>{truncateText(task.task_name, 25)}</td>
+                                        <td>{truncateText(task.description, 25)}</td>
                                         <td>{task.start_date}</td>
                                         <td>{task.end_date}</td>
                                         <td>
-                                             <select
-                                                  value={task.status}
-                                                  onChange={(e) => handleStatusChange(task.id, e.target.value)}
-                                                  className="form-select">
-                                                  <option value="Active">{t('Active')}</option>
-                                                  <option value="Inactive">{t('Inactive')}</option>
-                                             </select>
+                                             <span className="badge bg-secondary">{task.status}</span>
                                         </td>
-                                        <td>{task.project_id}</td>
+                                        <td>{truncateText(getProjectNameById(task.project_id), 15)}</td>
                                         <td>
                                              <div className="dropdown">
                                                   <button

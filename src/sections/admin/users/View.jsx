@@ -91,7 +91,7 @@ export function View() {
                     <div className="d-flex align-items-center">
                          <input
                               type="text"
-                              className="form-control me-2"
+                              className="form-control form-control-sm me-2"
                               placeholder={t('Search...')}
                               value={searchTerm}
                               onChange={handleSearchChange}

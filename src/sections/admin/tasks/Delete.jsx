@@ -8,7 +8,6 @@ export const Delete = ({ taskId, onClose, deleteTask }) => {
 
     const handleDelete = async () => {
         try {
-            // Gọi hàm deleteTask để xoá task
             await deleteTask(taskId);
             toast.success(t('Successfully deleted the task!'));
             setTimeout(() => {
