@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 export default function Header() {
      return (
           <header>
-               <nav className="layout-navbar container shadow-none py-0">
+               <nav className="layout-navbarr container shadow-none py-0">
                     <div className="navbar navbar-expand-lg landing-navbar border-top-0 px-4 px-md-8">
                          <div className="navbar-brand app-brand demo d-flex py-0 py-lg-2 me-6">
                               <button
