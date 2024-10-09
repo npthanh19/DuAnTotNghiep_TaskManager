@@ -1,17 +1,36 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Delete } from './Delete';
+import { useTranslation } from 'react-i18next';
+import { DeleteDepartment } from '../../../sections/admin/departments/Delete';
+import { getAllDepartments } from '../../../services/deparmentsService';
 
-export const View = () => {
+export function View() {
+     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
      const [currentPage, setCurrentPage] = useState(1);
-     const itemsPerPage = 9;
-
+     const itemsPerPage = 5;
      const { t } = useTranslation();
      const navigate = useNavigate();
 
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+     const [departments, setDepartments] = useState([]);
+     const [loading, setLoading] = useState(true);
+     const [error, setError] = useState(null);
+
+     useEffect(() => {
+          const fetchDepartments = async () => {
+               try {
+                    const fetchedDepartments = await getAllDepartments();
+                    setDepartments(fetchedDepartments);
+               } catch (err) {
+                    setError(err.message || 'Không thể lấy danh sách phòng ban');
+               } finally {
+                    setLoading(false);
+               }
+          };
+
+          fetchDepartments();
+     }, []);
 
      const handleDeleteClick = (id) => {
           setSelectedDepartmentId(id);
@@ -23,30 +42,13 @@ export const View = () => {
           setSelectedDepartmentId(null);
      };
 
-     const deleteDepartment = async (id) => {
-          console.log(`Department ID ${id} deleted.`);
-     };
-
      const handleEdit = (id) => {
           navigate(`/taskmaneger/departments/edit/${id}`);
      };
 
-     const handleDetails = (id) => {
-          navigate(`/taskmaneger/departments_user/details/${id}`);
+     const handleDeleteSuccess = () => {
+          setDepartments((prevDepartments) => prevDepartments.filter((department) => department.id !== selectedDepartmentId));
      };
-
-     const departments = [
-          {
-               id: 1,
-               department_name: 'Department 1',
-               description: 'Description 1',
-          },
-          {
-               id: 2,
-               department_name: 'Department 2',
-               description: 'Description 2',
-          },
-     ];
 
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -57,6 +59,20 @@ export const View = () => {
           setCurrentPage(pageNumber);
      };
 
+     if (loading) {
+          return (
+               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-border" role="status">
+                         <span className="visually-hidden">Loading...</span>
+                    </div>
+               </div>
+          );
+     }
+
+     if (error) {
+          return <div>Error: {error}</div>;
+     }
+
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
@@ -64,18 +80,17 @@ export const View = () => {
                          <span className="marquee">{t('Departments')}</span>
                     </h3>
                     <Link to="/taskmaneger/departments/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add new department')}
+                         <i className="bi bi-plus me-2"></i> {t('Add new')}
                     </Link>
                </div>
-
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th className="col-1">ID</th>
-                                   <th className="col-2">{t('Department Name')}</th>
-                                   <th className="col-4">{t('Description')}</th>
-                                   <th className="col-1">{t('Actions')}</th>
+                                   <th>ID</th>
+                                   <th>{t('Name')}</th>
+                                   <th>{t('Description')}</th>
+                                   <th>{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
@@ -96,21 +111,13 @@ export const View = () => {
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${department.id}`}>
                                                        <li>
-                                                            <button className="dropdown-item text-primary" onClick={() => handleDetails(department.id)}>
-                                                                 <i className="bi bi-info-circle me-2"></i> {t('Details')}
-                                                            </button>
-                                                       </li>
-                                                       <li>
                                                             <button className="dropdown-item text-warning" onClick={() => handleEdit(department.id)}>
                                                                  <i className="bi bi-pencil me-2"></i> {t('Edit')}
                                                             </button>
                                                        </li>
                                                        <li>
-                                                            <button
-                                                                 className="dropdown-item text-danger"
-                                                                 onClick={() => handleDeleteClick(department.id)}>
-                                                                 <i className="bi bi-trash me-2"></i>
-                                                                 {t('Delete')}
+                                                            <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(department.id)}>
+                                                                 <i className="bi bi-trash me-2"></i> {t('Delete')}
                                                             </button>
                                                        </li>
                                                   </ul>
@@ -145,7 +152,9 @@ export const View = () => {
                          </ul>
                     </nav>
                </div>
-               {showDeleteModal && <Delete onClose={handleCloseModal} departmentId={selectedDepartmentId} deleteDepartment={deleteDepartment} />}
+               {showDeleteModal && (
+                    <DeleteDepartment departmentId={selectedDepartmentId} onClose={handleCloseModal} onDeleteSuccess={handleDeleteSuccess} />
+               )}
           </div>
      );
-};
+}
