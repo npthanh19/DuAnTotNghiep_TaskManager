@@ -5,7 +5,7 @@ import '../../sections/client/Style.css';
 export default function Header() {
      return (
           <header>
-            <nav class="layout-navbar container shadow-none py-0">
+            <nav class="layout-navbarr container shadow-none py-0">
                 <div
                     class="navbar navbar-expand-lg landing-navbar border-top-0 px-4 px-md-8">
                     <div

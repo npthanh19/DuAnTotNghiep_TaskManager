@@ -4,7 +4,7 @@ body {
 }
 
 
-.layout-navbar {
+.layout-navbarr {
     background-color: white;
     width: 80%;
     height: 12%;
@@ -206,13 +206,7 @@ body {
     margin-right: 20px;
 }
 
-.card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
-}
+
 
 .client-logo {
     max-width: 100px;
@@ -245,11 +239,7 @@ body {
     display: flex; 
 }
 
-.card {
-    flex: 1; 
-    display: flex;
-    flex-direction: column;
-}
+
 
 .card-body {
     display: flex; 
