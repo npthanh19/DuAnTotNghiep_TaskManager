@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
 import { getAllProjects } from '../../../services/projectsService';
 import { getUserById } from '../../../services/usersService';
+import AddDepartmentForm from './AddDepartmentForm';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -18,6 +21,8 @@ export const View = () => {
      const [projects, setProjects] = useState([]);
      const [users, setUsers] = useState({});
      const [loading, setLoading] = useState(true);
+     const [showAddDepartmentForm, setShowAddDepartmentForm] = useState(false);
+     const [currentProjectId, setCurrentProjectId] = useState(null);
 
      useEffect(() => {
           const fetchProjects = async () => {
@@ -60,6 +65,15 @@ export const View = () => {
           navigate(`/taskmaneger/projects/edit/${id}`);
      };
 
+     const handleAddDepartmentClick = (projectId) => {
+          setCurrentProjectId(projectId);
+          setShowAddDepartmentForm(true);
+     };
+
+     const handleAddSuccess = () => {
+          setShowAddDepartmentForm(false);
+     };
+
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
      const currentProjects = projects.slice(indexOfFirstItem, indexOfLastItem);
@@ -94,14 +108,14 @@ export const View = () => {
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th className="col-1">ID</th>
-                                   <th className="col-2">{t('Project Name')}</th>
-                                   <th className="col-2">{t('Description')}</th>
-                                   <th className="col-2">{t('Start Date')}</th>
-                                   <th className="col-2">{t('End Date')}</th>
-                                   <th className="col-1">{t('Status')}</th>
-                                   <th className="col-1">{t('User ID')}</th>
-                                   <th className="col-1">{t('Actions')}</th>
+                                   <th className="col">ID</th>
+                                   <th className="col">{t('Project Name')}</th>
+                                   <th className="col">{t('Description')}</th>
+                                   <th className="col">{t('Start Date')}</th>
+                                   <th className="col">{t('End Date')}</th>
+                                   <th className="col">{t('Status')}</th>
+                                   <th className="col">{t('User ID')}</th>
+                                   <th className="col">{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
@@ -127,6 +141,13 @@ export const View = () => {
                                                        <i className="bi bi-three-dots-vertical"></i>
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${project.id}`}>
+                                                       <li>
+                                                            <button
+                                                                 className="dropdown-item text-warning"
+                                                                 onClick={() => handleAddDepartmentClick(project.id)}>
+                                                                 <i className="bi bi-plus me-2"></i> {t('Room')}
+                                                            </button>
+                                                       </li>
                                                        <li>
                                                             <button className="dropdown-item text-warning" onClick={() => handleEdit(project.id)}>
                                                                  <i className="bi bi-pencil me-2"></i> {t('Edit')}
@@ -172,8 +193,13 @@ export const View = () => {
                          </ul>
                     </nav>
                </div>
-
-               {showDeleteModal && <Delete projectId={selectedProjectId} onClose={handleCloseModal} onDeleteSuccess={handleDeleteSuccess} />}
+               <ToastContainer position="top-right" autoClose={2000} />
+               {showDeleteModal && (
+                    <Delete show={showDeleteModal} onClose={handleCloseModal} projectId={selectedProjectId} onDeleteSuccess={handleDeleteSuccess} />
+               )}
+               {showAddDepartmentForm && (
+                    <AddDepartmentForm projectId={currentProjectId} onClose={() => setShowAddDepartmentForm(false)} onAddSuccess={handleAddSuccess} />
+               )}
           </div>
      );
 };

@@ -62,6 +62,20 @@ export const addTasksToProject = async (projectId, tasks) => {
      }
 };
 
+export const addDepartmentToProject = async (projectId, data) => {
+     try {
+          const response = await axiosi.post(`${apiEndpoint}/${projectId}/add-departments`, data);
+          return response.data;
+     } catch (error) {
+          console.error(`Error adding departments to project with ID ${projectId}:`, error.response?.data || error.message);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+export const removeDepartmentFromProject = async (projectId, data) => {
+     const response = await axiosi.post(`${apiEndpoint}/${projectId}/remove-departments`, data);
+     return response.data;
+};
+
 export default {
      getAllProjects,
      getProjectById,
@@ -69,4 +83,5 @@ export default {
      updateProject,
      deleteProject,
      addTasksToProject,
+     removeDepartmentFromProject,
 };

@@ -108,3 +108,9 @@ input {
 .dark-mode .dark-mode-toggle i {
      color: #ffffff;
 }
+
+.app-brand-text:hover {
+     transform: scale(1.05); /* Tăng kích thước khi hover */
+     color: #0056b3; /* Màu chữ khi hover */
+ }
+ 

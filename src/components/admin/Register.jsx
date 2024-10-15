@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { createUser } from '../../services/usersService';
+import { register } from '../../services/authService';
 import { toast, ToastContainer } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,7 +8,7 @@ import { signInWithGooglePopup } from '../../utils/firebase-untils';
 
 function Register() {
      const {
-          register,
+          register: formRegister,
           handleSubmit,
           formState: { errors },
      } = useForm();
@@ -26,12 +26,18 @@ function Register() {
                return;
           }
 
+          if (data.password !== data.confirmPassword) {
+               toast.error('Passwords do not match.');
+               return;
+          }
+
           try {
                setLoading(true);
-               const response = await createUser({
+               const response = await register({
                     name: data.name,
                     email: data.email,
                     password: data.password,
+                    password_confirmation: data.confirmPassword,
                });
                console.log('Registration successful:', response);
                toast.success('Registration successful!');
@@ -41,6 +47,7 @@ function Register() {
                }, 1000);
           } catch (err) {
                toast.error(err.message || 'Registration failed.');
+               console.error('Registration error:', err);
           } finally {
                setLoading(false);
           }
@@ -77,7 +84,7 @@ function Register() {
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="text"
-                                             {...register('name', { required: 'Name is required' })}
+                                             {...formRegister('name', { required: 'Name is required' })} // Sử dụng formRegister
                                              className="form-control form-control-lg"
                                              placeholder="Enter your name"
                                         />
@@ -89,7 +96,7 @@ function Register() {
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="email"
-                                             {...register('email', { required: 'Email is required' })}
+                                             {...formRegister('email', { required: 'Email is required' })}
                                              className="form-control form-control-lg"
                                              placeholder="Enter a valid email address"
                                         />
@@ -101,7 +108,7 @@ function Register() {
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="password"
-                                             {...register('password', {
+                                             {...formRegister('password', {
                                                   required: 'Password is required',
                                                   minLength: { value: 6, message: 'Password must be at least 6 characters' },
                                              })}
@@ -116,7 +123,7 @@ function Register() {
                                    <div data-mdb-input-init className="form-outline mb-3">
                                         <input
                                              type="password"
-                                             {...register('confirmPassword', {
+                                             {...formRegister('confirmPassword', {
                                                   required: 'Please confirm your password',
                                                   validate: (value) =>
                                                        value === document.querySelector('[name="password"]').value || 'Passwords do not match',
@@ -178,4 +185,3 @@ function Register() {
 }
 
 export default Register;
-// update

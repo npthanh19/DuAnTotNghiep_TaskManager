@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createProject } from '../../../services/projectsService';
+import { createProject, addDepartmentToProject } from '../../../services/projectsService';
 import { getAllUsers } from '../../../services/usersService';
 import { getAllDepartments } from '../../../services/deparmentsService';
 
@@ -53,19 +53,19 @@ export const Add = () => {
                end_date: data.endDate,
                status: getStatusValue(data.status),
                user_id: data.projectManager,
-               department_ids: data.departmentIds.split(',').map((id) => id.trim()),
           };
 
           try {
-               await createProject(mappedData);
-               toast.success(t('Project added successfully!'));
+               const projectResponse = await createProject(mappedData);
+
+               toast.success(t('Project and department added successfully!'));
                reset();
                setTimeout(() => {
                     navigate('/taskmaneger/projects');
                }, 1000);
           } catch (error) {
-               console.error('Error adding project:', error.response?.data || error);
-               toast.error(t('Error adding project! Please try again.'));
+               console.error('Error adding project or department:', error.response?.data || error);
+               toast.error(t('Error adding project or department! Please try again.'));
           }
      };
 
@@ -176,25 +176,6 @@ export const Add = () => {
                                         ))}
                                    </select>
                                    {errors.projectManager && <div className="invalid-feedback">{errors.projectManager.message}</div>}
-                              </div>
-
-                              {/* Department IDs Dropdown */}
-                              <div className="col">
-                                   <label htmlFor="departmentIds" className="form-label">
-                                        {t('Department IDs')}
-                                   </label>
-                                   <select
-                                        id="departmentIds"
-                                        className={`form-select form-select-sm ${errors.departmentIds ? 'is-invalid' : ''}`}
-                                        {...register('departmentIds', { required: t('Department IDs are required') })}>
-                                        <option value="">{t('Select Department')}</option>
-                                        {departments.map((dept) => (
-                                             <option key={dept.id} value={dept.id}>
-                                                  {dept.department_name}
-                                             </option>
-                                        ))}
-                                   </select>
-                                   {errors.departmentIds && <div className="invalid-feedback">{errors.departmentIds.message}</div>}
                               </div>
                          </div>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import '../../index.css';
 
 const Sidebar = ({ isOpen }) => {
      const location = useLocation();
@@ -13,9 +14,14 @@ const Sidebar = ({ isOpen }) => {
           <aside id="layout-menu" className={`layout-menu menu-vertical menu bg-menu-theme ${isOpen ? 'open' : ''} d-md-block`}>
                <div className="app-brand demo">
                     <Link to="/taskmaneger" className="app-brand-link text-decoration-none">
-                         <span className="app-brand-text demo menu-text fw-semibold ms-2">NHĐT</span>
+                         <span
+                              className="app-brand-text demo menu-text fw-bold ms-2 fs-3 text-primary bg-light p-2 rounded shadow-sm transition"
+                              style={{ transition: 'all 0.3s ease' }}>
+                              NHĐT
+                         </span>
                     </Link>
                </div>
+
                <ul className="menu-inner py-1">
                     <li className="menu-header fw-medium">
                          <span className="menu-header-text">{t('Task Manager')}</span>
@@ -51,6 +57,13 @@ const Sidebar = ({ isOpen }) => {
                               <span>{t('Tasks')}</span>
                          </Link>
                     </li>
+                    <li className={`menu-item ${isActive('/taskmaneger/assignments')}`}>
+                         <Link to="/taskmaneger/assignments" className="menu-link text-decoration-none">
+                              <i className="bi bi-person-lines-fill menu-icon"></i>
+                              <span>{t('Assignment')}</span>
+                         </Link>
+                    </li>
+
                     <li className={`menu-item ${isActive('/taskmaneger/departments')}`}>
                          <Link to="/taskmaneger/departments" className="menu-link text-decoration-none">
                               <i className="bi bi-building menu-icon"></i> {/* Đổi icon ở đây */}

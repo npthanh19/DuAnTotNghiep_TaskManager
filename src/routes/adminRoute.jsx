@@ -295,7 +295,7 @@ export const AdminRoutes = () => (
 
           {/* Assignments */}
           <Route
-               path="assignments/details/:id"
+               path="/assignments"
                element={
                     <PrivateRoute>
                          <AdminLayout>

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
+import { getAllAssignments, deleteAssignment } from '../../../services/assignmentService';
 
 export const View = () => {
      const [currentPage, setCurrentPage] = useState(1);
@@ -10,8 +11,22 @@ export const View = () => {
      const { t } = useTranslation();
      const navigate = useNavigate();
 
+     const [assignments, setAssignments] = useState([]);
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
+
+     useEffect(() => {
+          const fetchAssignments = async () => {
+               try {
+                    const allAssignments = await getAllAssignments();
+                    setAssignments(allAssignments);
+               } catch (error) {
+                    console.error('Failed to fetch assignments:', error);
+               }
+          };
+
+          fetchAssignments();
+     }, []);
 
      const handleDeleteClick = (id) => {
           setSelectedAssignmentId(id);
@@ -23,35 +38,19 @@ export const View = () => {
           setSelectedAssignmentId(null);
      };
 
-     const deleteAssignment = async (id) => {
-          console.log(`Assignment ID ${id} deleted.`);
+     const deleteAssignmentHandler = async (id) => {
+          try {
+               await deleteAssignment(id);
+               setAssignments(assignments.filter((assignment) => assignment.id !== id));
+               console.log(`Assignment ID ${id} deleted.`);
+          } catch (error) {
+               console.error('Failed to delete assignment:', error);
+          }
      };
 
      const handleEdit = (id) => {
           navigate(`/taskmaneger/assignments/edit/${id}`);
      };
-
-     const handleDetails = (id) => {
-          navigate(`/taskmaneger/assignments/details/${id}`);
-     };
-
-     const assignments = [
-          {
-               id: 1,
-               note: 'Note 1',
-               role_id: 1,
-               user_id: 1,
-               task_id: 1,
-          },
-          {
-               id: 2,
-               note: 'Note 2',
-               role_id: 2,
-               user_id: 2,
-               task_id: 2,
-          },
-          // Add more assignments as needed
-     ];
 
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -70,7 +69,7 @@ export const View = () => {
                          <span className="marquee">{t('Assignments')}</span>
                     </h3>
                     <Link to="/taskmaneger/assignments/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add new assignment')}
+                         <i className="bi bi-plus me-2"></i> {t('Add ')}
                     </Link>
                </div>
                <div className="card-body" style={{ padding: '0' }}>
@@ -78,10 +77,10 @@ export const View = () => {
                          <thead>
                               <tr>
                                    <th className="col-1">ID</th>
-                                   <th className="col-2">{t('Note')}</th>
-                                   <th className="col-2">{t('Role ID')}</th>
                                    <th className="col-2">{t('User ID')}</th>
                                    <th className="col-2">{t('Task ID')}</th>
+                                   <th className="col-2">{t('Department ID')}</th>
+                                   <th className="col-2">{t('Status')}</th>
                                    <th className="col-1">{t('Actions')}</th>
                               </tr>
                          </thead>
@@ -89,10 +88,10 @@ export const View = () => {
                               {currentAssignments.map((assignment) => (
                                    <tr key={assignment.id}>
                                         <td>{assignment.id}</td>
-                                        <td>{assignment.note}</td>
-                                        <td>{assignment.role_id}</td>
-                                        <td>{assignment.user_id}</td>
-                                        <td>{assignment.task_id}</td>
+                                        <td>{assignment.user_name}</td>
+                                        <td>{assignment.task_name}</td>
+                                        <td>{assignment.department_name}</td>
+                                        <td>{assignment.status}</td>
                                         <td>
                                              <div className="dropdown">
                                                   <button
@@ -104,13 +103,6 @@ export const View = () => {
                                                        <i className="bi bi-three-dots-vertical"></i>
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${assignment.id}`}>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-primary"
-                                                                 onClick={() => handleDetails(assignment.id)}>
-                                                                 <i className="bi bi-info-circle me-2"></i> {t('Details')}
-                                                            </button>
-                                                       </li>
                                                        <li>
                                                             <button className="dropdown-item text-warning" onClick={() => handleEdit(assignment.id)}>
                                                                  <i className="bi bi-pencil me-2"></i> {t('Edit')}
@@ -157,7 +149,9 @@ export const View = () => {
                     </nav>
                </div>
 
-               {showDeleteModal && <Delete taskId={selectedAssignmentId} onClose={handleCloseModal} deleteTask={deleteAssignment} />}
+               {showDeleteModal && (
+                    <Delete assignmentId={selectedAssignmentId} onClose={handleCloseModal} deleteAssignment={deleteAssignmentHandler} />
+               )}
           </div>
      );
 };

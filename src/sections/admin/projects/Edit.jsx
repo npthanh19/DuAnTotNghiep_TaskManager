@@ -180,34 +180,13 @@ export const Edit = () => {
                               </div>
                          </div>
 
-                         <div className="row mb-3">
-                              <div className="col">
-                                   <label htmlFor="department" className="form-label">
-                                        {t('Phòng ban')}
-                                   </label>
-                                   <select
-                                        id="department"
-                                        className={`form-select form-select-sm ${errors.department_id ? 'is-invalid' : ''}`}
-                                        {...register('department_id', { required: t('Phòng ban không được để trống!') })}>
-                                        <option value="" disabled>
-                                             {t('Chọn phòng ban')}
-                                        </option>
-                                        {departments.map((department) => (
-                                             <option key={department.id} value={department.id}>
-                                                  {t(department.department_name)}
-                                             </option>
-                                        ))}
-                                   </select>
-                                   {errors.department_id && <div className="invalid-feedback">{errors.department_id.message}</div>}
-                              </div>
-
-                              <div className="col">
+                              <div className="mb-3">
                                    <label htmlFor="user" className="form-label">
                                         {t('Người dùng')}
                                    </label>
                                    <select
                                         id="user"
-                                        className={`form-select ${errors.user_id ? 'is-invalid' : ''}`}
+                                        className={`form-select form-select-sm ${errors.user_id ? 'is-invalid' : ''}`}
                                         {...register('user_id', { required: t('Người dùng không được để trống!') })}>
                                         <option value="" disabled>
                                              {t('Chọn người dùng')}
@@ -220,7 +199,6 @@ export const Edit = () => {
                                    </select>
                                    {errors.user_id && <div className="invalid-feedback">{errors.user_id.message}</div>}
                               </div>
-                         </div>
 
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-2"></i> {t('Cập nhật')}

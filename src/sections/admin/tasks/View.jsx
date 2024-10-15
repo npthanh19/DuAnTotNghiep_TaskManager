@@ -5,6 +5,7 @@ import { Delete } from './Delete';
 import { CommentForm } from '../comment/View';
 import { getAllTasks, deleteTask as deleteTaskService } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
+import { getTaskFiles } from '../../../services/fileService'; // Import API
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,6 +18,8 @@ export const View = () => {
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedTaskId, setSelectedTaskId] = useState(null);
      const [showCommentForm, setShowCommentForm] = useState(false);
+     const [showFilePopup, setShowFilePopup] = useState(false); // Trạng thái cho popup file
+     const [taskFiles, setTaskFiles] = useState([]); // Dữ liệu file
      const [tasks, setTasks] = useState([]);
      const [projects, setProjects] = useState([]);
      const [loading, setLoading] = useState(true);
@@ -52,8 +55,8 @@ export const View = () => {
 
      const deleteTask = async (id) => {
           try {
-               await deleteTaskService(id); // Call the delete task service
-               setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id)); // Update the tasks state
+               await deleteTaskService(id);
+               setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
                console.log(`Task ID ${id} deleted.`);
           } catch (error) {
                console.error('Error deleting task:', error);
@@ -64,14 +67,6 @@ export const View = () => {
           navigate(`/taskmaneger/tasks/edit/${id}`);
      };
 
-     const handleStatusChange = (id, newStatus) => {
-          console.log(`Task ID ${id} status changed to ${newStatus}`);
-     };
-
-     const handleDetails = (id) => {
-          navigate(`/taskmaneger/assignments/details/${id}`);
-     };
-
      const handleCommentClick = (id) => {
           setSelectedTaskId(id);
           setShowCommentForm(true);
@@ -80,6 +75,16 @@ export const View = () => {
      const handleCloseCommentForm = () => {
           setShowCommentForm(false);
           setSelectedTaskId(null);
+     };
+
+     const handleFileViewClick = async (taskId) => {
+          try {
+               const files = await getTaskFiles(taskId);
+               setTaskFiles(files);
+               setShowFilePopup(true);
+          } catch (error) {
+               console.error('Error fetching task files:', error);
+          }
      };
 
      const getProjectNameById = (projectId) => {
@@ -183,15 +188,17 @@ export const View = () => {
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${task.id}`}>
                                                        <li>
-                                                            <button className="dropdown-item text-primary" onClick={() => handleDetails(task.id)}>
-                                                                 <i className="bi bi-info-circle me-2"></i> {t('Details')}
+                                                            <button
+                                                                 className="dropdown-item text-primary"
+                                                                 onClick={() => handleCommentClick(task.id)}>
+                                                                 <i className="bi bi-chat me-2"></i> {t('Comment')}
                                                             </button>
                                                        </li>
                                                        <li>
                                                             <button
                                                                  className="dropdown-item text-primary"
-                                                                 onClick={() => handleCommentClick(task.id)}>
-                                                                 <i className="bi bi-chat me-2"></i> {t('Comment')}
+                                                                 onClick={() => handleFileViewClick(task.id)}>
+                                                                 <i className="bi bi-file-earmark-text me-2"></i> {t('Xem File')}
                                                             </button>
                                                        </li>
                                                        <li>
@@ -201,8 +208,7 @@ export const View = () => {
                                                        </li>
                                                        <li>
                                                             <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(task.id)}>
-                                                                 <i className="bi bi-trash me-2"></i>
-                                                                 {t('Delete')}
+                                                                 <i className="bi bi-trash me-2"></i> {t('Delete')}
                                                             </button>
                                                        </li>
                                                   </ul>
@@ -237,8 +243,38 @@ export const View = () => {
                          </ul>
                     </nav>
                </div>
+
                {showDeleteModal && <Delete onClose={handleCloseModal} taskId={selectedTaskId} deleteTask={deleteTask} />}
                {showCommentForm && <CommentForm taskId={selectedTaskId} showModal={showCommentForm} handleCloseModal={handleCloseCommentForm} />}
+
+               {showFilePopup && (
+                    <div className="modal show" style={{ display: 'block' }}>
+                         <div className="modal-dialog">
+                              <div className="modal-content">
+                                   <div className="modal-header">
+                                        <h5 className="modal-title">Danh sách file</h5>
+                                        <button type="button" className="btn-close" onClick={() => setShowFilePopup(false)}></button>
+                                   </div>
+                                   <div className="modal-body">
+                                        <ul className="list-group">
+                                             {taskFiles.map((file) => (
+                                                  <li key={file.id} className="list-group-item">
+                                                       <a href={file.url} target="_blank" rel="noopener noreferrer">
+                                                            {file.file_name}
+                                                       </a>
+                                                  </li>
+                                             ))}
+                                        </ul>
+                                   </div>
+                                   <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" onClick={() => setShowFilePopup(false)}>
+                                             Đóng
+                                        </button>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               )}
           </div>
      );
 };

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { DeleteUsers } from '../../../sections/admin/users/Delete';
 import { getAllUsers } from '../../../services/usersService';
+import { getAllRoles } from '../../../services/rolesService';
 
 export function View() {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,23 +15,25 @@ export function View() {
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedUsersId, setselectedUsersId] = useState(null);
      const [users, setUsers] = useState([]);
+     const [roles, setRoles] = useState([]);
      const [loading, setLoading] = useState(true);
      const [error, setError] = useState(null);
      const [searchTerm, setSearchTerm] = useState('');
 
      useEffect(() => {
-          const fetchUsers = async () => {
+          const fetchUsersAndRoles = async () => {
                try {
-                    const fetchedUsers = await getAllUsers();
+                    const [fetchedUsers, fetchedRoles] = await Promise.all([getAllUsers(), getAllRoles()]);
                     setUsers(fetchedUsers);
+                    setRoles(fetchedRoles);
                } catch (err) {
-                    setError(err.message || 'Không thể lấy danh sách người dùng');
+                    setError(err.message || 'Không thể lấy danh sách người dùng hoặc vai trò');
                } finally {
                     setLoading(false);
                }
           };
 
-          fetchUsers();
+          fetchUsersAndRoles();
      }, []);
 
      const handleDeleteClick = (id) => {
@@ -68,6 +71,11 @@ export function View() {
           setCurrentPage(1);
      };
 
+     const getRoleNameById = (roleId) => {
+          const role = roles.find((role) => role.id === roleId);
+          return role ? role.name : 'N/A';
+     };
+
      if (loading) {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -103,10 +111,11 @@ export function View() {
                          <thead>
                               <tr className="text-center">
                                    <th>ID</th>
-                                   <th>{t('name')}</th>
+                                   <th>{t('Name')}</th>
                                    <th>{t('Avatar')}</th>
                                    <th>{t('Email')}</th>
                                    <th>{t('Full Name')}</th>
+                                   <th>{t('Role')}</th>
                                    <th>{t('Actions')}</th>
                               </tr>
                          </thead>
@@ -125,6 +134,7 @@ export function View() {
                                         </td>
                                         <td>{user.email}</td>
                                         <td>{user.full_name}</td>
+                                        <td>{getRoleNameById(user.role_id)}</td>
                                         <td>
                                              <div className="dropdown">
                                                   <button
