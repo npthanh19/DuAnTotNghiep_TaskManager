@@ -8,27 +8,13 @@ import { getProjectById, updateProject } from '../../../services/projectsService
 import { getAllUsers } from '../../../services/usersService';
 import { getAllDepartments } from '../../../services/deparmentsService';
 
-const getStatusValue = (status) => {
-     switch (status) {
-          case 'To Do':
-               return 1;
-          case 'In Progress':
-               return 2;
-          case 'Preview':
-               return 3;
-          case 'Done':
-               return 4;
-          default:
-               return null;
-     }
-};
-
 export const Edit = () => {
      const { id } = useParams();
      const { t } = useTranslation();
      const [project, setProject] = useState(null);
      const [users, setUsers] = useState([]);
      const [departments, setDepartments] = useState([]);
+
      const {
           register,
           handleSubmit,
@@ -42,7 +28,15 @@ export const Edit = () => {
                try {
                     const fetchedProject = await getProjectById(id);
                     setProject(fetchedProject);
-                    reset(fetchedProject);
+                    reset({
+                         project_name: fetchedProject.project_name,
+                         description: fetchedProject.description,
+                         start_date: fetchedProject.start_date,
+                         end_date: fetchedProject.end_date,
+                         status: fetchedProject.status || '1',
+                         user_id: fetchedProject.user_id,
+                         department_id: fetchedProject.department_id,
+                    });
                } catch (error) {
                     toast.error(t('Lỗi khi lấy thông tin dự án!'));
                }
@@ -80,7 +74,7 @@ export const Edit = () => {
                description: data.description,
                start_date: data.start_date,
                end_date: data.end_date,
-               status: getStatusValue(data.status),
+               status: data.status, // Trạng thái được lấy từ form
                user_id: data.user_id,
                department_id: data.department_id,
           };
