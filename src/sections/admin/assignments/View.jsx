@@ -14,14 +14,18 @@ export const View = () => {
      const [assignments, setAssignments] = useState([]);
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
+     const [loading, setLoading] = useState(true); // Thêm state loading
 
      useEffect(() => {
           const fetchAssignments = async () => {
+               setLoading(true); // Bắt đầu loading
                try {
                     const allAssignments = await getAllAssignments();
                     setAssignments(allAssignments);
                } catch (error) {
                     console.error('Failed to fetch assignments:', error);
+               } finally {
+                    setLoading(false); // Kết thúc loading
                }
           };
 
@@ -61,6 +65,16 @@ export const View = () => {
      const handlePageChange = (pageNumber) => {
           setCurrentPage(pageNumber);
      };
+
+     if (loading) {
+          return (
+               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-border" role="status">
+                         <span className="visually-hidden">Loading...</span>
+                    </div>
+               </div>
+          );
+     }
 
      return (
           <div className="card">

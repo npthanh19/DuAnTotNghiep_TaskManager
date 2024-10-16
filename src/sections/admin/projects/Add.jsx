@@ -71,12 +71,14 @@ export const Add = () => {
 
      const getStatusValue = (status) => {
           switch (status) {
-               case 'Active':
+               case 'To Do':
                     return 1;
-               case 'Inactive':
-                    return 0;
-               case 'Pending':
+               case 'In Progress':
                     return 2;
+               case 'Preview':
+                    return 3;
+               case 'Done':
+                    return 4;
                default:
                     return null;
           }
@@ -115,7 +117,6 @@ export const Add = () => {
                               />
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
-
                          <div className="mb-3">
                               <label htmlFor="status" className="form-label">
                                    {t('Status')}
@@ -124,9 +125,10 @@ export const Add = () => {
                                    id="status"
                                    className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                                    {...register('status', { required: t('Status is required') })}>
-                                   <option value="Active">{t('Active')}</option>
-                                   <option value="Inactive">{t('Inactive')}</option>
-                                   <option value="Pending">{t('Pending')}</option>
+                                   <option value="To Do">{t('To Do')}</option>
+                                   <option value="In Progress">{t('In Progress')}</option>
+                                   <option value="Preview">{t('Preview')}</option>
+                                   <option value="Done">{t('Done')}</option>
                               </select>
                               {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                          </div>

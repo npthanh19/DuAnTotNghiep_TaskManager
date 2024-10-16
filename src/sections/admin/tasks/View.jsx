@@ -5,7 +5,7 @@ import { Delete } from './Delete';
 import { CommentForm } from '../comment/View';
 import { getAllTasks, deleteTask as deleteTaskService } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
-import { getTaskFiles } from '../../../services/fileService'; // Import API
+import { getTaskFiles } from '../../../services/fileService';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -18,8 +18,8 @@ export const View = () => {
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedTaskId, setSelectedTaskId] = useState(null);
      const [showCommentForm, setShowCommentForm] = useState(false);
-     const [showFilePopup, setShowFilePopup] = useState(false); // Trạng thái cho popup file
-     const [taskFiles, setTaskFiles] = useState([]); // Dữ liệu file
+     const [showFilePopup, setShowFilePopup] = useState(false);
+     const [taskFiles, setTaskFiles] = useState([]);
      const [tasks, setTasks] = useState([]);
      const [projects, setProjects] = useState([]);
      const [loading, setLoading] = useState(true);

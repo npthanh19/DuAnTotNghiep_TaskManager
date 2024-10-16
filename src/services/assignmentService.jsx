@@ -80,6 +80,26 @@ export const deleteAssignment = async (id) => {
      }
 };
 
+export const getDepartmentsByTask = async (taskId) => {
+     try {
+          const response = await axiosi.get(`${taskApiEndpoint}/${taskId}/departments`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error fetching departments for task ID ${taskId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+export const getUsersByDepartment = async (departmentId) => {
+     try {
+          const response = await axiosi.get(`${departmentApiEndpoint}/${departmentId}/users`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error fetching users for department ID ${departmentId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
 export default {
      getAllAssignments,
      getAssignmentById,

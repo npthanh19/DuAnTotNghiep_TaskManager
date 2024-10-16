@@ -1,6 +1,7 @@
 import { axiosi } from '../config/axios';
 
 const taskApiEndpoint = '/api/tasks';
+const projectApiEndpoint = '/api/projects';
 
 export const getAllTasks = async () => {
      try {
@@ -62,6 +63,16 @@ export const addUsersToTask = async (taskId, users) => {
      }
 };
 
+export const getDepartmentsByProjectId = async (projectId) => {
+     try {
+          const response = await axiosi.get(`${projectApiEndpoint}/${projectId}/departments`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error fetching departments for project ID ${projectId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
 export default {
      getAllTasks,
      getTaskById,
@@ -69,4 +80,5 @@ export default {
      updateTask,
      deleteTask,
      addUsersToTask,
+     getDepartmentsByProjectId,
 };

@@ -10,12 +10,14 @@ import { getAllDepartments } from '../../../services/deparmentsService';
 
 const getStatusValue = (status) => {
      switch (status) {
-          case 'Active':
+          case 'To Do':
                return 1;
-          case 'Inactive':
-               return 0;
-          case 'Pending':
+          case 'In Progress':
                return 2;
+          case 'Preview':
+               return 3;
+          case 'Done':
+               return 4;
           default:
                return null;
      }
@@ -145,9 +147,10 @@ export const Edit = () => {
                                    id="status"
                                    className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                                    {...register('status', { required: t('Trạng thái không được để trống!') })}>
-                                   <option value="Active">{t('Hoạt động')}</option>
-                                   <option value="Inactive">{t('Không hoạt động')}</option>
-                                   <option value="Pending">{t('Chờ xử lý')}</option>
+                                   <option value="1">{t('To Do')}</option>
+                                   <option value="2">{t('In Progress')}</option>
+                                   <option value="3">{t('Preview')}</option>
+                                   <option value="4">{t('Done')}</option>
                               </select>
                               {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                          </div>
@@ -180,25 +183,25 @@ export const Edit = () => {
                               </div>
                          </div>
 
-                              <div className="mb-3">
-                                   <label htmlFor="user" className="form-label">
-                                        {t('Người dùng')}
-                                   </label>
-                                   <select
-                                        id="user"
-                                        className={`form-select form-select-sm ${errors.user_id ? 'is-invalid' : ''}`}
-                                        {...register('user_id', { required: t('Người dùng không được để trống!') })}>
-                                        <option value="" disabled>
-                                             {t('Chọn người dùng')}
+                         <div className="mb-3">
+                              <label htmlFor="user" className="form-label">
+                                   {t('Người dùng')}
+                              </label>
+                              <select
+                                   id="user"
+                                   className={`form-select form-select-sm ${errors.user_id ? 'is-invalid' : ''}`}
+                                   {...register('user_id', { required: t('Người dùng không được để trống!') })}>
+                                   <option value="" disabled>
+                                        {t('Chọn người dùng')}
+                                   </option>
+                                   {users.map((user) => (
+                                        <option key={user.id} value={user.id}>
+                                             {t(user.name)}
                                         </option>
-                                        {users.map((user) => (
-                                             <option key={user.id} value={user.id}>
-                                                  {t(user.name)}
-                                             </option>
-                                        ))}
-                                   </select>
-                                   {errors.user_id && <div className="invalid-feedback">{errors.user_id.message}</div>}
-                              </div>
+                                   ))}
+                              </select>
+                              {errors.user_id && <div className="invalid-feedback">{errors.user_id.message}</div>}
+                         </div>
 
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-2"></i> {t('Cập nhật')}

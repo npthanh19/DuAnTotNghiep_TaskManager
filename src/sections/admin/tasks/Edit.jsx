@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import { getTaskById, updateTask as updateTaskService } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
-import { getAllDepartments } from '../../../services/deparmentsService';
+import { getDepartmentsByProjectId } from '../../../services/tasksService';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const Edit = () => {
@@ -25,14 +25,13 @@ export const Edit = () => {
      useEffect(() => {
           const fetchData = async () => {
                try {
-                    const [fetchedTask, fetchedProjects, fetchedDepartments] = await Promise.all([
-                         getTaskById(id),
-                         getAllProjects(),
-                         getAllDepartments(),
-                    ]);
+                    const [fetchedTask, fetchedProjects] = await Promise.all([getTaskById(id), getAllProjects()]);
                     setTask(fetchedTask);
                     setProjects(fetchedProjects);
-                    setDepartments(fetchedDepartments);
+
+                    const departmentData = await getDepartmentsByProjectId(fetchedTask.project_id);
+                    setDepartments(departmentData.departments || []);
+
                     reset(fetchedTask);
                } catch (err) {
                     console.error('Failed to fetch data:', err);
@@ -41,6 +40,19 @@ export const Edit = () => {
           };
           fetchData();
      }, [id, reset, t]);
+
+     const handleProjectChange = async (projectId) => {
+          if (!projectId) {
+               setDepartments([]);
+               return;
+          }
+          try {
+               const departmentData = await getDepartmentsByProjectId(projectId);
+               setDepartments(departmentData.departments || []);
+          } catch (error) {
+               toast.error(t('Failed to load departments.'));
+          }
+     };
 
      const onSubmit = async (data) => {
           try {
@@ -94,9 +106,10 @@ export const Edit = () => {
                                         id="status"
                                         className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                                         {...register('status', { required: t('Status is required') })}>
-                                        <option value="1">{t('Pending')}</option>
+                                        <option value="1">{t('To do')}</option>
                                         <option value="2">{t('In Progress')}</option>
-                                        <option value="3">{t('Completed')}</option>
+                                        <option value="3">{t('Privew')}</option>
+                                        <option value="4">{t('Done')}</option>
                                    </select>
                                    {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
@@ -113,6 +126,7 @@ export const Edit = () => {
                                    rows="3"></textarea>
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
+
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="project_id" className="form-label">
@@ -121,7 +135,9 @@ export const Edit = () => {
                                    <select
                                         id="project_id"
                                         className={`form-select form-select-sm ${errors.project_id ? 'is-invalid' : ''}`}
-                                        {...register('project_id', { required: t('Project ID is required') })}>
+                                        {...register('project_id', { required: t('Project ID is required') })}
+                                        onChange={(e) => handleProjectChange(e.target.value)} 
+                                   >
                                         <option value="">{t('Select Project')}</option>
                                         {projects.map((project) => (
                                              <option key={project.id} value={project.id}>
@@ -150,6 +166,7 @@ export const Edit = () => {
                                    {errors.department_id && <div className="invalid-feedback">{errors.department_id.message}</div>}
                               </div>
                          </div>
+
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="start_date" className="form-label">
