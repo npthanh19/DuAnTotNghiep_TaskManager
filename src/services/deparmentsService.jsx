@@ -54,7 +54,7 @@ export const deleteDepartment = async (id) => {
 
 export const addUserToDepartment = async (departmentId, userId) => {
      try {
-          const response = await axiosi.post(`${apiEndpoint}/${departmentId}/add-user`, { user_id: userId });
+          const response = await axiosi.post(`${apiEndpoint}/${departmentId}/add-user`, { user_ids: userId });
           return response.data;
      } catch (error) {
           console.error(`Error adding user to department with ID ${departmentId}:`, error);
@@ -64,13 +64,17 @@ export const addUserToDepartment = async (departmentId, userId) => {
 
 export const removeUserFromDepartment = async (departmentId, userId) => {
      try {
-          const response = await axiosi.delete(`${apiEndpoint}/${departmentId}/remove-user/${userId}`);
-          return response.data;
+         const response = await axiosi.post(`${apiEndpoint}/${departmentId}/remove-users`, 
+             { user_id: userId }); 
+         return response.data;
      } catch (error) {
-          console.error(`Error removing user from department with ID ${departmentId}:`, error);
-          throw error.response ? error.response.data : new Error('Network error');
+         console.error(`Error removing user from department with ID ${departmentId}:`, error);
+         throw error.response ? error.response.data : new Error('Network error');
      }
-};
+ };
+ 
+ 
+ 
 
 export default {
      getAllDepartments,
