@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
-import { createDepartment } from '../../../services/deparmentsService'; 
+import { createDepartment, addUserToDepartment } from '../../../services/deparmentsService';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const Add = () => {
@@ -15,20 +15,40 @@ export const Add = () => {
           formState: { errors },
           reset,
      } = useForm();
+     const [showModal, setShowModal] = useState(false);
+     const [departmentId, setDepartmentId] = useState(null);
+     const [userIds, setUserId] = useState('');
 
-     const onSubmit = async (data) => {
+     const onSubmit = async (departmentData) => {
           try {
-               await createDepartment(data);
+               const department = await createDepartment(departmentData);
                toast.success(t('Thêm phòng ban thành công!'));
                reset();
-               setTimeout(() => {
-                    navigate('/taskmaneger/departments');
-               }, 1000);
+               setDepartmentId(department.id); // Lưu ID phòng ban vừa tạo
+               setShowModal(true); // Hiện modal để thêm người dùng
           } catch (error) {
                toast.error(t('Thêm phòng ban thất bại!'));
                console.error('Failed to add department:', error);
           }
      };
+
+     const handleAddUser = async () => {
+          try {
+              if (!userIds) {
+                  throw new Error(t('User ID is required'));
+              }
+              console.log('Adding user ID:', userIds); // Log the user ID
+              await addUserToDepartment(departmentId, [userIds]); // Convert to array
+              toast.success(t('Thêm người dùng vào phòng ban thành công!'));
+              setShowModal(false);
+              setUserId('');
+          } catch (error) {
+              toast.error(t('Thêm người dùng vào phòng ban thất bại!'));
+              console.error('Failed to add user to department:', error);
+          }
+      };
+      
+      
 
      return (
           <div className="card my-4">
@@ -68,6 +88,42 @@ export const Add = () => {
                               <i className="bi bi-check-circle me-2"></i> {t('Add Department')}
                          </button>
                     </form>
+
+                    {/* Modal thêm người dùng */}
+                    {showModal && (
+                         <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+                              <div className="modal-dialog">
+                                   <div className="modal-content">
+                                        <div className="modal-header">
+                                             <h5 className="modal-title">{t('Add User to Department')}</h5>
+                                             <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                                        </div>
+                                        <div className="modal-body">
+                                             <div className="mb-3">
+                                                  <label htmlFor="userIds" className="form-label">
+                                                       {t('User ID')}
+                                                  </label>
+                                                  <input
+                                                       type="text"
+                                                       id="userIds"
+                                                       className="form-control"
+                                                       value={userIds}
+                                                       onChange={(e) => setUserId(e.target.value)}
+                                                  />
+                                             </div>
+                                        </div>
+                                        <div className="modal-footer">
+                                             <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                                  {t('Cancel')}
+                                             </button>
+                                             <button type="button" className="btn btn-primary" onClick={handleAddUser}>
+                                                  {t('Add User')}
+                                             </button>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                    )}
                </div>
                <ToastContainer position="top-right" autoClose={2000} />
           </div>

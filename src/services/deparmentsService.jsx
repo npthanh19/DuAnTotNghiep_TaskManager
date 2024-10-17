@@ -60,7 +60,7 @@ export const deleteDepartment = async (id) => {
 // Thêm người dùng vào phòng ban
 export const addUserToDepartment = async (departmentId, userId) => {
      try {
-          const response = await axiosi.post(`${apiEndpoint}/${departmentId}/add-user`, { user_id: userId });
+          const response = await axiosi.post(`${apiEndpoint}/${departmentId}/add-user`, { user_ids: userId });
           return response.data;
      } catch (error) {
           console.error(`Error adding user to department with ID ${departmentId}:`, error);
@@ -71,22 +71,11 @@ export const addUserToDepartment = async (departmentId, userId) => {
 // Xóa người dùng khỏi phòng ban
 export const removeUserFromDepartment = async (departmentId, userId) => {
      try {
-          const response = await axiosi.post(`${apiEndpoint}/${departmentId}/remove-users`, { user_id: userId });
+          const response = await axiosi.delete(`${apiEndpoint}/${departmentId}/remove-user/${userId}`);
           return response.data;
      } catch (error) {
-          console.error(`Error removing user from department with ID ${departmentId}:`, error);
-          throw error.response ? error.response.data : new Error('Network error');
-     }
-};
-
-// Thêm nhiều người dùng vào phòng ban
-export const addUsersToDepartment = async (departmentId, userIds) => {
-     try {
-          const response = await axiosi.post(`${apiEndpoint}/${departmentId}/add-users`, { user_ids: userIds });
-          return response.data;
-     } catch (error) {
-          console.error(`Error adding users to department with ID ${departmentId}:`, error);
-          throw error.response ? error.response.data : new Error('Network error');
+         console.error(`Error removing user from department with ID ${departmentId}:`, error);
+         throw error.response ? error.response.data : new Error('Network error');
      }
 };
 
@@ -98,5 +87,5 @@ export default {
      deleteDepartment,
      addUserToDepartment,
      removeUserFromDepartment,
-     addUsersToDepartment, // Thêm vào export
+     // addUsersToDepartment, 
 };

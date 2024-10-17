@@ -54,6 +54,7 @@ import ViewDepartments from '../pages/admin/Departments/List';
 import AddDepartments from '../pages/admin/Departments/Add';
 import EditDepartments from '../pages/admin/Departments/Edit';
 
+
 // Admin Department Users
 import ViewDepartmentUser from '../pages/admin/Department_user/List';
 import AddDepartmentUser from '../pages/admin/Department_user/Add';
@@ -369,7 +370,7 @@ export const AdminRoutes = () => (
                }
           />
           <Route
-               path="departments_user/add"
+               path="departments_user/add/:id" // Sửa :id ở đây
                element={
                     <PrivateRoute>
                          <AdminLayout>
@@ -378,6 +379,7 @@ export const AdminRoutes = () => (
                     </PrivateRoute>
                }
           />
+
           <Route
                path="departments_user/edit/:id"
                element={

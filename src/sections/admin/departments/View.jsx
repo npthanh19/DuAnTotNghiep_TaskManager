@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { DeleteDepartment } from '../../../sections/admin/departments/Delete';
 import { getAllDepartments } from '../../../services/deparmentsService';
+import { ToastContainer } from 'react-toastify';
+import AddUserToDepartment from './AddUserToDepartment';
+import 'react-toastify/dist/ReactToastify.css';
 
 export function View() {
-     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
      const [currentPage, setCurrentPage] = useState(1);
      const itemsPerPage = 5;
      const { t } = useTranslation();
@@ -16,6 +18,7 @@ export function View() {
      const [departments, setDepartments] = useState([]);
      const [loading, setLoading] = useState(true);
      const [error, setError] = useState(null);
+     const [showAddDepartmentForm, setShowAddDepartmentForm] = useState(false);
 
      useEffect(() => {
           const fetchDepartments = async () => {
@@ -46,8 +49,17 @@ export function View() {
           navigate(`/taskmaneger/departments/edit/${id}`);
      };
 
-     const handleDeleteSuccess = () => {
-          setDepartments((prevDepartments) => prevDepartments.filter((department) => department.id !== selectedDepartmentId));
+     const handleDeleteSuccess = (id) => {
+          setDepartments((prevDepartments) => prevDepartments.filter((department) => department.id !== id));
+     };
+
+     const handleAddUserToDepartment = (id) => {
+          setSelectedDepartmentId(id);
+          setShowAddDepartmentForm(true);
+     };
+
+     const handleAddSuccess = () => {
+          setShowAddDepartmentForm(false);
      };
 
      const indexOfLastItem = currentPage * itemsPerPage;
@@ -57,6 +69,10 @@ export function View() {
 
      const handlePageChange = (pageNumber) => {
           setCurrentPage(pageNumber);
+     };
+
+     const handleDetails = (id) => {
+          navigate(`/taskmaneger/departments_user/details/${id}`);
      };
 
      if (loading) {
@@ -70,7 +86,7 @@ export function View() {
      }
 
      if (error) {
-          return <div>Error: {error}</div>;
+          return <div className="text-danger text-center">{error}</div>;
      }
 
      return (
@@ -111,13 +127,29 @@ export function View() {
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${department.id}`}>
                                                        <li>
+                                                            <button
+                                                                 className="dropdown-item text-primary"
+                                                                 onClick={() => handleDetails(department.id)}>
+                                                                 <i className="bi bi-info-circle me-2"></i> {t('Details')}
+                                                            </button>
+                                                       </li>
+                                                       <li>
                                                             <button className="dropdown-item text-warning" onClick={() => handleEdit(department.id)}>
                                                                  <i className="bi bi-pencil me-2"></i> {t('Edit')}
                                                             </button>
                                                        </li>
                                                        <li>
-                                                            <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(department.id)}>
+                                                            <button
+                                                                 className="dropdown-item text-danger"
+                                                                 onClick={() => handleDeleteClick(department.id)}>
                                                                  <i className="bi bi-trash me-2"></i> {t('Delete')}
+                                                            </button>
+                                                       </li>
+                                                       <li>
+                                                            <button
+                                                                 className="dropdown-item text-success"
+                                                                 onClick={() => handleAddUserToDepartment(department.id)}>
+                                                                 <i className="bi bi-person-plus me-2"></i> {t('Add User')}
                                                             </button>
                                                        </li>
                                                   </ul>
@@ -152,8 +184,21 @@ export function View() {
                          </ul>
                     </nav>
                </div>
+               <ToastContainer position="top-right" autoClose={2000} />
                {showDeleteModal && (
-                    <DeleteDepartment departmentId={selectedDepartmentId} onClose={handleCloseModal} onDeleteSuccess={handleDeleteSuccess} />
+                    <DeleteDepartment
+                         show={showDeleteModal}
+                         onClose={handleCloseModal}
+                         departmentId={selectedDepartmentId}
+                         onDeleteSuccess={handleDeleteSuccess}
+                    />
+               )}
+               {showAddDepartmentForm && (
+                    <AddUserToDepartment
+                         departmentId={selectedDepartmentId}
+                         onClose={() => setShowAddDepartmentForm(false)}
+                         onAddSuccess={handleAddSuccess}
+                    />
                )}
           </div>
      );
