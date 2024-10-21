@@ -71,7 +71,7 @@ export const addUserToDepartment = async (departmentId, userId) => {
 // Xóa người dùng khỏi phòng ban
 export const removeUserFromDepartment = async (departmentId, userId) => {
      try {
-          const response = await axiosi.delete(`${apiEndpoint}/${departmentId}/remove-user/${userId}`);
+          const response = await axiosi.post(`${apiEndpoint}/${departmentId}/remove-users`, { user_id: userId });
           return response.data;
      } catch (error) {
          console.error(`Error removing user from department with ID ${departmentId}:`, error);

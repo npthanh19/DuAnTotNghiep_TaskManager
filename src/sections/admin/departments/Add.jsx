@@ -21,16 +21,18 @@ export const Add = () => {
 
      const onSubmit = async (departmentData) => {
           try {
-               const department = await createDepartment(departmentData);
-               toast.success(t('Thêm phòng ban thành công!'));
-               reset();
-               setDepartmentId(department.id); // Lưu ID phòng ban vừa tạo
-               setShowModal(true); // Hiện modal để thêm người dùng
+              await createDepartment(departmentData);
+              toast.success(t('Thêm phòng ban thành công!'));
+              reset();
+              // Chờ một khoảng thời gian trước khi chuyển hướng (2 giây)
+              setTimeout(() => {
+                  navigate('/taskmaneger/departments');
+              }, 2000); // Chuyển sau khi toast hoàn tất
           } catch (error) {
-               toast.error(t('Thêm phòng ban thất bại!'));
-               console.error('Failed to add department:', error);
+              toast.error(t('Thêm phòng ban thất bại!'));
+              console.error('Failed to add department:', error);
           }
-     };
+          };
 
      const handleAddUser = async () => {
           try {

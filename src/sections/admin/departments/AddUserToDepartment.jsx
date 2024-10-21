@@ -5,7 +5,7 @@ import Select from 'react-select'; // Import react-select
 import { addUserToDepartment, removeUserFromDepartment, getDepartmentById } from '../../../services/deparmentsService';
 import { getAllUsers } from '../../../services/usersService';
 
-const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess, onAddSuccess }) => {
+const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}, onAddSuccess }) => {
     const [users, setUsers] = useState([]);
     const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [departmentName, setDepartmentName] = useState('');
