@@ -66,7 +66,7 @@ const resources = {
                'Cancel successfully': 'Huỷ thành công',
                'Are you sure you want to delete this category?': 'Bạn chắc chắn muốn xoá danh mục này?',
                'Delete a digital catalogue': 'Xoá danh mục số',
-               'Cancel': 'Huỷ'
+               'Cancel': 'Huỷ',
           },
      },
 };

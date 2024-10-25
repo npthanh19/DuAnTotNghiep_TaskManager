@@ -85,7 +85,7 @@ export const getFileById = async (id) => {
 };
 
 // Xóa file
-export const deleteFile = async (id) => {
+export const deleteFile = async (id) => {    
      try {
           const response = await axiosi.delete(`${apiEndpoint}/${id}`);
           return response.data;
