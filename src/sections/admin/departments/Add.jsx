@@ -21,42 +21,36 @@ export const Add = () => {
 
      const onSubmit = async (departmentData) => {
           try {
-              await createDepartment(departmentData);
-              toast.success(t('Thêm phòng ban thành công!'));
-              reset();
-              // Chờ một khoảng thời gian trước khi chuyển hướng (2 giây)
-              setTimeout(() => {
-                  navigate('/taskmaneger/departments');
-              }, 2000); // Chuyển sau khi toast hoàn tất
+               await createDepartment(departmentData);
+               toast.success(t('Added successfully!'));
+               reset();
+               setTimeout(() => {
+                    navigate('/taskmaneger/departments');
+               }, 1000);
           } catch (error) {
-              toast.error(t('Thêm phòng ban thất bại!'));
-              console.error('Failed to add department:', error);
+               toast.error(t('Added Failed!'));
           }
-          };
+     };
 
      const handleAddUser = async () => {
           try {
-              if (!userIds) {
-                  throw new Error(t('User ID is required'));
-              }
-              console.log('Adding user ID:', userIds); // Log the user ID
-              await addUserToDepartment(departmentId, [userIds]); // Convert to array
-              toast.success(t('Thêm người dùng vào phòng ban thành công!'));
-              setShowModal(false);
-              setUserId('');
+               if (!userIds) {
+                    throw new Error(t('User ID is required'));
+               }
+               await addUserToDepartment(departmentId, [userIds]);
+               toast.success(t('Added successfully!'));
+               setShowModal(false);
+               setUserId('');
           } catch (error) {
-              toast.error(t('Thêm người dùng vào phòng ban thất bại!'));
-              console.error('Failed to add user to department:', error);
+               toast.error(t('Added Failed!'));
           }
-      };
-      
-      
+     };
 
      return (
           <div className="card my-4">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span className="marquee">{t('Add new department')}</span>
+                         <span className="marquee">{t('Add new departments')}</span>
                     </h3>
                </div>
                <div className="card-body">
@@ -69,7 +63,7 @@ export const Add = () => {
                                    type="text"
                                    id="departmentName"
                                    className={`form-control form-control-sm ${errors.department_name ? 'is-invalid' : ''}`}
-                                   {...register('department_name', { required: t('Tên phòng ban không được để trống') })}
+                                   {...register('department_name', { required: t('Department name cannot be empty!') })}
                               />
                               {errors.department_name && <div className="invalid-feedback">{errors.department_name.message}</div>}
                          </div>
@@ -82,16 +76,15 @@ export const Add = () => {
                                    id="departmentDescription"
                                    className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
                                    rows="5"
-                                   {...register('description', { required: t('Mô tả không được để trống') })}></textarea>
+                                   {...register('description', { required: t('Description cannot be empty!') })}></textarea>
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
 
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Add Department')}
+                              <i className="bi bi-check-circle me-3"></i> {t('Add')}
                          </button>
                     </form>
 
-                    {/* Modal thêm người dùng */}
                     {showModal && (
                          <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
                               <div className="modal-dialog">

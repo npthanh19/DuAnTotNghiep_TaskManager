@@ -173,8 +173,20 @@ export const View = () => {
                                         <td>{task.start_date}</td>
                                         <td>{task.end_date}</td>
                                         <td>
-                                             <span className="badge bg-secondary">{task.status}</span>
+                                             {task.status === 'to do' && (
+                                                  <span className="badge bg-secondary">{t('To Do')}</span>
+                                             )}
+                                             {task.status === 'in progress' && (
+                                                  <span className="badge bg-warning text-dark">{t('In Progress')}</span>
+                                             )}
+                                             {task.status === 'preview' && (
+                                                  <span className="badge bg-info text-dark">{t('Preview')}</span>
+                                             )}
+                                             {task.status === 'done' && (
+                                                  <span className="badge bg-success">{t('Done')}</span>
+                                             )}
                                         </td>
+
                                         <td>{truncateText(getProjectNameById(task.project_id), 15)}</td>
                                         <td>
                                              <div className="dropdown">

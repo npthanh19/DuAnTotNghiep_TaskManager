@@ -51,12 +51,12 @@ export const Edit = () => {
 
           try {
                await updateUser(id, updatedData);
-               toast.success(t('Cập nhật thành công!'));
+               toast.success(t('Updated successfully!'));
                setTimeout(() => {
                     navigate('/taskmaneger/users');
                }, 1000);
           } catch (error) {
-               toast.error(t('Cập nhật thất bại!'));
+               toast.error(t('Update failed!'));
           }
      };
 
@@ -80,7 +80,7 @@ export const Edit = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
                               <label htmlFor="name" className="form-label">
-                                   {t('name')}
+                                   {t('Name')}
                               </label>
                               <input
                                    type="text"
@@ -141,7 +141,7 @@ export const Edit = () => {
                          </div>
 
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Cập nhật')}
+                              <i className="bi bi-check-circle me-3"></i> {t('Confirm')}
                          </button>
                     </form>
                </div>

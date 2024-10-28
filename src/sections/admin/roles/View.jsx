@@ -80,7 +80,7 @@ export function View() {
                          <span className="marquee">{t('Roles')}</span>
                     </h3>
                     <Link to="/taskmaneger/roles/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add new')}
+                         <i className="bi bi-plus me-2"></i> {t('Add')}
                     </Link>
                </div>
                <div className="card-body" style={{ padding: '0' }}>
@@ -88,7 +88,7 @@ export function View() {
                          <thead>
                               <tr>
                                    <th>ID</th>
-                                   <th>{t('Name')}</th>
+                                   <th>{t('Role Name')}</th>
                                    <th>{t('Description')}</th>
                                    <th>{t('Actions')}</th>
                               </tr>

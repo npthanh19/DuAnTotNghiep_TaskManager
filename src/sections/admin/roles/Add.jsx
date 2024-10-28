@@ -19,13 +19,13 @@ export const Add = () => {
      const onSubmit = async (data) => {
           try {
                await createRole(data);
-               toast.success(t('Thêm vai trò thành công!'));
+               toast.success(t('Added successfully!'));
                reset();
                setTimeout(() => {
                     navigate('/taskmaneger/roles');
                }, 1000);
           } catch (error) {
-               toast.error(t('Thêm vai trò thất bại!'));
+               toast.error(t('Added Failed!'));
                console.error('Failed to add role:', error);
           }
      };
@@ -34,7 +34,7 @@ export const Add = () => {
           <div className="card my-4">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span className="marquee">{t('Add new role')}</span>
+                         <span className="marquee">{t('Add New Role')}</span>
                     </h3>
                </div>
                <div className="card-body">
@@ -47,7 +47,7 @@ export const Add = () => {
                                    type="text"
                                    id="name"
                                    className={`form-control form-control-sm ${errors.name ? 'is-invalid' : ''}`}
-                                   {...register('name', { required: t('Tên vai trò không được để trống') })}
+                                   {...register('name', { required: t('Role name cannot be empty!') })}
                               />
                               {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
                          </div>
@@ -60,12 +60,12 @@ export const Add = () => {
                                    id="roleDescription"
                                    className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
                                    rows="5"
-                                   {...register('description', { required: t('Mô tả không được để trống') })}></textarea>
+                                   {...register('description', { required: t('Description cannot be empty!') })}></textarea>
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
 
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Add Role')}
+                              <i className="bi bi-check-circle me-3"></i> {t('Add')}
                          </button>
                     </form>
                </div>

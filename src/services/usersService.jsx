@@ -52,10 +52,34 @@ export const deleteUser = async (id) => {
      }
 };
 
+// Thêm service xóa mềm người dùng
+export const softDeleteUser = async (id) => {
+     try {
+          const response = await axiosi.delete(`${apiEndpoint}/${id}`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error soft deleting user with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+// Thêm service khôi phục người dùng
+export const restoreUser = async (id) => {
+     try {
+          const response = await axiosi.patch(`${apiEndpoint}/${id}/restore`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error restoring user with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
 export default {
      getAllUsers,
      getUserById,
      createUser,
      updateUser,
      deleteUser,
+     softDeleteUser, 
+     restoreUser,    
 };

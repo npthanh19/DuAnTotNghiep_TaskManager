@@ -14,18 +14,18 @@ export const View = () => {
      const [assignments, setAssignments] = useState([]);
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
-     const [loading, setLoading] = useState(true); // Thêm state loading
+     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
           const fetchAssignments = async () => {
-               setLoading(true); // Bắt đầu loading
+               setLoading(true);
                try {
                     const allAssignments = await getAllAssignments();
                     setAssignments(allAssignments);
                } catch (error) {
-                    console.error('Failed to fetch assignments:', error);
+                    console.error(t('Failed:'), error);
                } finally {
-                    setLoading(false); // Kết thúc loading
+                    setLoading(false);
                }
           };
 
@@ -46,9 +46,8 @@ export const View = () => {
           try {
                await deleteAssignment(id);
                setAssignments(assignments.filter((assignment) => assignment.id !== id));
-               console.log(`Assignment ID ${id} deleted.`);
           } catch (error) {
-               console.error('Failed to delete assignment:', error);
+               console.error(t('Failed:'), error);
           }
      };
 
@@ -70,7 +69,7 @@ export const View = () => {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
           );
@@ -83,7 +82,7 @@ export const View = () => {
                          <span className="marquee">{t('Assignments')}</span>
                     </h3>
                     <Link to="/taskmaneger/assignments/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add ')}
+                         <i className="bi bi-plus me-2"></i> {t('Add')}
                     </Link>
                </div>
                <div className="card-body" style={{ padding: '0' }}>
@@ -91,9 +90,9 @@ export const View = () => {
                          <thead>
                               <tr>
                                    <th className="col-1">ID</th>
-                                   <th className="col-2">{t('User ID')}</th>
-                                   <th className="col-2">{t('Task ID')}</th>
-                                   <th className="col-2">{t('Department ID')}</th>
+                                   <th className="col-2">{t('User Name')}</th>
+                                   <th className="col-2">{t('Task Name')}</th>
+                                   <th className="col-2">{t('Department Name')}</th>
                                    <th className="col-2">{t('Status')}</th>
                                    <th className="col-1">{t('Actions')}</th>
                               </tr>
@@ -105,7 +104,20 @@ export const View = () => {
                                         <td>{assignment.user_name}</td>
                                         <td>{assignment.task_name}</td>
                                         <td>{assignment.department_name}</td>
-                                        <td>{assignment.status}</td>
+                                        <td>
+                                             {assignment.status === 'to do' && (
+                                                  <span className="badge bg-secondary">{t('To Do')}</span>
+                                             )}
+                                             {assignment.status === 'in progress' && (
+                                                  <span className="badge bg-warning text-dark">{t('In Progress')}</span>
+                                             )}
+                                             {assignment.status === 'preview' && (
+                                                  <span className="badge bg-info text-dark">{t('Preview')}</span>
+                                             )}
+                                             {assignment.status === 'done' && (
+                                                  <span className="badge bg-success">{t('Done')}</span>
+                                             )}
+                                        </td>
                                         <td>
                                              <div className="dropdown">
                                                   <button

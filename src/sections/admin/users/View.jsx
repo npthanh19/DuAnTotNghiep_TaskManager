@@ -80,7 +80,7 @@ export function View() {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
           );
@@ -94,7 +94,7 @@ export function View() {
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span className="marquee">{t('Users')}</span>
+                         <span className="">{t('Users')}</span>
                     </h3>
                     <div className="d-flex align-items-center">
                          <input

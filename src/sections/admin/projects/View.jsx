@@ -127,8 +127,20 @@ export const View = () => {
                                         <td>{project.start_date}</td>
                                         <td>{project.end_date}</td>
                                         <td>
-                                             <span className="badge bg-secondary">{project.status}</span>
+                                             {project.status === 'to do' && (
+                                                  <span className="badge bg-secondary">{t('To Do')}</span>
+                                             )}
+                                             {project.status === 'in progress' && (
+                                                  <span className="badge bg-warning text-dark">{t('In Progress')}</span>
+                                             )}
+                                             {project.status === 'preview' && (
+                                                  <span className="badge bg-info text-dark">{t('Preview')}</span>
+                                             )}
+                                             {project.status === 'done' && (
+                                                  <span className="badge bg-success">{t('Done')}</span>
+                                             )}
                                         </td>
+
                                         <td>{users[project.user_id]}</td>
                                         <td>
                                              <div className="dropdown">

@@ -25,8 +25,7 @@ export const Edit = () => {
                     setDepartment(fetchedDepartment);
                     reset(fetchedDepartment);
                } catch (error) {
-                    console.error('Error fetching department:', error);
-                    toast.error(t('Failed to fetch department data.'));
+                    toast.error(t('Failed.'));
                }
           };
           fetchDepartment();
@@ -35,13 +34,13 @@ export const Edit = () => {
      const onSubmit = async (data) => {
           try {
                await updateDepartment(id, data);
-               toast.success(t('Cập nhật thành công!'));
+               toast.success(t('Updated successfully!'));
                setTimeout(() => {
                     navigate('/taskmaneger/departments');
                }, 1000);
           } catch (error) {
-               console.error('Failed to update department:', error);
-               toast.error(t('Failed to update department: ') + (error.message || ''));
+               console.error('Failed:', error);
+               toast.error(t('Failed: ') + (error.message || ''));
           }
      };
 
@@ -71,7 +70,7 @@ export const Edit = () => {
                                    type="text"
                                    id="departmentName"
                                    className={`form-control form-control-sm ${errors.department_name ? 'is-invalid' : ''}`}
-                                   {...register('department_name', { required: t('Tên phòng ban không được để trống!') })}
+                                   {...register('department_name', { required: t('Deparment name cannot be empty!') })}
                               />
                               {errors.department_name && <div className="invalid-feedback">{errors.department_name.message}</div>}
                          </div>
@@ -83,12 +82,12 @@ export const Edit = () => {
                               <textarea
                                    id="departmentDescription"
                                    className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
-                                   {...register('description', { required: t('Mô tả không được để trống!') })}
+                                   {...register('description', { required: t('Description cannot be empty!') })}
                               />
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Cập nhật')}
+                              <i className="bi bi-check-circle me-2"></i> {t('Confirm')}
                          </button>
                     </form>
                </div>

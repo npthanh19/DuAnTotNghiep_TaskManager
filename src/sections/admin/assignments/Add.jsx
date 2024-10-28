@@ -32,7 +32,7 @@ export const Add = () => {
                     const tasksData = await getAllTasks();
                     setTasks(tasksData);
                } catch (error) {
-                    console.error('Failed to fetch tasks:', error);
+                    console.error('Failed:', error);
                }
           };
 
@@ -54,7 +54,6 @@ export const Add = () => {
                     setSelectedDepartmentId(null);
                     setUsers([]);
                } catch (error) {
-                    console.error('Failed to fetch departments:', error);
                     setDepartments([]);
                }
           } else {
@@ -76,7 +75,6 @@ export const Add = () => {
                          setUsers([]);
                     }
                } catch (error) {
-                    console.error('Failed to fetch users:', error);
                     setUsers([]);
                }
           } else {
@@ -94,14 +92,13 @@ export const Add = () => {
 
           try {
                await createAssignment(assignmentData);
-               toast.success(t('Assignment added successfully!'));
+               toast.success(t('Added successfully!'));
                reset();
                setTimeout(() => {
                     navigate('/taskmaneger/assignments');
                }, 1000);
           } catch (error) {
-               toast.error(t('Failed to add assignment.'));
-               console.error('Error adding assignment:', error);
+               toast.error(t('Added Failed!'));
           }
      };
 
@@ -117,7 +114,7 @@ export const Add = () => {
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="taskId" className="form-label">
-                                        {t('Task')}
+                                        {t('Task Name')}
                                    </label>
                                    <select
                                         id="taskId"
@@ -136,11 +133,12 @@ export const Add = () => {
 
                               <div className="col">
                                    <label htmlFor="departmentId" className="form-label">
-                                        {t('Department')}
+                                        {t('Department Name')}
                                    </label>
                                    <select
                                         id="departmentId"
                                         className={`form-select form-select-sm ${errors.departmentId ? 'is-invalid' : ''}`}
+                                        {...register('departmentId', { required: t('Department is required') })}
                                         onChange={handleDepartmentChange}>
                                         <option value="">{t('Select Department')}</option>
                                         {departments.map((department) => (
@@ -155,7 +153,7 @@ export const Add = () => {
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="userId" className="form-label">
-                                        {t('User')}
+                                        {t('User Name')}
                                    </label>
                                    <select
                                         id="userId"
@@ -180,21 +178,22 @@ export const Add = () => {
                                         className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                                         {...register('status', { required: t('Status is required') })}
                                         onChange={(e) => setStatus(e.target.value)}>
-                                        <option value="1">To do</option>
-                                        <option value="2">In progress</option>
-                                        <option value="3">Privew</option>
-                                        <option value="4">Done</option>
+                                        <option value="">{t('Select Status')}</option>
+                                        <option value="1">{t('To Do')}</option>
+                                        <option value="2">{t('In Progress')}</option>
+                                        <option value="3">{t('Preview')}</option>
+                                        <option value="4">{t('Done')}</option>
                                    </select>
                                    {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
                          </div>
 
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Add Assignment')}
+                              <i className="bi bi-check-circle me-3"></i> {t('Add')}
                          </button>
                     </form>
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
+               <ToastContainer position="top-right" autoClose={1000} />
           </div>
      );
 };

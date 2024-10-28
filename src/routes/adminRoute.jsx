@@ -9,11 +9,6 @@ import Register from '../components/admin/Register';
 import AdminLayout from '../layouts/Adminlayout';
 import UpdateProfile from '../components/admin/Update_profile';
 
-// Admin Categories
-import ViewCategories from '../pages/admin/Categories/List';
-import AddCategory from '../pages/admin/Categories/Add';
-import EditCategory from '../pages/admin/Categories/Edit';
-
 // Admin Users
 import ViewUser from '../pages/admin/Users/List';
 import AddUsers from '../pages/admin/Users/Add';
@@ -55,11 +50,6 @@ import AddDepartments from '../pages/admin/Departments/Add';
 import EditDepartments from '../pages/admin/Departments/Edit';
 
 
-// Admin Department Users
-import ViewDepartmentUser from '../pages/admin/Department_user/List';
-import AddDepartmentUser from '../pages/admin/Department_user/Add';
-import EditDepartmentUser from '../pages/admin/Department_user/Edit';
-
 export const AdminRoutes = () => (
      <Routes>
           {/* Public route */}
@@ -84,38 +74,6 @@ export const AdminRoutes = () => (
                element={
                     <PrivateRoute>
                          <UpdateProfile />
-                    </PrivateRoute>
-               }
-          />
-
-          {/* Categories */}
-          <Route
-               path="categories"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewCategories />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="categories/add"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <AddCategory />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="categories/edit/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <EditCategory />
-                         </AdminLayout>
                     </PrivateRoute>
                }
           />
@@ -353,39 +311,6 @@ export const AdminRoutes = () => (
                     <PrivateRoute>
                          <AdminLayout>
                               <EditDepartments />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-
-          {/* Department Users */}
-          <Route
-               path="departments_user/details/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewDepartmentUser />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="departments_user/add/:id" // Sửa :id ở đây
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <AddDepartmentUser />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-
-          <Route
-               path="departments_user/edit/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <EditDepartmentUser />
                          </AdminLayout>
                     </PrivateRoute>
                }

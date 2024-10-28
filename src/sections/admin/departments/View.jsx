@@ -26,7 +26,7 @@ export function View() {
                     const fetchedDepartments = await getAllDepartments();
                     setDepartments(fetchedDepartments);
                } catch (err) {
-                    setError(err.message || 'Không thể lấy danh sách phòng ban');
+                    setError(err.message || 'Cannot retrieve the list of departments');
                } finally {
                     setLoading(false);
                }
@@ -71,15 +71,11 @@ export function View() {
           setCurrentPage(pageNumber);
      };
 
-     const handleDetails = (id) => {
-          navigate(`/taskmaneger/departments_user/details/${id}`);
-     };
-
      if (loading) {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
           );
@@ -96,7 +92,7 @@ export function View() {
                          <span className="marquee">{t('Departments')}</span>
                     </h3>
                     <Link to="/taskmaneger/departments/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add new')}
+                         <i className="bi bi-plus me-2"></i> {t('Add')}
                     </Link>
                </div>
                <div className="card-body" style={{ padding: '0' }}>
@@ -126,13 +122,6 @@ export function View() {
                                                        <i className="bi bi-three-dots-vertical"></i>
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${department.id}`}>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-primary"
-                                                                 onClick={() => handleDetails(department.id)}>
-                                                                 <i className="bi bi-info-circle me-2"></i> {t('Details')}
-                                                            </button>
-                                                       </li>
                                                        <li>
                                                             <button className="dropdown-item text-warning" onClick={() => handleEdit(department.id)}>
                                                                  <i className="bi bi-pencil me-2"></i> {t('Edit')}

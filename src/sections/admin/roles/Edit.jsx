@@ -25,8 +25,7 @@ export const Edit = () => {
                     setRole(fetchedRole);
                     reset(fetchedRole);
                } catch (error) {
-                    console.error('Error fetching role:', error);
-                    toast.error(t('Failed to fetch role data.'));
+                    toast.error(t('Failed!'));
                }
           };
           fetchRole();
@@ -35,13 +34,13 @@ export const Edit = () => {
      const onSubmit = async (data) => {
           try {
                await updateRole(id, data);
-               toast.success(t('Cập nhật thành công!'));
+               toast.success(t('Updated successfully!'));
                setTimeout(() => {
                     navigate('/taskmaneger/roles');
                }, 1000);
           } catch (error) {
-               console.error('Failed to update role:', error);
-               toast.error(t('Failed to update role: ') + (error.message || ''));
+               console.error('Failed:', error);
+               toast.error(t('Failed: ') + (error.message || ''));
           }
      };
 
@@ -49,7 +48,7 @@ export const Edit = () => {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
           );
@@ -65,13 +64,13 @@ export const Edit = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
                               <label htmlFor="name" className="form-label">
-                                   {t('Name Roles')}
+                                   {t('Role Name')}
                               </label>
                               <input
                                    type="text"
                                    id="name"
                                    className={`form-control form-control-sm ${errors.name ? 'is-invalid' : ''}`}
-                                   {...register('name', { required: t('Tên danh mục không được để trống!') })}
+                                   {...register('name', { required: t('Role name cannot be empty!') })}
                               />
                               {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
                          </div>
@@ -83,12 +82,12 @@ export const Edit = () => {
                               <textarea
                                    id="roleDescription"
                                    className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
-                                   {...register('description', { required: t('Mô tả không được để trống!') })}
+                                   {...register('description', { required: t('Description cannot be empty!') })}
                               />
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Cập nhật')}
+                              <i className="bi bi-check-circle me-2"></i> {t('Confirm')}
                          </button>
                     </form>
                </div>
