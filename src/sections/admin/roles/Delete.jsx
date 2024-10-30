@@ -16,7 +16,7 @@ export const DeleteRoles = ({ rolesId, onClose, onDeleteSuccess }) => {
                     onClose();
                }, 1000);
           } catch (error) {
-               toast.error(t('Failed: ') + (error.message || ''));
+               toast.error(t('Failed') + (error.message || ''));
           }
      };
 

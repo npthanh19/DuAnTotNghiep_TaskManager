@@ -13,7 +13,7 @@ export function View() {
      const navigate = useNavigate();
 
      const [showDeleteModal, setShowDeleteModal] = useState(false);
-     const [selectedUsersId, setselectedUsersId] = useState(null);
+     const [selectedUsersId, setSelectedUsersId] = useState(null);
      const [users, setUsers] = useState([]);
      const [roles, setRoles] = useState([]);
      const [loading, setLoading] = useState(true);
@@ -24,7 +24,8 @@ export function View() {
           const fetchUsersAndRoles = async () => {
                try {
                     const [fetchedUsers, fetchedRoles] = await Promise.all([getAllUsers(), getAllRoles()]);
-                    setUsers(fetchedUsers);
+                    const sortedUsers = fetchedUsers.sort((a, b) => b.id - a.id);
+                    setUsers(sortedUsers);
                     setRoles(fetchedRoles);
                } catch (err) {
                     setError(err.message || 'Không thể lấy danh sách người dùng hoặc vai trò');
@@ -37,13 +38,13 @@ export function View() {
      }, []);
 
      const handleDeleteClick = (id) => {
-          setselectedUsersId(id);
+          setSelectedUsersId(id);
           setShowDeleteModal(true);
      };
 
      const handleCloseModal = () => {
           setShowDeleteModal(false);
-          setselectedUsersId(null);
+          setSelectedUsersId(null);
      };
 
      const handleEdit = (id) => {
@@ -57,8 +58,9 @@ export function View() {
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-     const filteredUsers = users.filter((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
+     const filteredUsers = users.filter((user) =>
+          user.fullname && user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
+     );
      const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
      const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
@@ -90,12 +92,17 @@ export function View() {
           return <div>Error: {error}</div>;
      }
 
+     const handleAddUser = () => {
+          navigate('/taskmaneger/users/add');
+     };
+
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
                          <span className="">{t('Users')}</span>
                     </h3>
+
                     <div className="d-flex align-items-center">
                          <input
                               type="text"
@@ -105,35 +112,39 @@ export function View() {
                               onChange={handleSearchChange}
                          />
                     </div>
+                    <button className="btn btn-primary btn-sm" onClick={handleAddUser}>
+                         {t('Add')}
+                    </button>
                </div>
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
                               <tr className="text-center">
-                                   <th>ID</th>
-                                   <th>{t('Name')}</th>
+                                   <th>{t('ID')}</th>
+                                   <th>{t('Full Name')}</th>
                                    <th>{t('Avatar')}</th>
                                    <th>{t('Email')}</th>
-                                   <th>{t('Full Name')}</th>
                                    <th>{t('Role')}</th>
                                    <th>{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
                               {currentUsers.map((user) => (
+
                                    <tr key={user.id} className="text-center">
                                         <td>{user.id}</td>
-                                        <td>{user.name}</td>
+                                        <td>{user.fullname}</td>
                                         <td>
-                                             <img
-                                                  src={user.avatar}
-                                                  alt={user.username}
-                                                  className="img-thumbnail"
-                                                  style={{ width: '50px', height: '50px' }}
-                                             />
+                                             <div className="d-flex justify-content-center">
+                                                  <img
+                                                       src={user.avatar ? `${process.env.REACT_APP_BASE_URL}/storage/${user.avatar}` : 'https://i.pinimg.com/474x/c5/21/64/c52164749f7460c1ededf8992cd9a6ec--page-design-design-web.jpg'}
+                                                       alt={user.fullname}
+                                                       className="img-thumbnail"
+                                                       style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '50%' }}
+                                                  />
+                                             </div>
                                         </td>
                                         <td>{user.email}</td>
-                                        <td>{user.full_name}</td>
                                         <td>{getRoleNameById(user.role_id)}</td>
                                         <td>
                                              <div className="dropdown">

@@ -25,8 +25,7 @@ export const Add = () => {
                     const roleData = await getAllRoles();
                     setRoles(roleData);
                } catch (error) {
-                    console.error('Error fetching roles:', error);
-                    toast.error(t('Failed to load roles'));
+                    toast.error(t('Failed'));
                }
           };
 
@@ -34,19 +33,35 @@ export const Add = () => {
      }, []);
 
      const onSubmit = async (data) => {
-          console.log('User data to be submitted:', data); // Log user data
+          const formData = new FormData();
+          Object.keys(data).forEach((key) => {
+               formData.append(key, data[key]);
+          });
+
+          if (data.avatar && data.avatar.length > 0) {
+               formData.append('avatar', data.avatar[0]);
+          }
+
+
           try {
-               await createUser(data);
-               toast.success(t('Thêm mới thành công!'));
+               await createUser(formData);
+               toast.success(t('Added successfully!'));
                reset();
                setImagePreview(null);
                setTimeout(() => {
                     navigate('/taskmaneger/users');
                }, 1000);
           } catch (error) {
+               const errorData = error.response ? error.response.data : { message: 'Unknown error occurred' };
                toast.error(t('Failed to create user'));
-               console.error('Error creating user:', error);
           }
+     };
+
+
+
+     const handleImageChange = (e) => {
+          const file = e.target.files[0];
+          setImagePreview(file ? URL.createObjectURL(file) : null);
      };
 
      return (
@@ -59,16 +74,17 @@ export const Add = () => {
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
-                              <label htmlFor="name" className="form-label">
+                              <label htmlFor="fullname" className="form-label">
                                    {t('Name')}
                               </label>
                               <input
                                    type="text"
-                                   id="name"
-                                   className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                                   {...register('name', { required: t('Tên không được để trống') })}
+                                   id="fullname"
+                                   className={`form-control ${errors.fullname ? 'is-invalid' : ''}`}
+                                   {...register('fullname', { required: t('Tên không được để trống') })}
                               />
-                              {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+
+                              {errors.fullname && <div className="invalid-feedback">{errors.fullname.message}</div>}
                          </div>
 
                          <div className="mb-3">
@@ -116,6 +132,29 @@ export const Add = () => {
                                    ))}
                               </select>
                          </div>
+
+                         <div className="mb-3">
+                              <label htmlFor="avatar" className="form-label">
+                                   {t('Avatar')}
+                              </label>
+                              <input
+                                   type="file"
+                                   id="avatar"
+                                   className="form-control"
+                                   {...register('avatar')}
+                                   onChange={handleImageChange}
+                              />
+
+                              {imagePreview && (
+                                   <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        className="img-thumbnail mt-2"
+                                        style={{ width: '100px', height: '100px' }}
+                                   />
+                              )}
+                         </div>
+
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-2"></i> {t('Thêm')}
                          </button>

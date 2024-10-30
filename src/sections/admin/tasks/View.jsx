@@ -29,9 +29,9 @@ export const View = () => {
      useEffect(() => {
           const fetchTasksAndProjects = async () => {
                try {
-                    const tasksData = await getAllTasks();
-                    const projectsData = await getAllProjects();
-                    setTasks(tasksData);
+                    const [tasksData, projectsData] = await Promise.all([getAllTasks(), getAllProjects()]);
+                    const sortedTasks = tasksData.sort((a, b) => b.id - a.id);
+                    setTasks(sortedTasks);
                     setProjects(projectsData);
                } catch (err) {
                     console.error('Failed to fetch tasks or projects:', err);

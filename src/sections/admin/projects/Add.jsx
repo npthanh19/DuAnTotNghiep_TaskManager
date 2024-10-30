@@ -173,7 +173,7 @@ export const Add = () => {
                                         <option value="">{t('Select Project Manager')}</option>
                                         {users.map((user) => (
                                              <option key={user.id} value={user.id}>
-                                                  {user.name}
+                                                  {user.fullname}
                                              </option>
                                         ))}
                                    </select>

@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { getCommentsByTask } from '../../../services/commentService';
 import { getTaskById } from '../../../services/tasksService';
 import { getUserById } from '../../../services/usersService';
-import { getTaskFiles } from '../../../services/fileService'; 
+import { getTaskFiles } from '../../../services/fileService';
 import { DeleteComment } from './Delete';
 
 export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
@@ -22,7 +22,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
             comments.map(async (comment) => {
                 try {
                     const user = await getUserById(comment.user_id);
-                    return { ...comment, userName: user.name };
+                    return { ...comment, userName: user.fullname };
                 } catch (error) {
                     console.error(`Error fetching user with ID ${comment.user_id}:`, error);
                     return { ...comment, userName: 'Unknown User' };
@@ -145,7 +145,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                         </ul>
                     </nav>
                 </div>
-                
+
                 {showDeleteModal && (
                     <DeleteComment
                         show={showDeleteModal}
@@ -155,7 +155,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                     />
                 )}
             </Modal>
-            <ToastContainer 
+            <ToastContainer
                 position="top-right" // Đặt vị trí là góc trên bên phải
                 autoClose={1000} // Thời gian tự động đóng
                 hideProgressBar={false} // Hiển thị thanh tiến trình

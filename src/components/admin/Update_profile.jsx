@@ -1,16 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
+import { getUserById } from '../../services/usersService'; // Đường dẫn đến service của bạn
 import '../../index.css';
+
 export default function Update_profile() {
      const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+     const [user, setUser] = useState({}); // State để lưu thông tin người dùng
+     const userId = 1; // Thay đổi ID theo người dùng bạn muốn cập nhật
 
      const toggleSidebar = () => {
-          console.log('Sidebar toggle clicked');
-          console.log('Sidebar open state:', !isSidebarOpen);
           setIsSidebarOpen(!isSidebarOpen);
      };
+
+     useEffect(() => {
+          const fetchUserData = async () => {
+               try {
+                    const userData = await getUserById(userId);
+                    setUser(userData); // Cập nhật thông tin người dùng vào state
+               } catch (error) {
+                    console.error('Error fetching user data:', error);
+               }
+          };
+
+          fetchUserData();
+     }, [userId]); // Chỉ gọi khi userId thay đổi
+
      return (
           <div className="layout-wrapper layout-content-navbar">
                <div className="layout-container">
@@ -49,8 +65,8 @@ export default function Update_profile() {
                                                   <div className="card-body">
                                                        <div className="d-flex align-items-start align-items-sm-center gap-6">
                                                             <img
-                                                                 src="/assets/admin/img/avatars/1.png"
-                                                                 alt="user-avatar"
+                                                                 src={user.avatar ? `${process.env.REACT_APP_BASE_URL}/storage/${user.avatar}` : 'https://i.pinimg.com/474x/c5/21/64/c52164749f7460c1ededf8992cd9a6ec--page-design-design-web.jpg'}
+                                                                 alt={user.fullname || 'User Avatar'}
                                                                  className="d-block w-px-100 h-px-100 rounded"
                                                                  id="uploadedAvatar"
                                                             />
@@ -68,7 +84,7 @@ export default function Update_profile() {
                                                                  </label>
                                                                  <button
                                                                       type="button"
-                                                                      className="btn btn-sm btn-outline-danger account-image-reset mb-4">
+                                                                      className="btn btn-sm btn-outline-danger account-image-reset mb-1">
                                                                       <i className="ri-refresh-line d-block d-sm-none" />
                                                                       <span className="d-none d-sm-block">Reset</span>
                                                                  </button>
@@ -89,11 +105,12 @@ export default function Update_profile() {
                                                                            <input
                                                                                 className="form-control"
                                                                                 type="text"
-                                                                                name="name"
-                                                                                id="name"
-                                                                                defaultValue="Doe Nguyexn"
+                                                                                name="fullname"
+                                                                                id="fullname"
+                                                                                value={user.fullname || ''}
+                                                                                onChange={(e) => setUser({ ...user, fullname: e.target.value })}
                                                                            />
-                                                                           <label htmlFor="name">Full Name</label>
+                                                                           <label htmlFor="fullname">Full Name</label>
                                                                       </div>
                                                                  </div>
                                                                  <div className="col-md-6">
@@ -103,8 +120,8 @@ export default function Update_profile() {
                                                                                 type="text"
                                                                                 id="email"
                                                                                 name="email"
-                                                                                defaultValue="john.doe@example.com"
-                                                                                placeholder="john.doe@example.com"
+                                                                                value={user.email || ''}
+                                                                                onChange={(e) => setUser({ ...user, email: e.target.value })}
                                                                            />
                                                                            <label htmlFor="email">E-mail</label>
                                                                       </div>
@@ -117,11 +134,12 @@ export default function Update_profile() {
                                                                                      id="phoneNumber"
                                                                                      name="phoneNumber"
                                                                                      className="form-control"
+                                                                                     value={user.phoneNumber || ''}
+                                                                                     onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
                                                                                      placeholder="374 253 758"
                                                                                 />
                                                                                 <label htmlFor="phoneNumber">Phone Number</label>
                                                                            </div>
-                                                                           <span className="input-group-text">VN (+84)</span>
                                                                       </div>
                                                                  </div>
                                                                  <div className="col-md-6">
@@ -131,6 +149,8 @@ export default function Update_profile() {
                                                                                 className="form-control"
                                                                                 id="address"
                                                                                 name="address"
+                                                                                value={user.address || ''}
+                                                                                onChange={(e) => setUser({ ...user, address: e.target.value })}
                                                                                 placeholder="Cần Thơ"
                                                                            />
                                                                            <label htmlFor="address">Address</label>
@@ -143,6 +163,8 @@ export default function Update_profile() {
                                                                                 type="text"
                                                                                 id="state"
                                                                                 name="state"
+                                                                                value={user.state || ''}
+                                                                                onChange={(e) => setUser({ ...user, state: e.target.value })}
                                                                                 placeholder="Việt nam"
                                                                            />
                                                                            <label htmlFor="state">State</label>

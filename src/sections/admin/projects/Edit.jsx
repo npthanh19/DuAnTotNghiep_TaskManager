@@ -190,7 +190,7 @@ export const Edit = () => {
                                    </option>
                                    {users.map((user) => (
                                         <option key={user.id} value={user.id}>
-                                             {t(user.name)}
+                                             {t(user.fullname)}
                                         </option>
                                    ))}
                               </select>

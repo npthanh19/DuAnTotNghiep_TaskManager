@@ -12,6 +12,7 @@ export const Edit = () => {
      const { t } = useTranslation();
      const [user, setUser] = useState(null);
      const [roles, setRoles] = useState([]);
+     const [imagePreview, setImagePreview] = useState(null);
      const {
           register,
           handleSubmit,
@@ -26,6 +27,9 @@ export const Edit = () => {
                     const fetchedUser = await getUserById(id);
                     setUser(fetchedUser);
                     reset(fetchedUser);
+                    if (fetchedUser.avatar) {
+                         setImagePreview(`${process.env.REACT_APP_BASE_URL}/storage/${fetchedUser.avatar}`);
+                    }
                } catch (error) {
                     toast.error(t('Failed to fetch user data'));
                }
@@ -46,8 +50,13 @@ export const Edit = () => {
      }, [t]);
 
      const onSubmit = async (data) => {
-          const updatedData = { ...data };
-          delete updatedData.password;
+          const updatedData = new FormData();
+          updatedData.append('fullname', data.fullname);
+          updatedData.append('email', data.email);
+          if (data.avatar && data.avatar.length > 0) {
+               updatedData.append('avatar', data.avatar[0]);
+          }
+          updatedData.append('roleId', data.roleId);
 
           try {
                await updateUser(id, updatedData);
@@ -58,6 +67,13 @@ export const Edit = () => {
           } catch (error) {
                toast.error(t('Update failed!'));
           }
+     };
+
+
+
+     const handleImageChange = (e) => {
+          const file = e.target.files[0];
+          setImagePreview(file ? URL.createObjectURL(file) : null);
      };
 
      if (!user)
@@ -79,16 +95,16 @@ export const Edit = () => {
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
-                              <label htmlFor="name" className="form-label">
+                              <label htmlFor="fullname" className="form-label">
                                    {t('Name')}
                               </label>
                               <input
                                    type="text"
-                                   id="name"
-                                   className={`form-control form-control-sm ${errors.name ? 'is-invalid' : ''}`}
-                                   {...register('name', { required: t('Tên đăng nhập không được để trống!') })}
+                                   id="fullname"
+                                   className={`form-control ${errors.fullname ? 'is-invalid' : ''}`}
+                                   {...register('fullname', { required: t('Tên không được để trống') })}
                               />
-                              {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+                              {errors.fullname && <div className="invalid-feedback">{errors.fullname.message}</div>}
                          </div>
 
                          <div className="mb-3">
@@ -98,13 +114,10 @@ export const Edit = () => {
                               <input
                                    type="email"
                                    id="email"
-                                   className={`form-control form-control-sm ${errors.email ? 'is-invalid' : ''}`}
+                                   className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                                    {...register('email', {
-                                        required: t('Email không được để trống!'),
-                                        pattern: {
-                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                             message: t('Email không hợp lệ'),
-                                        },
+                                        required: t('Email không được để trống'),
+                                        pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('Email không hợp lệ') },
                                    })}
                               />
                               {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
@@ -117,31 +130,53 @@ export const Edit = () => {
                               <input
                                    type="password"
                                    id="password"
-                                   className={`form-control form-control-sm ${errors.password ? 'is-invalid' : ''}`}
+                                   className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                                    {...register('password')}
-                                   disabled
                               />
+                              {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                          </div>
-
                          <div className="mb-3">
-                              <label htmlFor="role" className="form-label">
+                              <label htmlFor="roleId" className="form-label">
                                    {t('Role')}
                               </label>
                               <select
-                                   id="role"
-                                   className={`form-select from-select-sm ${errors.role_id ? 'is-invalid' : ''}`}
-                                   {...register('role_id', { required: t('Vai trò không được để trống!') })}>
+                                   id="roleId"
+                                   className={`form-select ${errors.roleId ? 'is-invalid' : ''}`}
+                                   {...register('roleId', { required: t('ID vai trò không được để trống') })}
+                                   defaultValue={user.roleId}
+                              >
                                    {roles.map((role) => (
                                         <option key={role.id} value={role.id}>
-                                             {t(role.name)}
+                                             {role.name}
                                         </option>
                                    ))}
                               </select>
-                              {errors.role_id && <div className="invalid-feedback">{errors.role_id.message}</div>}
+                              {errors.roleId && <div className="invalid-feedback">{errors.roleId.message}</div>}
+                         </div>
+
+                         <div className="mb-3">
+                              <label htmlFor="avatar" className="form-label">
+                                   {t('Avatar')}
+                              </label>
+                              <input
+                                   type="file"
+                                   id="avatar"
+                                   className="form-control"
+                                   {...register('avatar')}
+                                   onChange={handleImageChange}
+                              />
+                              {imagePreview && (
+                                   <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        className="img-thumbnail mt-2"
+                                        style={{ width: '100px', height: '100px' }}
+                                   />
+                              )}
                          </div>
 
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-3"></i> {t('Confirm')}
+                              <i className="bi bi-check-circle me-2"></i> {t('Confirm')}
                          </button>
                     </form>
                </div>

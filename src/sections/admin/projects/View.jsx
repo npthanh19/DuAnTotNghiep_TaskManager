@@ -33,7 +33,7 @@ export const View = () => {
                     const userPromises = userIds.map((id) => getUserById(id));
                     const usersData = await Promise.all(userPromises);
                     const usersMap = usersData.reduce((acc, user) => {
-                         acc[user.id] = user.name;
+                         acc[user.id] = user.fullname;
                          return acc;
                     }, {});
                     setUsers(usersMap);

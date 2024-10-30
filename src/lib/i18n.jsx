@@ -86,7 +86,7 @@ const resources = {
                'Role name cannot be empty!': 'Tên vai trò không được để trống!',
                'Description cannot be empty!': 'Mô tả không được để trống!',
                'Added Failed!': 'Thất bại!',
-               'Failed!': 'Lỗi!',
+               'Failed': 'Lỗi!',
                'Update Roles': 'Cập nhật vai trò',
                'Successfully deleted the role!': 'Xoá vai trò thành công!',
                'Delete a Role': 'Xoá danh mục',
