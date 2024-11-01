@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createProject, addDepartmentToProject } from '../../../services/projectsService';
+import { createProject } from '../../../services/projectsService';
 import { getAllUsers } from '../../../services/usersService';
 import { getAllDepartments } from '../../../services/deparmentsService';
 
@@ -16,6 +16,7 @@ export const Add = () => {
           handleSubmit,
           formState: { errors },
           reset,
+          getValues,
      } = useForm();
      const [users, setUsers] = useState([]);
      const [departments, setDepartments] = useState([]);
@@ -56,12 +57,11 @@ export const Add = () => {
           };
 
           try {
-               const projectResponse = await createProject(mappedData);
-
+               await createProject(mappedData);
                toast.success(t('Project and department added successfully!'));
                reset();
                setTimeout(() => {
-                    navigate('/taskmaneger/projects');
+                    navigate('/taskmanager/projects');
                }, 1000);
           } catch (error) {
                console.error('Error adding project or department:', error.response?.data || error);
@@ -113,7 +113,7 @@ export const Add = () => {
                               <textarea
                                    id="description"
                                    className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
-                                   {...register('description', { required: t('Description is required') })}
+                                   {...register('description', { required: t('Description cannot be empty!') })}
                               />
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
@@ -124,7 +124,8 @@ export const Add = () => {
                               <select
                                    id="status"
                                    className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
-                                   {...register('status', { required: t('Status is required') })}>
+                                   {...register('status', { required: t('Status is required!') })}>
+                                   <option value="">{t('Select Status')}</option>
                                    <option value="To Do">{t('To Do')}</option>
                                    <option value="In Progress">{t('In Progress')}</option>
                                    <option value="Preview">{t('Preview')}</option>
@@ -143,10 +144,23 @@ export const Add = () => {
                                         type="date"
                                         id="startDate"
                                         className={`form-control form-control-sm ${errors.startDate ? 'is-invalid' : ''}`}
-                                        {...register('startDate', { required: t('Start date is required') })}
+                                        {...register('startDate', {
+                                             required: t('Start date is required!'),
+                                             validate: (value) => {
+                                                  const today = new Date();
+                                                  today.setHours(0, 0, 0, 0);
+                                                  const selectedDate = new Date(value);
+                                                  selectedDate.setHours(0, 0, 0, 0);
+                                                  if (selectedDate.getTime() !== today.getTime()) {
+                                                       return t('Start date must be today');
+                                                  }
+                                                  return true;
+                                             },
+                                        })}
                                    />
                                    {errors.startDate && <div className="invalid-feedback">{errors.startDate.message}</div>}
                               </div>
+
                               <div className="col">
                                    <label htmlFor="endDate" className="form-label">
                                         {t('End Date')}
@@ -155,7 +169,17 @@ export const Add = () => {
                                         type="date"
                                         id="endDate"
                                         className={`form-control form-control-sm ${errors.endDate ? 'is-invalid' : ''}`}
-                                        {...register('endDate', { required: t('End date is required') })}
+                                        {...register('endDate', {
+                                             required: t('End date is required!'),
+                                             validate: (value) => {
+                                                  const startDate = new Date(getValues('startDate'));
+                                                  const endDate = new Date(value);
+                                                  if (endDate < startDate) {
+                                                       return t('End date cannot be earlier than start date');
+                                                  }
+                                                  return true;
+                                             },
+                                        })}
                                    />
                                    {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
                               </div>
@@ -169,7 +193,7 @@ export const Add = () => {
                                    <select
                                         id="projectManager"
                                         className={`form-select form-select-sm ${errors.projectManager ? 'is-invalid' : ''}`}
-                                        {...register('projectManager', { required: t('Project Manager is required') })}>
+                                        {...register('projectManager', { required: t('Project Manager is required!') })}>
                                         <option value="">{t('Select Project Manager')}</option>
                                         {users.map((user) => (
                                              <option key={user.id} value={user.id}>
@@ -182,7 +206,7 @@ export const Add = () => {
                          </div>
 
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Add Project')}
+                              <i className="bi bi-check-circle me-2"></i> {t('Add')}
                          </button>
                     </form>
                </div>

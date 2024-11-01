@@ -114,7 +114,7 @@ export const View = () => {
                                    <th className="col">{t('Start Date')}</th>
                                    <th className="col">{t('End Date')}</th>
                                    <th className="col">{t('Status')}</th>
-                                   <th className="col">{t('User ID')}</th>
+                                   <th className="col">{t('Name User')}</th>
                                    <th className="col">{t('Actions')}</th>
                               </tr>
                          </thead>
@@ -150,7 +150,7 @@ export const View = () => {
                                                        id={`dropdownMenuButton${project.id}`}
                                                        data-bs-toggle="dropdown"
                                                        aria-expanded="false">
-                                                       <i className="bi bi-three-dots-vertical"></i>
+                                                       <i className="bi bi-three-dots-vertical me-2"></i>
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${project.id}`}>
                                                        <li>

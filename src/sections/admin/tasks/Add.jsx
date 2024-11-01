@@ -17,6 +17,7 @@ export const Add = () => {
           register,
           handleSubmit,
           formState: { errors },
+          getValues,
           reset,
      } = useForm();
 
@@ -95,7 +96,7 @@ export const Add = () => {
                                         type="text"
                                         id="task_name"
                                         className={`form-control form-control-sm ${errors.task_name ? 'is-invalid' : ''}`}
-                                        {...register('task_name', { required: t('Task name is required') })}
+                                        {...register('task_name', { required: t('Task name is required!') })}
                                    />
                                    {errors.task_name && <div className="invalid-feedback">{errors.task_name.message}</div>}
                               </div>
@@ -106,7 +107,8 @@ export const Add = () => {
                                    <select
                                         id="status"
                                         className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
-                                        {...register('status', { required: t('Status is required') })}>
+                                        {...register('status', { required: t('Status is required!') })}>
+                                        <option value="">{t('Select Status')}</option>
                                         <option value="1">{t('To do')}</option>
                                         <option value="2">{t('In Progress')}</option>
                                         <option value="3">{t('Priview')}</option>
@@ -124,7 +126,7 @@ export const Add = () => {
                               <textarea
                                    id="description"
                                    className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
-                                   {...register('description', { required: t('Description is required') })}
+                                   {...register('description', { required: t('Description cannot be empty!') })}
                                    rows="3"></textarea>
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
@@ -133,12 +135,12 @@ export const Add = () => {
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="project_id" className="form-label">
-                                        {t('Project ID')}
+                                        {t('Projects')}
                                    </label>
                                    <select
                                         id="project_id"
                                         className={`form-select form-select-sm ${errors.project_id ? 'is-invalid' : ''}`}
-                                        {...register('project_id', { required: t('Project ID is required') })}
+                                        {...register('project_id', { required: t('Project is required!') })}
                                         onChange={(e) => handleProjectChange(e.target.value)}>
                                         <option value="">{t('Select Project')}</option>
                                         {projects.map((project) => (
@@ -152,12 +154,12 @@ export const Add = () => {
 
                               <div className="col">
                                    <label htmlFor="department_id" className="form-label">
-                                        {t('Department ID')}
+                                        {t('Departments')}
                                    </label>
                                    <select
                                         id="department_id"
                                         className={`form-select form-select-sm ${errors.department_id ? 'is-invalid' : ''}`}
-                                        {...register('department_id', { required: t('Department ID is required') })}>
+                                        {...register('department_id', { required: t('Department is required') })}>
                                         <option value="">{t('Select Department')}</option>
                                         {Array.isArray(departments) &&
                                              departments.map((department) => (
@@ -172,34 +174,56 @@ export const Add = () => {
 
                          <div className="row mb-3">
                               <div className="col">
-                                   <label htmlFor="start_date" className="form-label">
+                                   <label htmlFor="startDate" className="form-label">
                                         {t('Start Date')}
                                    </label>
                                    <input
                                         type="date"
-                                        id="start_date"
-                                        className={`form-control form-control-sm ${errors.start_date ? 'is-invalid' : ''}`}
-                                        {...register('start_date', { required: t('Start date is required') })}
+                                        id="startDate"
+                                        className={`form-control form-control-sm ${errors.startDate ? 'is-invalid' : ''}`}
+                                        {...register('startDate', {
+                                             required: t('Start date is required!'),
+                                             validate: (value) => {
+                                                  const today = new Date();
+                                                  today.setHours(0, 0, 0, 0);
+                                                  const selectedDate = new Date(value);
+                                                  selectedDate.setHours(0, 0, 0, 0);
+                                                  if (selectedDate.getTime() !== today.getTime()) {
+                                                       return t('Start date must be today');
+                                                  }
+                                                  return true;
+                                             },
+                                        })}
                                    />
-                                   {errors.start_date && <div className="invalid-feedback">{errors.start_date.message}</div>}
+                                   {errors.startDate && <div className="invalid-feedback">{errors.startDate.message}</div>}
                               </div>
 
                               <div className="col">
-                                   <label htmlFor="end_date" className="form-label">
+                                   <label htmlFor="endDate" className="form-label">
                                         {t('End Date')}
                                    </label>
                                    <input
                                         type="date"
-                                        id="end_date"
-                                        className={`form-control form-control-sm ${errors.end_date ? 'is-invalid' : ''}`}
-                                        {...register('end_date', { required: t('End date is required') })}
+                                        id="endDate"
+                                        className={`form-control form-control-sm ${errors.endDate ? 'is-invalid' : ''}`}
+                                        {...register('endDate', {
+                                             required: t('End date is required!'),
+                                             validate: (value) => {
+                                                  const startDate = new Date(getValues('startDate'));
+                                                  const endDate = new Date(value);
+                                                  if (endDate < startDate) {
+                                                       return t('End date cannot be earlier than start date');
+                                                  }
+                                                  return true;
+                                             },
+                                        })}
                                    />
-                                   {errors.end_date && <div className="invalid-feedback">{errors.end_date.message}</div>}
+                                   {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
                               </div>
                          </div>
 
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Add Task')}
+                              <i className="bi bi-check-circle me-2"></i> {t('Add')}
                          </button>
                     </form>
                </div>

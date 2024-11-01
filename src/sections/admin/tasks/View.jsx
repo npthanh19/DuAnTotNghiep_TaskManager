@@ -210,7 +210,7 @@ export const View = () => {
                                                             <button
                                                                  className="dropdown-item text-primary"
                                                                  onClick={() => handleFileViewClick(task.id)}>
-                                                                 <i className="bi bi-file-earmark-text me-2"></i> {t('Xem File')}
+                                                                 <i className="bi bi-file-earmark-text me-2"></i> {t('See File')}
                                                             </button>
                                                        </li>
                                                        <li>

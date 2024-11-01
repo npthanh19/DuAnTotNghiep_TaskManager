@@ -18,6 +18,7 @@ export const Edit = () => {
           register,
           handleSubmit,
           formState: { errors },
+          setValue,
           reset,
      } = useForm();
      const navigate = useNavigate();
@@ -94,7 +95,7 @@ export const Edit = () => {
                                         type="text"
                                         id="task_name"
                                         className={`form-control form-control-sm ${errors.task_name ? 'is-invalid' : ''}`}
-                                        {...register('task_name', { required: t('Task name is required') })}
+                                        {...register('task_name', { required: t('Task name is required!') })}
                                    />
                                    {errors.task_name && <div className="invalid-feedback">{errors.task_name.message}</div>}
                               </div>
@@ -105,10 +106,10 @@ export const Edit = () => {
                                    <select
                                         id="status"
                                         className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
-                                        {...register('status', { required: t('Status is required') })}>
-                                        <option value="1">{t('To do')}</option>
+                                        {...register('status', { required: t('Status is required!') })}>
+                                        <option value="1">{t('To Do')}</option>
                                         <option value="2">{t('In Progress')}</option>
-                                        <option value="3">{t('Privew')}</option>
+                                        <option value="3">{t('Preview')}</option>
                                         <option value="4">{t('Done')}</option>
                                    </select>
                                    {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
@@ -122,7 +123,7 @@ export const Edit = () => {
                               <textarea
                                    id="description"
                                    className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
-                                   {...register('description', { required: t('Description is required') })}
+                                   {...register('description', { required: t('Description cannot be empty!') })}
                                    rows="3"></textarea>
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
@@ -130,14 +131,13 @@ export const Edit = () => {
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="project_id" className="form-label">
-                                        {t('Project ID')}
+                                        {t('Projects')}
                                    </label>
                                    <select
                                         id="project_id"
                                         className={`form-select form-select-sm ${errors.project_id ? 'is-invalid' : ''}`}
-                                        {...register('project_id', { required: t('Project ID is required') })}
-                                        onChange={(e) => handleProjectChange(e.target.value)} 
-                                   >
+                                        {...register('project_id', { required: t('Project is required!') })}
+                                        onChange={(e) => handleProjectChange(e.target.value)}>
                                         <option value="">{t('Select Project')}</option>
                                         {projects.map((project) => (
                                              <option key={project.id} value={project.id}>
@@ -150,12 +150,12 @@ export const Edit = () => {
 
                               <div className="col">
                                    <label htmlFor="department_id" className="form-label">
-                                        {t('Department ID')}
+                                        {t('Departments')}
                                    </label>
                                    <select
                                         id="department_id"
                                         className={`form-select form-select-sm ${errors.department_id ? 'is-invalid' : ''}`}
-                                        {...register('department_id', { required: t('Department ID is required') })}>
+                                        {...register('department_id', { required: t('Department is required') })}>
                                         <option value="">{t('Select Department')}</option>
                                         {departments.map((department) => (
                                              <option key={department.id} value={department.id}>
@@ -176,7 +176,18 @@ export const Edit = () => {
                                         type="date"
                                         id="start_date"
                                         className={`form-control form-control-sm ${errors.start_date ? 'is-invalid' : ''}`}
-                                        {...register('start_date', { required: t('Start date is required') })}
+                                        {...register('start_date', {
+                                             required: t('Start date is required!'),
+                                             validate: {
+                                                  isToday: (value) => {
+                                                       const today = new Date().toISOString().split('T')[0];
+                                                       if (value !== today) {
+                                                            return t('Start date must be today');
+                                                       }
+                                                       return true;
+                                                  },
+                                             },
+                                        })}
                                    />
                                    {errors.start_date && <div className="invalid-feedback">{errors.start_date.message}</div>}
                               </div>
@@ -189,7 +200,18 @@ export const Edit = () => {
                                         type="date"
                                         id="end_date"
                                         className={`form-control form-control-sm ${errors.end_date ? 'is-invalid' : ''}`}
-                                        {...register('end_date', { required: t('End date is required') })}
+                                        {...register('end_date', {
+                                             required: t('End date is required!'),
+                                             validate: {
+                                                  isAfterToday: (value) => {
+                                                       const today = new Date().toISOString().split('T')[0];
+                                                       if (value < today) {
+                                                            return t('End date cannot be earlier than start date');
+                                                       }
+                                                       return true;
+                                                  },
+                                             },
+                                        })}
                                    />
                                    {errors.end_date && <div className="invalid-feedback">{errors.end_date.message}</div>}
                               </div>
