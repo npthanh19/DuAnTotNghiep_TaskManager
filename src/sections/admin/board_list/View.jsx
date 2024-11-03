@@ -120,14 +120,59 @@ export function View() {
 
      return (
           <div className="container-fluid py-4">
-               <h2 className="mb-4">
-                    <small className="d-block mb-2">Backlog</small>
+                <h2 className="mb-4">
                     <div className="d-flex align-items-center justify-content-between">
-                         <button className="btn btn-bg-secondary" onClick={() => setIsCreatedFormVisible(!isCreatedFormVisible)}>
-                              <i className="bi bi-plus-circle me-1" /> Created
-                         </button>
+                         {/* Project name nằm bên trái */}
+                         <small className="mb-0">Backlog</small>
+
+                         {/* Các phần còn lại nằm bên phải */}
+                         <div className="d-flex align-items-center small">
+                              {/* User */}
+                              <div className="users_img d-flex align-items-center position-relative me-3">
+                                   <img src={users[0].avatar} alt={users[0].name} className="user-avatar" />
+                                   <span className="qty ms-2">+{users.length - 1}</span>
+                                   <button className="btn btn-link btn-sm ms-2" onClick={handleToggleDropdown}>
+                                        <i className="bi bi-plus-circle" />
+                                   </button>
+
+                                   {showDropdown && (
+                                        <div className="dropdown-menu show" style={{ position: 'absolute', zIndex: 1000, top: '100%', left: '0' }}>
+                                             {users.slice(1).map((user) => (
+                                                  <div key={user.id} className="dropdown-item d-flex align-items-center">
+                                                       <input
+                                                            type="checkbox"
+                                                            checked={selectedUsers.includes(user.id)}
+                                                            onChange={() => handleSelectUser(user)}
+                                                            className="me-2"
+                                                       />
+                                                       <img src={user.avatar} alt={user.name} className="user-avatar me-2" />
+                                                       {user.name}
+                                                  </div>
+                                             ))}
+                                        </div>
+                                   )}
+                              </div>
+
+                              {/* Search */}
+                              <input type="text" className="form-control form-control-sm me-3" placeholder="Search..." style={{ width: '150px' }} />
+
+                              {/* Dropdowns */}
+                              <select className="form-select form-select-sm me-3" aria-label="Epic Dropdown">
+                                   <option value="">Epic</option>
+                                   <option value="epic1">Topic 1</option>
+                                   <option value="epic2">Topic 2</option>
+                                   <option value="epic3">Topic 3</option>
+                              </select>
+                              <select className="form-select form-select-sm me-3" aria-label="Label Dropdown">
+                                   <option value="">Label</option>
+                                   <option value="label1">Nhân Viên</option>
+                                   <option value="label2">Dev</option>
+                                   <option value="label3">Chủ tịch</option>
+                              </select>
+                         </div>
                     </div>
                </h2>
+               
 
                {isCreatedFormVisible && (
                     <div className="created-form mb-3">

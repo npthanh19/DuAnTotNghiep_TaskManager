@@ -49,7 +49,9 @@ import ViewDepartments from '../pages/admin/Departments/List';
 import AddDepartments from '../pages/admin/Departments/Add';
 import EditDepartments from '../pages/admin/Departments/Edit';
 
-
+// Admin Worktime
+import ViewWorktime from '../pages/admin/Worktime/List';
+import AddWorktime from '../pages/admin/Worktime/Add';
 export const AdminRoutes = () => (
      <Routes>
           {/* Public route */}
@@ -311,6 +313,27 @@ export const AdminRoutes = () => (
                     <PrivateRoute>
                          <AdminLayout>
                               <EditDepartments />
+                         </AdminLayout>
+                    </PrivateRoute>
+               }
+          />
+          {/* Worktime */}
+          <Route
+               path="worktimes"
+               element={
+                    <PrivateRoute>
+                         <AdminLayout>
+                             <ViewWorktime/>
+                         </AdminLayout>
+                    </PrivateRoute>
+               }
+          />
+            <Route
+               path="worktimes/add"
+               element={
+                    <PrivateRoute>
+                         <AdminLayout>
+                            <AddWorktime/>
                          </AdminLayout>
                     </PrivateRoute>
                }
