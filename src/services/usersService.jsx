@@ -52,10 +52,10 @@ export const deleteUser = async (id) => {
      }
 };
 
-// Thêm service xóa mềm người dùng
-export const softDeleteUser = async (id) => {
+// Service xóa mềm người dùng
+export const forceDelete = async (id) => {
      try {
-          const response = await axiosi.delete(`${apiEndpoint}/${id}`);
+          const response = await axiosi.delete(`${apiEndpoint}/${id}/force`);
           return response.data;
      } catch (error) {
           console.error(`Error soft deleting user with ID ${id}:`, error);
@@ -63,15 +63,41 @@ export const softDeleteUser = async (id) => {
      }
 };
 
-// Thêm service khôi phục người dùng
+// Service khôi phục người dùng
 export const restoreUser = async (id) => {
      try {
-          const response = await axiosi.patch(`${apiEndpoint}/${id}/restore`);
+          const response = await axiosi.post(`${apiEndpoint}/${id}/restore`);
           return response.data;
      } catch (error) {
           console.error(`Error restoring user with ID ${id}:`, error);
           throw error.response ? error.response.data : new Error('Network error');
      }
+};
+
+// Service lấy danh sách người dùng đã xóa mềm
+export const getTrashedUsers = async () => {
+     try {
+          const response = await axiosi.get('/api/users-trashed');
+          return response.data;
+     } catch (error) {
+          console.error('Error fetching trashed users:', error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+// Service cập nhật avatar người dùng
+export const updateAvatar = async (id, avatarData) => {
+     try {
+          const response = await axiosi.post(`${apiEndpoint}/${id}/update-avatar`, avatarData);
+          return response.data;
+     } catch (error) {
+          console.error(`Error updating avatar for user with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+export const getAvatarUrl = (avatar) => {
+     return avatar ? `${process.env.REACT_APP_BASE_URL}/storage/${avatar}` : null;
 };
 
 export default {
@@ -80,6 +106,9 @@ export default {
      createUser,
      updateUser,
      deleteUser,
-     softDeleteUser, 
-     restoreUser,    
+     forceDelete,
+     restoreUser,
+     getTrashedUsers,
+     updateAvatar,
+     getAvatarUrl
 };

@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { DeleteUsers } from '../../../sections/admin/users/Delete';
-import { getAllUsers } from '../../../services/usersService';
+import { getAllUsers, deleteUser } from '../../../services/usersService';
 import { getAllRoles } from '../../../services/rolesService';
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from 'react-toastify';
 
 export function View() {
-     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
      const [currentPage, setCurrentPage] = useState(1);
      const itemsPerPage = 9;
      const { t } = useTranslation();
      const navigate = useNavigate();
 
-     const [showDeleteModal, setShowDeleteModal] = useState(false);
-     const [selectedUsersId, setSelectedUsersId] = useState(null);
      const [users, setUsers] = useState([]);
      const [roles, setRoles] = useState([]);
      const [loading, setLoading] = useState(true);
@@ -28,7 +26,7 @@ export function View() {
                     setUsers(sortedUsers);
                     setRoles(fetchedRoles);
                } catch (err) {
-                    setError(err.message || 'Không thể lấy danh sách người dùng hoặc vai trò');
+                    setError(err.message || 'Unable to fetch the list of users or roles');
                } finally {
                     setLoading(false);
                }
@@ -37,22 +35,31 @@ export function View() {
           fetchUsersAndRoles();
      }, []);
 
-     const handleDeleteClick = (id) => {
-          setSelectedUsersId(id);
-          setShowDeleteModal(true);
-     };
-
-     const handleCloseModal = () => {
-          setShowDeleteModal(false);
-          setSelectedUsersId(null);
+     const handleDeleteClick = (id, userName) => {
+          Swal.fire({
+               title: t(`Delete User: ${userName}`),
+               text: t('Are you sure you want to delete this user?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#d33',
+               cancelButtonColor: '#3085d6',
+               confirmButtonText: t('Delete'),
+               cancelButtonText: t('Cancel')
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    try {
+                         await deleteUser(id);
+                         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+                         toast.success(t('User has been moved to the trash!'));
+                    } catch (error) {
+                         toast.error(t('An error occurred while deleting the user.'));
+                    }
+               }
+          });
      };
 
      const handleEdit = (id) => {
           navigate(`/taskmaneger/users/edit/${id}`);
-     };
-
-     const handleDeleteSuccess = (id) => {
-          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
      };
 
      const indexOfLastItem = currentPage * itemsPerPage;
@@ -80,11 +87,12 @@ export function View() {
 
      if (loading) {
           return (
-               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-70px' }}>
                     <div className="spinner-border" role="status">
                          <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
+
           );
      }
 
@@ -100,10 +108,10 @@ export function View() {
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span className="">{t('Users')}</span>
+                         <span>{t('Users')}</span>
                     </h3>
 
-                    <div className="d-flex align-items-center">
+                    <div className="d-flex align-items-center ms-auto">
                          <input
                               type="text"
                               className="form-control form-control-sm me-2"
@@ -111,11 +119,17 @@ export function View() {
                               value={searchTerm}
                               onChange={handleSearchChange}
                          />
+
+                         <button className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2" onClick={() => navigate('/taskmaneger/users/trashed')}>
+                              <i className="bi bi-trash me-2"></i>
+                         </button>
+
+                         {/* <button className="btn btn-primary btn-sm" onClick={handleAddUser}>
+                              {t('Add')}
+                         </button> */}
                     </div>
-                    <button className="btn btn-primary btn-sm" onClick={handleAddUser}>
-                         {t('Add')}
-                    </button>
                </div>
+
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
@@ -154,7 +168,7 @@ export function View() {
                                                        id={`dropdownMenuButton${user.id}`}
                                                        data-bs-toggle="dropdown"
                                                        aria-expanded="false">
-                                                       <i className="bi bi-three-dots-vertical"></i>
+                                                       <i className="bi bi-three-dots-vertical me-2"></i>
                                                   </button>
                                                   <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${user.id}`}>
                                                        <li>
@@ -163,7 +177,7 @@ export function View() {
                                                             </button>
                                                        </li>
                                                        <li>
-                                                            <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(user.id)}>
+                                                            <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(user.id, user.fullname)}>
                                                                  <i className="bi bi-trash me-2"></i> {t('Delete')}
                                                             </button>
                                                        </li>
@@ -199,8 +213,16 @@ export function View() {
                          </ul>
                     </nav>
                </div>
-
-               {showDeleteModal && <DeleteUsers userId={selectedUsersId} onClose={handleCloseModal} onDeleteSuccess={handleDeleteSuccess} />}
+               <ToastContainer
+                    autoClose={1500}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+               />
           </div>
      );
 }

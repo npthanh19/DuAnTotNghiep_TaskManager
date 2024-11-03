@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { DeleteRoles } from '../../../sections/admin/roles/Delete';
-import { getAllRoles } from '../../../services/rolesService';
+import { getAllRoles, deleteRole } from '../../../services/rolesService';
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from 'react-toastify';
 
 export function View() {
-     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
      const [currentPage, setCurrentPage] = useState(1);
      const itemsPerPage = 5;
      const { t } = useTranslation();
      const navigate = useNavigate();
 
-     const [showDeleteModal, setShowDeleteModal] = useState(false);
-     const [selectedRolesId, setSelectedRolesId] = useState(null);
      const [roles, setRoles] = useState([]);
      const [loading, setLoading] = useState(true);
      const [error, setError] = useState(null);
@@ -23,31 +21,44 @@ export function View() {
                     const fetchedRoles = await getAllRoles();
                     setRoles(fetchedRoles);
                } catch (err) {
-                    setError(err.message || 'Không thể lấy danh sách vai trò');
+                    setError(err.message || 'Unable to fetch the list of roles');
                } finally {
                     setLoading(false);
                }
           };
-
           fetchRoles();
      }, []);
 
-     const handleDeleteClick = (id) => {
-          setSelectedRolesId(id);
-          setShowDeleteModal(true);
+     const handleDeleteRole = async (id) => {
+          try {
+               await deleteRole(id);
+               setRoles((prevRoles) => prevRoles.filter((role) => role.id !== id));
+               toast.success(t('Role has been deleted!'));
+          } catch (error) {
+               toast.error(t('An error occurred while deleting the role'));
+          }
      };
 
-     const handleCloseModal = () => {
-          setShowDeleteModal(false);
-          setSelectedRolesId(null);
+     const handleDeleteClick = (id) => {
+          Swal.fire({
+               title: t('Delete Roles'),
+               text: t('Are you sure you want to delete this role?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#d33',
+               cancelButtonColor: '#3085d6',
+               confirmButtonText: t('Delete'),
+               cancelButtonText: t('Cancel')
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    await handleDeleteRole(id);
+               }
+          });
      };
+
 
      const handleEdit = (id) => {
           navigate(`/taskmaneger/roles/edit/${id}`);
-     };
-
-     const handleDeleteSuccess = () => {
-          setRoles((prevRoles) => prevRoles.filter((role) => role.id !== selectedRolesId));
      };
 
      const indexOfLastItem = currentPage * itemsPerPage;
@@ -61,11 +72,11 @@ export function View() {
 
      if (loading) {
           return (
-               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-70px' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
-               </div>
+               </div >
           );
      }
 
@@ -77,7 +88,7 @@ export function View() {
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span className="marquee">{t('Roles')}</span>
+                         <span>{t('Roles')}</span>
                     </h3>
                     <Link to="/taskmaneger/roles/add" className="btn btn-primary">
                          <i className="bi bi-plus me-2"></i> {t('Add')}
@@ -152,7 +163,16 @@ export function View() {
                          </ul>
                     </nav>
                </div>
-               {showDeleteModal && <DeleteRoles rolesId={selectedRolesId} onClose={handleCloseModal} onDeleteSuccess={handleDeleteSuccess} />}
+               <ToastContainer
+                    autoClose={1500}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+               />
           </div>
      );
 }

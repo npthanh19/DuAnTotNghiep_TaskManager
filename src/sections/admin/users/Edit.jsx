@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getUserById, updateUser } from '../../../services/usersService';
+import { getUserById, updateUser, updateAvatar, getAvatarUrl } from '../../../services/usersService';
 import { getAllRoles } from '../../../services/rolesService';
 
 export const Edit = () => {
@@ -26,16 +26,20 @@ export const Edit = () => {
                try {
                     const fetchedUser = await getUserById(id);
                     setUser(fetchedUser);
-                    reset(fetchedUser);
-                    if (fetchedUser.avatar) {
-                         setImagePreview(`${process.env.REACT_APP_BASE_URL}/storage/${fetchedUser.avatar}`);
-                    }
+                    // Reset form values, including roleId
+                    reset({
+                         fullname: fetchedUser.fullname,
+                         email: fetchedUser.email,
+                         roleId: fetchedUser.role_id, // Sử dụng role_id từ fetchedUser
+                    });
+                    setImagePreview(getAvatarUrl(fetchedUser.avatar));
                } catch (error) {
                     toast.error(t('Failed to fetch user data'));
                }
           };
           fetchUser();
      }, [id, reset, t]);
+
 
      useEffect(() => {
           const fetchRoles = async () => {
@@ -53,23 +57,29 @@ export const Edit = () => {
           const updatedData = new FormData();
           updatedData.append('fullname', data.fullname);
           updatedData.append('email', data.email);
-          if (data.avatar && data.avatar.length > 0) {
-               updatedData.append('avatar', data.avatar[0]);
-          }
           updatedData.append('roleId', data.roleId);
 
           try {
                await updateUser(id, updatedData);
                toast.success(t('Updated successfully!'));
-               setTimeout(() => {
-                    navigate('/taskmaneger/users');
-               }, 1000);
           } catch (error) {
                toast.error(t('Update failed!'));
           }
+
+          if (data.avatar && data.avatar.length > 0) {
+               const avatarData = new FormData();
+               avatarData.append('avatar', data.avatar[0]);
+               try {
+                    await updateAvatar(id, avatarData);
+               } catch (error) {
+                    toast.error(t('Failed to update avatar!'));
+               }
+          }
+
+          setTimeout(() => {
+               navigate('/taskmaneger/users');
+          }, 1000);
      };
-
-
 
      const handleImageChange = (e) => {
           const file = e.target.files[0];
@@ -95,9 +105,7 @@ export const Edit = () => {
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                          <div className="mb-3">
-                              <label htmlFor="fullname" className="form-label">
-                                   {t('Name')}
-                              </label>
+                              <label htmlFor="fullname" className="form-label">{t('Name')}</label>
                               <input
                                    type="text"
                                    id="fullname"
@@ -108,9 +116,7 @@ export const Edit = () => {
                          </div>
 
                          <div className="mb-3">
-                              <label htmlFor="email" className="form-label">
-                                   {t('Email')}
-                              </label>
+                              <label htmlFor="email" className="form-label">{t('Email')}</label>
                               <input
                                    type="email"
                                    id="email"
@@ -124,9 +130,7 @@ export const Edit = () => {
                          </div>
 
                          <div className="mb-3">
-                              <label htmlFor="password" className="form-label">
-                                   {t('Password')}
-                              </label>
+                              <label htmlFor="password" className="form-label">{t('Password')}</label>
                               <input
                                    type="password"
                                    id="password"
@@ -135,16 +139,15 @@ export const Edit = () => {
                               />
                               {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                          </div>
+
                          <div className="mb-3">
-                              <label htmlFor="roleId" className="form-label">
-                                   {t('Role')}
-                              </label>
+                              <label htmlFor="roleId" className="form-label">{t('Role')}</label>
                               <select
                                    id="roleId"
                                    className={`form-select ${errors.roleId ? 'is-invalid' : ''}`}
                                    {...register('roleId', { required: t('ID vai trò không được để trống') })}
-                                   defaultValue={user.roleId}
                               >
+                                   <option value="" disabled>{t('Chọn vai trò')}</option>
                                    {roles.map((role) => (
                                         <option key={role.id} value={role.id}>
                                              {role.name}
@@ -155,9 +158,7 @@ export const Edit = () => {
                          </div>
 
                          <div className="mb-3">
-                              <label htmlFor="avatar" className="form-label">
-                                   {t('Avatar')}
-                              </label>
+                              <label htmlFor="avatar" className="form-label">{t('Avatar')}</label>
                               <input
                                    type="file"
                                    id="avatar"
@@ -180,7 +181,7 @@ export const Edit = () => {
                          </button>
                     </form>
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
+               <ToastContainer position="top-right" autoClose={1000} />
           </div>
      );
 };
