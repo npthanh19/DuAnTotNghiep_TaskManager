@@ -13,6 +13,7 @@ import UpdateProfile from '../components/admin/Update_profile';
 import ViewUser from '../pages/admin/Users/List';
 import AddUsers from '../pages/admin/Users/Add';
 import EditUsers from '../pages/admin/Users/Edit';
+import RecentlyDeletedUsers from '../sections/admin/users/RecentlyDeletedUsers';
 
 // Admin Roles
 import ViewRoles from '../pages/admin/Roles/List';
@@ -59,6 +60,7 @@ export const AdminRoutes = () => (
           <Route path="register" element={<Register />} />
 
           {/* Protected Routes */}
+          
           <Route
                path="/"
                element={
@@ -107,6 +109,16 @@ export const AdminRoutes = () => (
                     <PrivateRoute>
                          <AdminLayout>
                               <EditUsers />
+                         </AdminLayout>
+                    </PrivateRoute>
+               }
+          />
+          <Route
+               path="users/trashed"
+               element={
+                    <PrivateRoute>
+                         <AdminLayout>
+                              <RecentlyDeletedUsers />
                          </AdminLayout>
                     </PrivateRoute>
                }
