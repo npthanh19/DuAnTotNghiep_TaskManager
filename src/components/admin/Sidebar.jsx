@@ -31,7 +31,7 @@ const Sidebar = ({ isOpen }) => {
                               <i className="bi bi-file-earmark-text menu-icon"></i>
                               <span>{t('Activity Log')}</span>
                          </Link>
-                    </li>
+                    </li>     
                     <li className={`menu-item ${isActive('/taskmaneger/board')}`}>
                          <Link to="/taskmaneger/board" className="menu-link text-decoration-none">
                               <i className="bi bi-kanban menu-icon"></i>
@@ -49,6 +49,12 @@ const Sidebar = ({ isOpen }) => {
                          <Link to="/taskmaneger/projects" className="menu-link text-decoration-none">
                               <i className="bi bi-folder2 menu-icon"></i>
                               <span>{t('Projects')}</span>
+                         </Link>
+                    </li>
+                     <li className={`menu-item ${isActive('/taskmaneger/worktimes')}`}>
+                         <Link to="/taskmaneger/worktimes" className="menu-link text-decoration-none">
+                               <i className="bi bi-calendar menu-icon"></i>
+                              <span>{t('Worktimes')}</span>
                          </Link>
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/tasks')}`}>
