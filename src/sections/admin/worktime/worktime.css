@@ -1,0 +1,76 @@
+/* Định dạng cho toàn bộ bảng */
+
+
+/* Định dạng các hàng của bảng khi di chuột qua */
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Định dạng cho các trường nhập liệu */
+input[type="text"],
+input[type="date"],
+textarea,
+select {
+    width: 100%;
+    padding: 8px;
+    margin: 4px 0;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Định dạng textarea riêng */
+textarea {
+    resize: vertical; /* Cho phép thay đổi kích thước theo chiều dọc */
+}
+
+/* Định dạng nút hành động trong dropdown */
+.dropdown-item {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Định dạng các nút điều hướng */
+.pagination .page-item {
+    margin: 0 5px;
+}
+
+.pagination .page-link {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    color: #007bff;
+    transition: background-color 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Định dạng nút "Save" */
+.btn-save {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-save:hover {
+    background-color: #218838;
+}
+
+/* Định dạng modal chỉnh sửa */
+.edit-modal {
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}

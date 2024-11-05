@@ -18,3 +18,9 @@ export const register = async (userData) => {
           throw error.response ? error.response.data : new Error('Network error');
      }
 };
+// authService.js
+export const getLoggedUserId = () => {
+     const user = JSON.parse(localStorage.getItem('user')); 
+     return user ? user.id : null; 
+ };
+ 

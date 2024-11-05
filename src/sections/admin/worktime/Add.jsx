@@ -5,12 +5,14 @@ import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import { createWorktime } from '../../../services/worktimeService';
 import { getAllProjects } from '../../../services/projectsService';
+import { getAllUsers } from '../../../services/usersService';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const Add = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
+    const [users, setUsers] = useState([]);
     const {
         register,
         handleSubmit,
@@ -19,31 +21,34 @@ export const Add = () => {
     } = useForm();
 
     useEffect(() => {
-        const fetchProjects = async () => {
+        const fetchProjectsAndUsers = async () => {
             try {
                 const projectList = await getAllProjects();
                 setProjects(projectList);
+
+                const userList = await getAllUsers();
+                setUsers(userList);
             } catch (error) {
-                console.error('Failed to fetch projects:', error);
-                toast.error(t('Failed to load projects!')); // Thông báo lỗi
+                console.error('Failed to fetch data:', error);
+                toast.error(t('Failed to load data!'));
             }
         };
 
-        fetchProjects();
+        fetchProjectsAndUsers();
     }, [t]);
 
     const onSubmit = async (data) => {
-        console.log(data); // Kiểm tra dữ liệu gửi đi
+        console.log(data);
         try {
-            await createWorktime(data); // Gọi API để thêm worktime
+            await createWorktime(data);
             toast.success(t('Worktime added successfully!'));
-            reset(); // Đặt lại form sau khi thành công
+            reset();
             setTimeout(() => {
-                navigate('/taskmaneger/worktimes'); // Điều hướng đến trang worktimes
+                navigate('/taskmaneger/worktimes');
             }, 1000);
         } catch (error) {
             toast.error(t('Failed to add worktime!'));
-            console.error('Failed to add worktime:', error); // Ghi log lỗi
+            console.error('Failed to add worktime:', error);
         }
     };
 
@@ -83,11 +88,31 @@ export const Add = () => {
                             <option value="">{t('Select a project')}</option>
                             {projects.map((project) => (
                                 <option key={project.id} value={project.id}>
-                                    {project.project_name} {/* Giả định rằng tên dự án nằm trong thuộc tính project_name */}
+                                    {project.project_name}
                                 </option>
                             ))}
                         </select>
                         {errors.project_id && <div className="invalid-feedback">{errors.project_id.message}</div>}
+                    </div>
+
+                    {/* User ID */}
+                    <div className="mb-3">
+                        <label htmlFor="user_id" className="form-label">
+                            {t('User')}
+                        </label>
+                        <select
+                            id="user_id"
+                            className={`form-control form-control-sm ${errors.user_id ? 'is-invalid' : ''}`}
+                            {...register('user_id', { required: t('User selection is required!') })}
+                        >
+                            <option value="">{t('Select a user')}</option>
+                            {users.map((user) => (
+                                <option key={user.id} value={user.id}>
+                                    {user.fullname} {/* Hiển thị fullname thay vì name */}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.user_id && <div className="invalid-feedback">{errors.user_id.message}</div>}
                     </div>
 
                     {/* Start Date */}
