@@ -110,7 +110,7 @@ export const Edit = () => {
                                    type="text"
                                    id="fullname"
                                    className={`form-control ${errors.fullname ? 'is-invalid' : ''}`}
-                                   {...register('fullname', { required: t('Tên không được để trống') })}
+                                   {...register('fullname', { required: t('User name is required!') })}
                               />
                               {errors.fullname && <div className="invalid-feedback">{errors.fullname.message}</div>}
                          </div>
@@ -122,7 +122,7 @@ export const Edit = () => {
                                    id="email"
                                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                                    {...register('email', {
-                                        required: t('Email không được để trống'),
+                                        required: t('Email is required!'),
                                         pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('Email không hợp lệ') },
                                    })}
                               />
@@ -136,6 +136,7 @@ export const Edit = () => {
                                    id="password"
                                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                                    {...register('password')}
+                                   disabled
                               />
                               {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                          </div>
@@ -145,7 +146,7 @@ export const Edit = () => {
                               <select
                                    id="roleId"
                                    className={`form-select ${errors.roleId ? 'is-invalid' : ''}`}
-                                   {...register('roleId', { required: t('ID vai trò không được để trống') })}
+                                   {...register('roleId', { required: t('Vai trò bắt buộc chọn!') })}
                               >
                                    <option value="" disabled>{t('Chọn vai trò')}</option>
                                    {roles.map((role) => (

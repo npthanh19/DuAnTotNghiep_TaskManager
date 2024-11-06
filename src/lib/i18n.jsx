@@ -170,7 +170,20 @@ const resources = {
                'Update Task': 'Cập nhật nhiệm vụ',
                'Task name is required!': 'Tên nhiện vụ không được để trống',
                'Delete a task': 'Xóa nhiệm vụ',
-               'Are you sure you want to delete this task?': 'Bạn có chắc muốn xóa nhiệm vụ này? '
+               'Are you sure you want to delete this task?': 'Bạn có chắc muốn xóa nhiệm vụ này? ',
+               'Recently Deleted': 'Đã xóa gần đây',
+               'Restore': 'Khôi phục',
+               'User name is required!': 'Tên người dùng không được để trống!',
+               'Email is required!': 'Email không được để trống!',
+               'Invalid email': 'Email không hợp lệ',
+               'Delete User:': 'Xóa người dùng:',
+               'Are you sure you want to delete this user?': 'Bạn có chắc muốn xóa người dùng này không?',
+               'Restore user': 'Khôi phục người dùng', 
+               'Are you sure you want to restore this user?': 'Bạn có chắc chắn muốn khôi phục người dùng này?',
+               'Delete User': 'Xóa người dùng',
+               'Are you sure you want to permanently delete this user?': 'Bạn có chắc chắn muốn xóa vĩnh viễn người dùng này?'
+         
+
 
           },
      },
