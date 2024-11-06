@@ -36,8 +36,10 @@ export function View() {
      }, []);
 
      const handleDeleteClick = (id, userName) => {
+          const deleteTitle = t('Delete User:') + ` ${userName}`;
+          
           Swal.fire({
-               title: t(`Delete User: ${userName}`),
+               title: deleteTitle,
                text: t('Are you sure you want to delete this user?'),
                icon: 'warning',
                showCancelButton: true,
@@ -57,6 +59,7 @@ export function View() {
                }
           });
      };
+     
 
      const handleEdit = (id) => {
           navigate(`/taskmaneger/users/edit/${id}`);
