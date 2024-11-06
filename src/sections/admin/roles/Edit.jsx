@@ -33,7 +33,12 @@ export const Edit = () => {
 
      const onSubmit = async (data) => {
           try {
-               await updateRole(id, data);
+               const roleData = {
+                    name: data.name,
+                    description: data.description,
+               };
+
+               await updateRole(id, roleData);
                toast.success(t('Updated successfully!'));
                setTimeout(() => {
                     navigate('/taskmaneger/roles');
@@ -43,6 +48,7 @@ export const Edit = () => {
                toast.error(t('Failed: ') + (error.message || ''));
           }
      };
+
 
      if (!role)
           return (
@@ -86,12 +92,13 @@ export const Edit = () => {
                               />
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
+
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-2"></i> {t('Confirm')}
                          </button>
                     </form>
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
+               <ToastContainer position="top-right" autoClose={1000} />
           </div>
      );
 };

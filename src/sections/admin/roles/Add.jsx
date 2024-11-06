@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import { createRole } from '../../../services/rolesService';
+import { getAllPermissions } from '../../../services/permissionService';
+import Select from 'react-select';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const Add = () => {
@@ -15,12 +17,33 @@ export const Add = () => {
           formState: { errors },
           reset,
      } = useForm();
+     const [permissions, setPermissions] = useState([]);
+     const [selectedPermissions, setSelectedPermissions] = useState([]);
+
+     useEffect(() => {
+          const fetchPermissions = async () => {
+               try {
+                    const fetchedPermissions = await getAllPermissions();
+                    const formattedPermissions = fetchedPermissions.map((permission) => ({
+                         value: permission.id,
+                         label: permission.name,
+                    }));
+                    setPermissions(formattedPermissions);
+               } catch (error) {
+                    toast.error(t('Failed to fetch permissions!'));
+               }
+          };
+
+          fetchPermissions();
+     }, []);
 
      const onSubmit = async (data) => {
           try {
-               await createRole(data);
+               const roleData = { ...data, permissions: selectedPermissions.map((perm) => perm.value) };
+               await createRole(roleData);
                toast.success(t('Added successfully!'));
                reset();
+               setSelectedPermissions([]);
                setTimeout(() => {
                     navigate('/taskmaneger/roles');
                }, 1000);
@@ -62,6 +85,21 @@ export const Add = () => {
                                    rows="5"
                                    {...register('description', { required: t('Description cannot be empty!') })}></textarea>
                               {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+                         </div>
+
+                         <div className="mb-3">
+                              <label htmlFor="permissions" className="form-label">
+                                   {t('Permissions')}
+                              </label>
+                              <Select
+                                   id="permissions"
+                                   isMulti
+                                   options={permissions}
+                                   value={selectedPermissions}
+                                   onChange={setSelectedPermissions}
+                                   classNamePrefix="select"
+                                   placeholder={t('Select permissions...')}
+                              />
                          </div>
 
                          <button type="submit" className="btn btn-success">
