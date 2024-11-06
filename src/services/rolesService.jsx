@@ -1,3 +1,5 @@
+// services/roleService.js
+
 import { axiosi } from '../config/axios';
 
 const apiEndpoint = '/api/roles';
@@ -52,10 +54,24 @@ export const deleteRole = async (id) => {
      }
 };
 
+export const deletePermissionFromRole = async (roleId, permissionId) => {
+     try {
+          const response = await axiosi.delete(`${apiEndpoint}/${roleId}/permissions`, {
+               data: { permissions: [permissionId] }, 
+          });
+          return response.data;
+     } catch (error) {
+          console.error(`Error deleting permission from role with ID ${roleId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+
 export default {
      getAllRoles,
      getRoleById,
      createRole,
      updateRole,
      deleteRole,
+     deletePermissionFromRole, // Thêm phương thức mới vào export mặc định
 };

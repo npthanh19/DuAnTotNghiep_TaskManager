@@ -53,302 +53,70 @@ import EditDepartments from '../pages/admin/Departments/Edit';
 // Admin Worktime
 import ViewWorktime from '../pages/admin/Worktime/List';
 import AddWorktime from '../pages/admin/Worktime/Add';
+
+// Admin Permissions
+import ViewPer from '../pages/admin/Permission/List';
+import TrashPer from '../sections/admin/permissions/RecentlyDeletePermissions'
+
 export const AdminRoutes = () => (
      <Routes>
-          {/* Public route */}
+          {/* Public Routes */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
 
-          {/* Protected Routes */}
-          
-          <Route
-               path="/"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <Dashboard />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          {/* Dashboard */}
+          <Route path="/" element={<PrivateRoute><AdminLayout><Dashboard /></AdminLayout></PrivateRoute>} />
 
           {/* Profile */}
-          <Route
-               path="update_profile"
-               element={
-                    <PrivateRoute>
-                         <UpdateProfile />
-                    </PrivateRoute>
-               }
-          />
+          <Route path="update_profile" element={<PrivateRoute><UpdateProfile /></PrivateRoute>} />
 
-          {/* Users */}
-          <Route
-               path="users"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewUser />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="users/add"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <AddUsers />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="users/edit/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <EditUsers />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="users/trashed"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <RecentlyDeletedUsers />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          {/* User Management */}
+          <Route path="users" element={<PrivateRoute><AdminLayout><ViewUser /></AdminLayout></PrivateRoute>} />
+          <Route path="users/add" element={<PrivateRoute><AdminLayout><AddUsers /></AdminLayout></PrivateRoute>} />
+          <Route path="users/edit/:id" element={<PrivateRoute><AdminLayout><EditUsers /></AdminLayout></PrivateRoute>} />
+          <Route path="users/trashed" element={<PrivateRoute><AdminLayout><RecentlyDeletedUsers /></AdminLayout></PrivateRoute>} />
 
-          {/* Roles */}
-          <Route
-               path="roles"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewRoles />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="roles/add"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <AddRoles />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="roles/edit/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <EditRoles />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          {/* Role Management */}
+          <Route path="roles" element={<PrivateRoute><AdminLayout><ViewRoles /></AdminLayout></PrivateRoute>} />
+          <Route path="roles/add" element={<PrivateRoute><AdminLayout><AddRoles /></AdminLayout></PrivateRoute>} />
+          <Route path="roles/edit/:id" element={<PrivateRoute><AdminLayout><EditRoles /></AdminLayout></PrivateRoute>} />
 
-          {/* Tasks */}
-          <Route
-               path="tasks"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewTasks />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="tasks/add"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <AddTasks />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="tasks/edit/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <EditTasks />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          {/* Task Management */}
+          <Route path="tasks" element={<PrivateRoute><AdminLayout><ViewTasks /></AdminLayout></PrivateRoute>} />
+          <Route path="tasks/add" element={<PrivateRoute><AdminLayout><AddTasks /></AdminLayout></PrivateRoute>} />
+          <Route path="tasks/edit/:id" element={<PrivateRoute><AdminLayout><EditTasks /></AdminLayout></PrivateRoute>} />
 
-          {/* Projects */}
-          <Route
-               path="projects"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewProjects />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="projects/add"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <AddProjects />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="projects/edit/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <EditProjects />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          {/* Project Management */}
+          <Route path="projects" element={<PrivateRoute><AdminLayout><ViewProjects /></AdminLayout></PrivateRoute>} />
+          <Route path="projects/add" element={<PrivateRoute><AdminLayout><AddProjects /></AdminLayout></PrivateRoute>} />
+          <Route path="projects/edit/:id" element={<PrivateRoute><AdminLayout><EditProjects /></AdminLayout></PrivateRoute>} />
 
           {/* Recently Deleted */}
-          <Route
-               path="recentlydelete"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewRecentlyDeleted />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          <Route path="recentlydelete" element={<PrivateRoute><AdminLayout><ViewRecentlyDeleted /></AdminLayout></PrivateRoute>} />
 
           {/* Activity Log */}
-          <Route
-               path="log"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewActivityLog />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          <Route path="log" element={<PrivateRoute><AdminLayout><ViewActivityLog /></AdminLayout></PrivateRoute>} />
 
           {/* Drag & Drop Board */}
-          <Route
-               path="board"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewBoard />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="board_list"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewBoardList />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          <Route path="board" element={<PrivateRoute><AdminLayout><ViewBoard /></AdminLayout></PrivateRoute>} />
+          <Route path="board_list" element={<PrivateRoute><AdminLayout><ViewBoardList /></AdminLayout></PrivateRoute>} />
 
-          {/* Assignments */}
-          <Route
-               path="/assignments"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewAssignments />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="assignments/edit/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <EditAssignments />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="assignments/add"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <AddAssignments />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          {/* Assignment Management */}
+          <Route path="assignments" element={<PrivateRoute><AdminLayout><ViewAssignments /></AdminLayout></PrivateRoute>} />
+          <Route path="assignments/add" element={<PrivateRoute><AdminLayout><AddAssignments /></AdminLayout></PrivateRoute>} />
+          <Route path="assignments/edit/:id" element={<PrivateRoute><AdminLayout><EditAssignments /></AdminLayout></PrivateRoute>} />
 
-          {/* Departments */}
-          <Route
-               path="departments"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <ViewDepartments />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="departments/add"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <AddDepartments />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          <Route
-               path="departments/edit/:id"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                              <EditDepartments />
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-          {/* Worktime */}
-          <Route
-               path="worktimes"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                             <ViewWorktime/>
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
-            <Route
-               path="worktimes/add"
-               element={
-                    <PrivateRoute>
-                         <AdminLayout>
-                            <AddWorktime/>
-                         </AdminLayout>
-                    </PrivateRoute>
-               }
-          />
+          {/* Department Management */}
+          <Route path="departments" element={<PrivateRoute><AdminLayout><ViewDepartments /></AdminLayout></PrivateRoute>} />
+          <Route path="departments/add" element={<PrivateRoute><AdminLayout><AddDepartments /></AdminLayout></PrivateRoute>} />
+          <Route path="departments/edit/:id" element={<PrivateRoute><AdminLayout><EditDepartments /></AdminLayout></PrivateRoute>} />
+
+          {/* Worktime Management */}
+          <Route path="worktimes" element={<PrivateRoute><AdminLayout><ViewWorktime /></AdminLayout></PrivateRoute>} />
+          <Route path="worktimes/add" element={<PrivateRoute><AdminLayout><AddWorktime /></AdminLayout></PrivateRoute>} />
+
+          {/* Permission Management */}
+          <Route path="permissions" element={<PrivateRoute><AdminLayout><ViewPer /></AdminLayout></PrivateRoute>} />
+          <Route path="permissions/trash" element={<PrivateRoute><AdminLayout><TrashPer /></AdminLayout></PrivateRoute>} />
      </Routes>
 );

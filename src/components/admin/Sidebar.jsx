@@ -31,7 +31,7 @@ const Sidebar = ({ isOpen }) => {
                               <i className="bi bi-file-earmark-text menu-icon"></i>
                               <span>{t('Activity Log')}</span>
                          </Link>
-                    </li>     
+                    </li>
                     <li className={`menu-item ${isActive('/taskmaneger/board')}`}>
                          <Link to="/taskmaneger/board" className="menu-link text-decoration-none">
                               <i className="bi bi-kanban menu-icon"></i>
@@ -51,9 +51,9 @@ const Sidebar = ({ isOpen }) => {
                               <span>{t('Projects')}</span>
                          </Link>
                     </li>
-                     <li className={`menu-item ${isActive('/taskmaneger/worktimes')}`}>
+                    <li className={`menu-item ${isActive('/taskmaneger/worktimes')}`}>
                          <Link to="/taskmaneger/worktimes" className="menu-link text-decoration-none">
-                               <i className="bi bi-calendar menu-icon"></i>
+                              <i className="bi bi-calendar menu-icon"></i>
                               <span>{t('Worktimes')}</span>
                          </Link>
                     </li>
@@ -101,10 +101,17 @@ const Sidebar = ({ isOpen }) => {
                     </li>
                     <li className={`menu-item ${isActive('/taskmaneger/roles')}`}>
                          <Link to="/taskmaneger/roles" className="menu-link text-decoration-none">
-                              <i className="bi bi-shield-lock menu-icon"></i>
+                              <i className="bi bi-people menu-icon"></i> 
+                              <span>{t('Role')}</span>
+                         </Link>
+                    </li>
+                    <li className={`menu-item ${isActive('/taskmaneger/permissions')}`}>
+                         <Link to="/taskmaneger/permissions" className="menu-link text-decoration-none">
+                              <i className="bi bi-shield-lock menu-icon"></i> 
                               <span>{t('Permissions')}</span>
                          </Link>
                     </li>
+
                </ul>
           </aside>
      );
