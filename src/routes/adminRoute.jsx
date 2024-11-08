@@ -8,6 +8,9 @@ import Login from '../components/admin/Login';
 import Register from '../components/admin/Register';
 import AdminLayout from '../layouts/Adminlayout';
 import UpdateProfile from '../components/admin/Update_profile';
+import ResetPassword from '../components/admin/ResetPassword';
+import OtpReset from '../components/admin/otp';
+import NewPasswordPage from '../components/admin/NewPasswordPage';
 
 // Admin Users
 import ViewUser from '../pages/admin/Users/List';
@@ -63,6 +66,9 @@ export const AdminRoutes = () => (
           {/* Public Routes */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+          <Route path="otp" element={<OtpReset />} />
+          <Route path="/new-password" element={<NewPasswordPage />} />
 
           {/* Dashboard */}
           <Route path="/" element={<PrivateRoute><AdminLayout><Dashboard /></AdminLayout></PrivateRoute>} />

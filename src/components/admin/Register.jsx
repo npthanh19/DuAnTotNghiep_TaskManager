@@ -22,12 +22,12 @@ function Register() {
 
      const onSubmit = async (data) => {
           if (!agreeToTerms) {
-               toast.error('You must agree to the terms and conditions.');
+               toast.error('Bạn phải đồng ý với các điều khoản và điều kiện.');
                return;
           }
 
           if (data.password !== data.confirmPassword) {
-               toast.error('Passwords do not match.');
+               toast.error('Mật khẩu không khớp.');
                return;
           }
 
@@ -39,15 +39,17 @@ function Register() {
                     password: data.password,
                     password_confirmation: data.confirmPassword,
                });
-               console.log('Registration successful:', response);
-               toast.success('Registration successful!');
+               console.log('Đăng ký thành công:', response);
+               toast.success('Đăng ký thành công!');
+
+               toast.info('Vui lòng xác nhận Email của bạn.');
 
                setTimeout(() => {
                     navigate('/taskmaneger/login');
                }, 1000);
           } catch (err) {
-               toast.error(err.message || 'Registration failed.');
-               console.error('Registration error:', err);
+               toast.error(err.message || 'Đăng ký thất bại.');
+               console.error('Lỗi đăng ký:', err);
           } finally {
                setLoading(false);
           }
@@ -59,11 +61,11 @@ function Register() {
                console.log(response);
           } catch (error) {
                if (error.code === 'auth/popup-closed-by-user') {
-                    toast.error('You closed the login popup. Please try again.', { position: 'top-right' });
+                    toast.error('Bạn đã đóng cửa sổ đăng nhập. Vui lòng thử lại.', { position: 'top-right' });
                } else {
-                    toast.error('Login failed. Please try again.', { position: 'top-right' });
+                    toast.error('Đăng nhập thất bại. Vui lòng thử lại.', { position: 'top-right' });
                }
-               console.error('Google login error:', error);
+               console.error('Lỗi đăng nhập Google:', error);
           }
      };
 
@@ -76,7 +78,7 @@ function Register() {
                               <img
                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
                                    className="img-fluid"
-                                   alt="Sample image"
+                                   alt="Ảnh minh họa"
                               />
                          </div>
                          <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
@@ -84,24 +86,24 @@ function Register() {
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="text"
-                                             {...formRegister('name', { required: 'Name is required' })} // Sử dụng formRegister
-                                             className="form-control form-control-lg"
-                                             placeholder="Enter your name"
+                                             {...formRegister('name', { required: 'Tên là bắt buộc' })}
+                                             className="form-control form-control-sm"
+                                             placeholder="Nhập tên của bạn"
                                         />
                                         <label className="form-label" htmlFor="form3ExampleName">
-                                             Name
+                                             Họ và tên
                                         </label>
                                         {errors.name && <p className="text-danger">{errors.name.message}</p>}
                                    </div>
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="email"
-                                             {...formRegister('email', { required: 'Email is required' })}
-                                             className="form-control form-control-lg"
-                                             placeholder="Enter a valid email address"
+                                             {...formRegister('email', { required: 'Email là bắt buộc' })}
+                                             className="form-control form-control-sm"
+                                             placeholder="Nhập địa chỉ email hợp lệ"
                                         />
                                         <label className="form-label" htmlFor="form3Example2">
-                                             Email address
+                                             Địa chỉ Email
                                         </label>
                                         {errors.email && <p className="text-danger">{errors.email.message}</p>}
                                    </div>
@@ -109,14 +111,14 @@ function Register() {
                                         <input
                                              type="password"
                                              {...formRegister('password', {
-                                                  required: 'Password is required',
-                                                  minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                                                  required: 'Mật khẩu là bắt buộc',
+                                                  minLength: { value: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' },
                                              })}
-                                             className="form-control form-control-lg"
-                                             placeholder="Enter password"
+                                             className="form-control form-control-sm"
+                                             placeholder="Nhập mật khẩu"
                                         />
                                         <label className="form-label" htmlFor="form3Example3">
-                                             Password
+                                             Mật khẩu
                                         </label>
                                         {errors.password && <p className="text-danger">{errors.password.message}</p>}
                                    </div>
@@ -124,15 +126,15 @@ function Register() {
                                         <input
                                              type="password"
                                              {...formRegister('confirmPassword', {
-                                                  required: 'Please confirm your password',
+                                                  required: 'Vui lòng xác nhận mật khẩu',
                                                   validate: (value) =>
-                                                       value === document.querySelector('[name="password"]').value || 'Passwords do not match',
+                                                       value === document.querySelector('[name="password"]').value || 'Mật khẩu không khớp',
                                              })}
-                                             className="form-control form-control-lg"
-                                             placeholder="Confirm password"
+                                             className="form-control form-control-sm"
+                                             placeholder="Xác nhận mật khẩu"
                                         />
                                         <label className="form-label" htmlFor="form3Example4">
-                                             Confirm Password
+                                             Xác nhận mật khẩu
                                         </label>
                                         {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>}
                                    </div>
@@ -146,27 +148,27 @@ function Register() {
                                                   onChange={handleCheckboxChange}
                                              />
                                              <label className="form-check-label" htmlFor="form2Example3">
-                                                  I agree to the terms and conditions
+                                                  Tôi đồng ý với các điều khoản và điều kiện
                                              </label>
                                         </div>
                                    </div>
-                                   <div className="text-center text-lg-start mt-4 pt-2">
+                                   <div className="text-center text-lg-start pt-2">
                                         <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-                                             {loading ? 'Registering...' : 'Register'}
+                                             {loading ? 'Đang đăng ký...' : 'Đăng ký tài khoản'}
                                         </button>
                                         <p className="small fw-bold mt-2 pt-1 mb-0">
-                                             Already have an account?{' '}
+                                             Đã có tài khoản?{' '}
                                              <Link to="/taskmaneger/login" className="link-danger">
-                                                  Login
+                                                  Đăng nhập
                                              </Link>
                                         </p>
                                    </div>
                               </form>
                               <div className="divider d-flex align-items-center my-4">
-                                   <p className="text-center fw-bold mx-3 mb-0">Or</p>
+                                   <p className="text-center fw-bold mx-3 mb-0">Hoặc</p>
                               </div>
                               <div className="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                                   <p className="lead fw-normal mb-0 me-3">Sign in with</p>
+                                   <p className="lead fw-normal mb-0 me-3">Đăng nhập với</p>
                                    <button type="button" onClick={logGoogleUser} className="btn btn-lg btn-floating mx-1 social-btn google-btn">
                                         <i className="bi bi-google" />
                                    </button>

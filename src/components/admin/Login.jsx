@@ -24,40 +24,39 @@ const Login = () => {
                     localStorage.setItem('token', response.access_token);
                     console.log('Token retrieved:', response.access_token);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
-                    toast.success(`Welcome back, ${data.email}!`, { position: 'top-right' });
+                    toast.success(`Chào mừng trở lại, ${data.email}!`, { position: 'top-right' });
                     setTimeout(() => {
                          window.location.href = '/taskmaneger';
                     }, 1000);
-               } else {
-                    toast.error('Invalid login response', { position: 'top-right' });
                }
           } catch (error) {
-               toast.error(error.message || 'Login failed. Please try again.', { position: 'top-right' });
+               toast.error(error.response && error.response.status === 401 ? 'Email hoặc Mật khẩu đã sai' : 'Đăng nhập thất bại. Vui lòng thử lại.', {
+                    position: 'top-right',
+               });
           }
      };
 
      const logGoogleUser = async () => {
-          const provider = new GoogleAuthProvider(); // Tạo provider
+          const provider = new GoogleAuthProvider();
           try {
-               const response = await signInWithPopup(auth, provider); // Sử dụng signInWithPopup
+               const response = await signInWithPopup(auth, provider);
                const credential = GoogleAuthProvider.credentialFromResult(response);
                const token = credential.accessToken;
 
-               // Gửi token đến backend để xác thực
                const result = await axiosi.post('/api/google-login', { token });
                if (result && result.data.access_token) {
                     localStorage.setItem('isAuthenticated', 'true');
                     localStorage.setItem('token', result.data.access_token);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${result.data.access_token}`;
-                    window.location.href = '/taskmaneger'; // Chuyển hướng đến trang admin
+                    window.location.href = '/taskmaneger';
                } else {
-                    toast.error('Invalid login response', { position: 'top-right' });
+                    toast.error('Phản hồi đăng nhập không hợp lệ', { position: 'top-right' });
                }
           } catch (error) {
                if (error.code === 'auth/popup-closed-by-user') {
-                    toast.error('You closed the login popup. Please try again.', { position: 'top-right' });
+                    toast.error('Bạn đã đóng cửa sổ đăng nhập. Vui lòng thử lại.', { position: 'top-right' });
                } else {
-                    toast.error('Login failed. Please try again.', { position: 'top-right' });
+                    toast.error('Đăng nhập thất bại. Vui lòng thử lại.', { position: 'top-right' });
                }
                console.error('Google login error:', error);
           }
@@ -81,11 +80,17 @@ const Login = () => {
                                              type="email"
                                              id="form3Example3"
                                              className={`form-control form-control-lg ${errors.email ? 'is-invalid' : ''}`}
-                                             placeholder="Enter a valid email address"
-                                             {...register('email', { required: 'Email is required' })}
+                                             placeholder="Nhập địa chỉ Email"
+                                             {...register('email', {
+                                                  required: 'Email không được để trống',
+                                                  pattern: {
+                                                       value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                                                       message: 'Định dạng email không hợp lệ',
+                                                  },
+                                             })}
                                         />
                                         <label className="form-label" htmlFor="form3Example3">
-                                             Email address
+                                             Địa chỉ Email
                                         </label>
                                         {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
                                    </div>
@@ -95,44 +100,51 @@ const Login = () => {
                                              type="password"
                                              id="form3Example4"
                                              className={`form-control form-control-lg ${errors.password ? 'is-invalid' : ''}`}
-                                             placeholder="Enter password"
-                                             {...register('password', { required: 'Password is required' })}
+                                             placeholder="Nhập mật khẩu"
+                                             {...register('password', {
+                                                  required: 'Mật khẩu không được để trống',
+                                                  minLength: {
+                                                       value: 6,
+                                                       message: 'Mật khẩu không được dưới 6 kí tự',
+                                                  },
+                                             })}
                                         />
                                         <label className="form-label" htmlFor="form3Example4">
-                                             Password
+                                             Mật khẩu
                                         </label>
                                         {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                                    </div>
 
                                    <div className="d-flex justify-content-between align-items-center">
-                                        <a href="#!" className="text-decoration-none text-primary fw-semibold d-flex align-items-center">
-                                             <i className="bi bi-question-circle me-1"></i> Forgot password?
-                                        </a>
+                                        <Link
+                                             to="/taskmaneger/reset-password"
+                                             className="text-decoration-none text-primary fw-semibold d-flex align-items-center">
+                                             <i className="bi bi-question-circle me-2"></i> Quên mật khẩu?
+                                        </Link>
                                    </div>
-
 
                                    <div className="text-center text-lg-start mt-4 pt-2">
                                         <button
                                              type="submit"
                                              className="btn btn-primary btn-lg"
                                              style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}>
-                                             Login
+                                             Đăng nhập
                                         </button>
                                         <p className="small fw-bold mt-2 pt-1 mb-0">
-                                             Don't have an account?{' '}
+                                             Bạn không có tài khoản?{' '}
                                              <Link to="/taskmaneger/register" className="link-danger">
-                                                  Register
+                                                  Đăng ký
                                              </Link>
                                         </p>
                                    </div>
                               </form>
 
                               <div className="divider d-flex align-items-center my-4">
-                                   <p className="text-center fw-bold mx-3 mb-0">Or</p>
+                                   <p className="text-center fw-bold mx-3 mb-0">Hoặc</p>
                               </div>
 
                               <div className="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                                   <p className="lead fw-normal mb-0 me-3">Sign in with</p>
+                                   <p className="lead fw-normal mb-0 me-3">Đăng nhập với</p>
                                    <button type="button" onClick={logGoogleUser} className="btn btn-lg btn-floating mx-1 social-btn google-btn">
                                         <i className="bi bi-google" />
                                    </button>
@@ -146,7 +158,6 @@ const Login = () => {
                          </div>
                     </div>
                </div>
-
                <ToastContainer />
           </section>
      );
