@@ -11,8 +11,11 @@ export const Edit = () => {
      const { id } = useParams();
      const { t } = useTranslation();
      const [user, setUser] = useState(null);
-     const [roles, setRoles] = useState([]);
      const [imagePreview, setImagePreview] = useState(null);
+     const [roles, setRoles] = useState([]);
+     const [showModal, setShowModal] = useState(false);
+     const [selectedImage, setSelectedImage] = useState(null); 
+
      const {
           register,
           handleSubmit,
@@ -22,78 +25,79 @@ export const Edit = () => {
      const navigate = useNavigate();
 
      useEffect(() => {
-          const fetchUser = async () => {
+          const fetchData = async () => {
                try {
                     const fetchedUser = await getUserById(id);
                     setUser(fetchedUser);
-                    // Reset form values, including roleId
+
                     reset({
-                         fullname: fetchedUser.fullname,
-                         email: fetchedUser.email,
-                         roleId: fetchedUser.role_id, // Sử dụng role_id từ fetchedUser
+                         ...fetchedUser,
+                         role_id: fetchedUser.role_id,
                     });
-                    setImagePreview(getAvatarUrl(fetchedUser.avatar));
+                    setImagePreview(getAvatarUrl(fetchedUser.avatar)); 
+
+                    const fetchedRoles = await getAllRoles();
+                    setRoles(fetchedRoles);
                } catch (error) {
                     toast.error(t('Failed to fetch user data'));
                }
           };
-          fetchUser();
+          fetchData();
      }, [id, reset, t]);
 
 
-     useEffect(() => {
-          const fetchRoles = async () => {
-               try {
-                    const fetchedRoles = await getAllRoles();
-                    setRoles(fetchedRoles);
-               } catch (error) {
-                    toast.error(t('Failed to fetch roles'));
-               }
-          };
-          fetchRoles();
-     }, [t]);
-
      const onSubmit = async (data) => {
-          const updatedData = new FormData();
-          updatedData.append('fullname', data.fullname);
-          updatedData.append('email', data.email);
-          updatedData.append('roleId', data.roleId);
-
           try {
+               const updatedData = {
+                    fullname: data.fullname,
+                    email: data.email,
+                    role_id: data.role_id, 
+               };
+
+               if (data.avatar && data.avatar.length > 0) {
+                    const avatarData = new FormData();
+                    avatarData.append('avatar', data.avatar[0]);
+
+                    await updateAvatar(id, avatarData);
+               } else if (user.avatar) {
+                    updatedData.avatar = user.avatar; 
+               }
+
                await updateUser(id, updatedData);
                toast.success(t('Updated successfully!'));
+
+               setTimeout(() => {
+                    navigate('/taskmaneger/users');
+               }, 1000);
           } catch (error) {
-               toast.error(t('Update failed!'));
+               toast.error(t('Update failed!') + (error.message || ''));
           }
-
-          if (data.avatar && data.avatar.length > 0) {
-               const avatarData = new FormData();
-               avatarData.append('avatar', data.avatar[0]);
-               try {
-                    await updateAvatar(id, avatarData);
-               } catch (error) {
-                    toast.error(t('Failed to update avatar!'));
-               }
-          }
-
-          setTimeout(() => {
-               navigate('/taskmaneger/users');
-          }, 1000);
      };
+
 
      const handleImageChange = (e) => {
           const file = e.target.files[0];
           setImagePreview(file ? URL.createObjectURL(file) : null);
      };
 
-     if (!user)
+     const openModal = () => {
+          setSelectedImage(imagePreview);
+          setShowModal(true);
+     };
+
+     const closeModal = () => {
+          setShowModal(false);
+     };
+
+     if (!user) {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
           );
+     }
 
      return (
           <div className="card my-4">
@@ -104,76 +108,85 @@ export const Edit = () => {
                </div>
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
+                         {/* Full name */}
                          <div className="mb-3">
-                              <label htmlFor="fullname" className="form-label">{t('Name')}</label>
+                              <label htmlFor="fullname" className="form-label">{t('Full Name')}</label>
                               <input
                                    type="text"
                                    id="fullname"
-                                   className={`form-control ${errors.fullname ? 'is-invalid' : ''}`}
-                                   {...register('fullname', { required: t('User name is required!') })}
+                                   className={`form-control form-control-sm ${errors.fullname ? 'is-invalid' : ''}`}
+                                   {...register('fullname', { required: t('Full name is required!') })}
                               />
                               {errors.fullname && <div className="invalid-feedback">{errors.fullname.message}</div>}
                          </div>
 
+                         {/* Email */}
                          <div className="mb-3">
                               <label htmlFor="email" className="form-label">{t('Email')}</label>
                               <input
                                    type="email"
                                    id="email"
-                                   className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.email ? 'is-invalid' : ''}`}
                                    {...register('email', {
                                         required: t('Email is required!'),
-                                        pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('Email không hợp lệ') },
+                                        pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('Invalid email format') },
                                    })}
                               />
                               {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
                          </div>
 
+                         {/* Password */}
                          <div className="mb-3">
                               <label htmlFor="password" className="form-label">{t('Password')}</label>
                               <input
                                    type="password"
                                    id="password"
-                                   className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                                   className={`form-control form-control-sm ${errors.password ? 'is-invalid' : ''}`}
                                    {...register('password')}
                                    disabled
                               />
                               {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                          </div>
 
+                         {/* Role */}
                          <div className="mb-3">
-                              <label htmlFor="roleId" className="form-label">{t('Role')}</label>
+                              <label htmlFor="role_id" className="form-label">{t('Role')}</label>
                               <select
-                                   id="roleId"
-                                   className={`form-select ${errors.roleId ? 'is-invalid' : ''}`}
-                                   {...register('roleId', { required: t('Vai trò bắt buộc chọn!') })}
+                                   id="role_id"
+                                   className={`form-control form-control-sm ${errors.role_id ? 'is-invalid' : ''}`}
+                                   {...register('role_id', { required: t('Role is required!') })}
                               >
-                                   <option value="" disabled>{t('Chọn vai trò')}</option>
+                                   <option value="">{t('Select Role')}</option>
                                    {roles.map((role) => (
                                         <option key={role.id} value={role.id}>
                                              {role.name}
                                         </option>
                                    ))}
                               </select>
-                              {errors.roleId && <div className="invalid-feedback">{errors.roleId.message}</div>}
+                              {errors.role_id && <div className="invalid-feedback">{errors.role_id.message}</div>}
                          </div>
 
+
+                         {/* Avatar */}
                          <div className="mb-3">
                               <label htmlFor="avatar" className="form-label">{t('Avatar')}</label>
                               <input
                                    type="file"
                                    id="avatar"
-                                   className="form-control"
+                                   className="form-control form-control-sm"
                                    {...register('avatar')}
                                    onChange={handleImageChange}
                               />
                               {imagePreview && (
-                                   <img
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        className="img-thumbnail mt-2"
-                                        style={{ width: '100px', height: '100px' }}
-                                   />
+                                   <div>
+                                        <img
+                                             src={imagePreview}
+                                             alt="Preview"
+                                             className="img-thumbnail mt-2"
+                                             style={{ width: '100px', height: '100px', cursor: 'pointer' }}
+                                             onClick={openModal}
+                                        />
+                                   </div>
                               )}
                          </div>
 
@@ -182,6 +195,29 @@ export const Edit = () => {
                          </button>
                     </form>
                </div>
+
+               {/* Modal for showing the enlarged image */}
+               {showModal && (
+                    <div className="modal show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
+                         <div className="modal-dialog modal-dialog-centered" role="document">
+                              <div className="modal-content">
+                                   <div className="modal-header">
+                                        <h5 className="modal-title">{t('Avatar')}</h5>
+                                        <button type="button" className="btn-close" onClick={closeModal} aria-label="Close"></button>
+                                   </div>
+                                   <div className="modal-body">
+                                        <img
+                                             src={selectedImage}
+                                             alt="Enlarged Preview"
+                                             className="img-fluid"
+                                             style={{ maxHeight: '500px', width: 'auto' }}
+                                        />
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               )}
+
                <ToastContainer position="top-right" autoClose={1000} />
           </div>
      );
