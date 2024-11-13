@@ -21,31 +21,37 @@ export const Edit = () => {
         formState: { errors },
         setValue,
         reset,
-        getValues,
     } = useForm();
     const navigate = useNavigate();
 
+    // Fetch project data
     useEffect(() => {
         const fetchProject = async () => {
             try {
                 const fetchedProject = await getProjectById(id);
                 setProject(fetchedProject);
+                
+                // Reset form values and ensure status is set correctly
                 reset({
                     project_name: fetchedProject.project_name,
                     description: fetchedProject.description,
                     start_date: fetchedProject.start_date,
                     end_date: fetchedProject.end_date,
-                    status: fetchedProject.status || '1',
+                    status: fetchedProject.status || '1', // Default to '1' if status is not available
                     user_id: fetchedProject.user_id,
                     department_id: fetchedProject.department_id,
                 });
+
+                // Optionally call setValue if needed for individual fields
+                setValue('status', fetchedProject.status || '1'); // Ensure status is set
             } catch (error) {
                 toast.error(t('Lỗi khi lấy thông tin dự án!'));
             }
         };
         fetchProject();
-    }, [id, reset, t]);
+    }, [id, reset, t, setValue]);
 
+    // Fetch users list
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -58,6 +64,7 @@ export const Edit = () => {
         fetchUsers();
     }, [t]);
 
+    // Fetch departments list
     useEffect(() => {
         const fetchDepartments = async () => {
             try {
@@ -143,10 +150,7 @@ export const Edit = () => {
                             id="status"
                             className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                             {...register('status', { required: t('Status is required!') })}
-                            value={project.status}
-                            onChange={(e) => setValue('status', e.target.value)}
                         >
-                            <option value="">{t('Select Status')}</option>
                             <option value="1">{t('To Do')}</option>
                             <option value="2">{t('In Progress')}</option>
                             <option value="3">{t('Preview')}</option>
@@ -203,27 +207,6 @@ export const Edit = () => {
                             />
                             {errors.end_date && <div className="invalid-feedback">{errors.end_date.message}</div>}
                         </div>
-                    </div>
-
-                    <div className="mb-3">
-                        <label htmlFor="user" className="form-label">
-                            {t('Người dùng')}
-                        </label>
-                        <select
-                            id="user"
-                            className={`form-select form-select-sm ${errors.user_id ? 'is-invalid' : ''}`}
-                            {...register('user_id', { required: t('Người dùng không được để trống!') })}
-                        >
-                            <option value="" disabled>
-                                {t('Chọn người dùng')}
-                            </option>
-                            {users.map((user) => (
-                                <option key={user.id} value={user.id}>
-                                    {t(user.fullname)}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.user_id && <div className="invalid-feedback">{errors.user_id.message}</div>}
                     </div>
 
                     <button type="submit" className="btn btn-success">

@@ -4,214 +4,232 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
+import { getAllUsers } from '../../../services/usersService'; 
 import { getAllProjects } from '../../../services/projectsService';
 import { getUserById } from '../../../services/usersService';
 import AddDepartmentForm from './AddDepartmentForm';
 
 export const View = () => {
-     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-     const [currentPage, setCurrentPage] = useState(1);
-     const itemsPerPage = 9;
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 9;
 
-     const { t } = useTranslation();
-     const navigate = useNavigate();
+    const { t } = useTranslation();
+    const navigate = useNavigate();
 
-     const [showDeleteModal, setShowDeleteModal] = useState(false);
-     const [selectedProjectId, setSelectedProjectId] = useState(null);
-     const [projects, setProjects] = useState([]);
-     const [users, setUsers] = useState({});
-     const [loading, setLoading] = useState(true);
-     const [showAddDepartmentForm, setShowAddDepartmentForm] = useState(false);
-     const [currentProjectId, setCurrentProjectId] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [users, setUsers] = useState({});  // Lưu danh sách người dùng
+    const [loading, setLoading] = useState(true);
+    const [showAddDepartmentForm, setShowAddDepartmentForm] = useState(false);
+    const [currentProjectId, setCurrentProjectId] = useState(null);
 
-     useEffect(() => {
-          const fetchProjects = async () => {
-               try {
-                    const data = await getAllProjects();
-                    setProjects(data);
-                    const userIds = [...new Set(data.map((project) => project.user_id))];
-                    const userPromises = userIds.map((id) => getUserById(id));
-                    const usersData = await Promise.all(userPromises);
-                    const usersMap = usersData.reduce((acc, user) => {
-                         acc[user.id] = user.fullname;
-                         return acc;
-                    }, {});
-                    setUsers(usersMap);
-               } catch (error) {
-                    console.error('Error fetching projects:', error);
-               } finally {
-                    setLoading(false);
-               }
-          };
+    useEffect(() => {
+        const fetchProjectsAndUsers = async () => {
+            try {
+                // Fetch all projects
+                const projectsData = await getAllProjects();
+                setProjects(projectsData);
 
-          fetchProjects();
-     }, []);
+                // Lấy tất cả người dùng
+                const usersData = await getAllUsers();  // Gọi API lấy người dùng
+                const usersMap = usersData.reduce((acc, user) => {
+                    acc[user.id] = user.fullname;
+                    return acc;
+                }, {});
+                setUsers(usersMap);
 
-     const handleDeleteClick = (id) => {
-          setSelectedProjectId(id);
-          setShowDeleteModal(true);
-     };
+                // Lấy thông tin người dùng cho các dự án
+                const userIds = [...new Set(projectsData.map((project) => project.user_id))];
+                const userPromises = userIds.map((id) => getUserById(id));
+                const usersDataFromProjects = await Promise.all(userPromises);
+                const usersMapFromProjects = usersDataFromProjects.reduce((acc, user) => {
+                    acc[user.id] = user.fullname;
+                    return acc;
+                }, {});
+                setUsers((prevUsers) => ({ ...prevUsers, ...usersMapFromProjects }));
 
-     const handleCloseModal = () => {
-          setShowDeleteModal(false);
-          setSelectedProjectId(null);
-     };
+            } catch (error) {
+                console.error('Error fetching projects or users:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-     const handleDeleteSuccess = (id) => {
-          setProjects((prevProjects) => prevProjects.filter((project) => project.id !== id));
-     };
+        fetchProjectsAndUsers();
+    }, []);
 
-     const handleEdit = (id) => {
-          navigate(`/taskmaneger/projects/edit/${id}`);
-     };
+    const handleDeleteClick = (id) => {
+        setSelectedProjectId(id);
+        setShowDeleteModal(true);
+    };
 
-     const handleAddDepartmentClick = (projectId) => {
-          setCurrentProjectId(projectId);
-          setShowAddDepartmentForm(true);
-     };
+    const handleCloseModal = () => {
+        setShowDeleteModal(false);
+        setSelectedProjectId(null);
+    };
 
-     const handleAddSuccess = () => {
-          setShowAddDepartmentForm(false);
-     };
+    const handleDeleteSuccess = (id) => {
+        setProjects((prevProjects) => prevProjects.filter((project) => project.id !== id));
+    };
 
-     const indexOfLastItem = currentPage * itemsPerPage;
-     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-     const currentProjects = projects.slice(indexOfFirstItem, indexOfLastItem);
+    const handleEdit = (id) => {
+        navigate(`/taskmaneger/projects/edit/${id}`);
+    };
 
-     const totalPages = Math.ceil(projects.length / itemsPerPage);
+    const handleAddDepartmentClick = (projectId) => {
+        setCurrentProjectId(projectId);
+        setShowAddDepartmentForm(true);
+    };
 
-     const handlePageChange = (pageNumber) => {
-          setCurrentPage(pageNumber);
-     };
+    const handleAddSuccess = () => {
+        setShowAddDepartmentForm(false);
+    };
 
-     if (loading) {
-          return (
-               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                    <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
-                    </div>
-               </div>
-          );
-     }
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentProjects = projects.slice(indexOfFirstItem, indexOfLastItem);
 
-     return (
-          <div className="card">
-               <div className="card-header d-flex justify-content-between align-items-center">
-                    <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span className="marquee">{t('Projects')}</span>
-                    </h3>
-                    <Link to="/taskmaneger/projects/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add')}
-                    </Link>
-               </div>
-               <div className="card-body" style={{ padding: '0' }}>
-                    <table className="table">
-                         <thead>
-                              <tr>
-                                   <th className="col">ID</th>
-                                   <th className="col">{t('Project Name')}</th>
-                                   <th className="col">{t('Description')}</th>
-                                   <th className="col">{t('Start Date')}</th>
-                                   <th className="col">{t('End Date')}</th>
-                                   <th className="col">{t('Status')}</th>
-                                   <th className="col">{t('Name User')}</th>
-                                   <th className="col">{t('Actions')}</th>
-                              </tr>
-                         </thead>
-                         <tbody>
-                              {currentProjects.map((project) => (
-                                   <tr key={project.id}>
-                                        <td>{project.id}</td>
-                                        <td>{project.project_name}</td>
-                                        <td>{project.description}</td>
-                                        <td>{project.start_date}</td>
-                                        <td>{project.end_date}</td>
-                                        <td>
-                                             {project.status === 'to do' && (
-                                                  <span className="badge bg-secondary">{t('To Do')}</span>
-                                             )}
-                                             {project.status === 'in progress' && (
-                                                  <span className="badge bg-warning text-dark">{t('In Progress')}</span>
-                                             )}
-                                             {project.status === 'preview' && (
-                                                  <span className="badge bg-info text-dark">{t('Preview')}</span>
-                                             )}
-                                             {project.status === 'done' && (
-                                                  <span className="badge bg-success">{t('Done')}</span>
-                                             )}
-                                        </td>
+    const totalPages = Math.ceil(projects.length / itemsPerPage);
 
-                                        <td>{users[project.user_id]}</td>
-                                        <td>
-                                             <div className="dropdown">
-                                                  <button
-                                                       className="btn btn-sm"
-                                                       type="button"
-                                                       id={`dropdownMenuButton${project.id}`}
-                                                       data-bs-toggle="dropdown"
-                                                       aria-expanded="false">
-                                                       <i className="bi bi-three-dots-vertical me-2"></i>
-                                                  </button>
-                                                  <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${project.id}`}>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-warning"
-                                                                 onClick={() => handleAddDepartmentClick(project.id)}>
-                                                                 <i className="bi bi-plus me-2"></i> {t('Room')}
-                                                            </button>
-                                                       </li>
-                                                       <li>
-                                                            <button className="dropdown-item text-warning" onClick={() => handleEdit(project.id)}>
-                                                                 <i className="bi bi-pencil me-2"></i> {t('Edit')}
-                                                            </button>
-                                                       </li>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-danger"
-                                                                 onClick={() => handleDeleteClick(project.id)}>
-                                                                 <i className="bi bi-trash me-2"></i>
-                                                                 {t('Delete')}
-                                                            </button>
-                                                       </li>
-                                                  </ul>
-                                             </div>
-                                        </td>
-                                   </tr>
-                              ))}
-                         </tbody>
-                    </table>
-                    <nav aria-label="Page navigation">
-                         <ul className="pagination mt-2">
-                              <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                   <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                                        {t('Previous')}
-                                   </button>
-                              </li>
-                              {[...Array(totalPages)].map((_, index) => (
-                                   <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-                                        <button className="page-link" onClick={() => handlePageChange(index + 1)}>
-                                             {index + 1}
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="card">
+            <div className="card-header d-flex justify-content-between align-items-center">
+                <h3 className="fw-bold py-3 mb-4 highlighted-text">
+                    <span className="marquee">{t('Projects')}</span>
+                </h3>
+                <Link to="/taskmaneger/projects/add" className="btn btn-primary">
+                    <i className="bi bi-plus me-2"></i> {t('Add')}
+                </Link>
+            </div>
+            <div className="card-body" style={{ padding: '0' }}>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th className="col">ID</th>
+                            <th className="col">{t('Project Name')}</th>
+                            <th className="col">{t('Description')}</th>
+                            <th className="col">{t('Start Date')}</th>
+                            <th className="col">{t('End Date')}</th>
+                            <th className="col">{t('Status')}</th>
+                            <th className="col">{t('User Create')}</th>
+                            <th className="col">{t('Actions')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {currentProjects.map((project) => (
+                            <tr key={project.id}>
+                                <td>{project.id}</td>
+                                <td>{project.project_name}</td>
+                                <td>{project.description}</td>
+                                <td>{project.start_date}</td>
+                                <td>{project.end_date}</td>
+                                <td>
+                                    {project.status === 'to do' && (
+                                        <span className="badge bg-secondary">{t('To Do')}</span>
+                                    )}
+                                    {project.status === 'in progress' && (
+                                        <span className="badge bg-warning text-dark">{t('In Progress')}</span>
+                                    )}
+                                    {project.status === 'preview' && (
+                                        <span className="badge bg-info text-dark">{t('Preview')}</span>
+                                    )}
+                                    {project.status === 'done' && (
+                                        <span className="badge bg-success">{t('Done')}</span>
+                                    )}
+                                </td>
+
+                                <td>{users[project.user_id]}</td>
+                                <td>
+                                    <div className="dropdown">
+                                        <button
+                                            className="btn btn-sm"
+                                            type="button"
+                                            id={`dropdownMenuButton${project.id}`}
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i className="bi bi-three-dots-vertical me-2"></i>
                                         </button>
-                                   </li>
-                              ))}
-                              <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                                   <button
-                                        className="page-link"
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}>
-                                        {t('Next')}
-                                   </button>
-                              </li>
-                         </ul>
-                    </nav>
-               </div>
-               <ToastContainer position="top-right" autoClose={2000} />
-               {showDeleteModal && (
-                    <Delete show={showDeleteModal} onClose={handleCloseModal} projectId={selectedProjectId} onDeleteSuccess={handleDeleteSuccess} />
-               )}
-               {showAddDepartmentForm && (
-                    <AddDepartmentForm projectId={currentProjectId} onClose={() => setShowAddDepartmentForm(false)} onAddSuccess={handleAddSuccess} />
-               )}
-          </div>
-     );
+                                        <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${project.id}`}>
+                                            <li>
+                                                <button
+                                                    className="dropdown-item text-warning"
+                                                    onClick={() => handleAddDepartmentClick(project.id)}>
+                                                    <i className="bi bi-plus me-2"></i> {t('Room')}
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button className="dropdown-item text-warning" onClick={() => handleEdit(project.id)}>
+                                                    <i className="bi bi-pencil me-2"></i> {t('Edit')}
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button
+                                                    className="dropdown-item text-danger"
+                                                    onClick={() => handleDeleteClick(project.id)}>
+                                                    <i className="bi bi-trash me-2"></i>
+                                                    {t('Delete')}
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <nav aria-label="Page navigation">
+                    <ul className="pagination mt-2">
+                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                            <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                                {t('Previous')}
+                            </button>
+                        </li>
+                        {[...Array(totalPages)].map((_, index) => (
+                            <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(index + 1)}>
+                                    {index + 1}
+                                </button>
+                            </li>
+                        ))}
+                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                            <button
+                                className="page-link"
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}>
+                                {t('Next')}
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <ToastContainer position="top-right" />
+            {showDeleteModal && (
+                <Delete
+                    show={showDeleteModal}
+                    onClose={handleCloseModal}
+                    onDeleteSuccess={handleDeleteSuccess}
+                    id={selectedProjectId}
+                />
+            )}
+            {showAddDepartmentForm && (
+                <AddDepartmentForm projectId={currentProjectId} onAddSuccess={handleAddSuccess} />
+            )}
+        </div>
+    );
 };

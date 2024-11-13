@@ -5,14 +5,13 @@ import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import { createWorktime } from '../../../services/worktimeService';
 import { getAllProjects } from '../../../services/projectsService';
-import { getAllUsers } from '../../../services/usersService';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const Add = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
-    const [users, setUsers] = useState([]);
+    const [userId, setUserId] = useState(null); // Lưu id người dùng
     const {
         register,
         handleSubmit,
@@ -21,26 +20,33 @@ export const Add = () => {
     } = useForm();
 
     useEffect(() => {
-        const fetchProjectsAndUsers = async () => {
+        const fetchProjectsAndUser = async () => {
             try {
                 const projectList = await getAllProjects();
                 setProjects(projectList);
 
-                const userList = await getAllUsers();
-                setUsers(userList);
+                // Giả sử backend đã trả về thông tin người dùng
+                const currentUser = await getCurrentUser();
+                setUserId(currentUser.id); // Lấy id người dùng hiện tại
             } catch (error) {
                 console.error('Failed to fetch data:', error);
                 toast.error(t('Failed to load data!'));
             }
         };
 
-        fetchProjectsAndUsers();
+        fetchProjectsAndUser();
     }, [t]);
 
+    const getCurrentUser = async () => {
+        // Đây là hàm giả định để lấy thông tin người dùng từ backend
+        // Bạn có thể thay thế bằng cách gọi API thực tế để lấy thông tin người dùng
+        return { id: 1 }; // Giả sử người dùng có id = 1
+    };
+
     const onSubmit = async (data) => {
-        console.log(data);
         try {
-            await createWorktime(data);
+            const worktimeData = { ...data, user_id: userId }; // Thêm user_id vào dữ liệu gửi lên
+            await createWorktime(worktimeData);
             toast.success(t('Worktime added successfully!'));
             reset();
             setTimeout(() => {
@@ -93,26 +99,6 @@ export const Add = () => {
                             ))}
                         </select>
                         {errors.project_id && <div className="invalid-feedback">{errors.project_id.message}</div>}
-                    </div>
-
-                    {/* User ID */}
-                    <div className="mb-3">
-                        <label htmlFor="user_id" className="form-label">
-                            {t('User')}
-                        </label>
-                        <select
-                            id="user_id"
-                            className={`form-control form-control-sm ${errors.user_id ? 'is-invalid' : ''}`}
-                            {...register('user_id', { required: t('User selection is required!') })}
-                        >
-                            <option value="">{t('Select a user')}</option>
-                            {users.map((user) => (
-                                <option key={user.id} value={user.id}>
-                                    {user.fullname} {/* Hiển thị fullname thay vì name */}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.user_id && <div className="invalid-feedback">{errors.user_id.message}</div>}
                     </div>
 
                     {/* Start Date */}

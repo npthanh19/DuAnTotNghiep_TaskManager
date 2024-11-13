@@ -61,7 +61,7 @@ export const Add = () => {
                toast.success(t('Project and department added successfully!'));
                reset();
                setTimeout(() => {
-                    navigate('/taskmanager/projects');
+                    navigate('/taskmaneger/projects');
                }, 1000);
           } catch (error) {
                console.error('Error adding project or department:', error.response?.data || error);
@@ -148,14 +148,16 @@ export const Add = () => {
                                              required: t('Start date is required!'),
                                              validate: (value) => {
                                                   const today = new Date();
-                                                  today.setHours(0, 0, 0, 0);
+                                                  today.setHours(0, 0, 0, 0); // Xóa phần giờ, phút, giây
                                                   const selectedDate = new Date(value);
-                                                  selectedDate.setHours(0, 0, 0, 0);
-                                                  if (selectedDate.getTime() !== today.getTime()) {
-                                                       return t('Start date must be today');
+                                                  selectedDate.setHours(0, 0, 0, 0); // Xóa phần giờ, phút, giây của ngày được chọn
+                                              
+                                                  if (selectedDate < today) {
+                                                      return t('Start date must be today or later');
                                                   }
                                                   return true;
-                                             },
+                                              },
+                                              
                                         })}
                                    />
                                    {errors.startDate && <div className="invalid-feedback">{errors.startDate.message}</div>}

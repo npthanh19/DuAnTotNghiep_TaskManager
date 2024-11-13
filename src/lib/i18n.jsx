@@ -133,6 +133,7 @@ const resources = {
                'Start Date': 'Ngày bắt đầu',
                'End Date': 'Ngày kết thúc',
                'Name User': 'Tên người dùng',
+               'User Create': 'Người tạo',
                'Room': 'Phòng ban',
                'Project Manager': 'Người quản lý dự án',
                'Project name is required': 'Tên dự án không được để trống',
