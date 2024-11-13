@@ -22,9 +22,9 @@ const Login = () => {
                if (response && response.access_token) {
                     localStorage.setItem('isAuthenticated', 'true');
                     localStorage.setItem('token', response.access_token);
-                    console.log('Token retrieved:', response.access_token);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
-                    toast.success(`Chào mừng trở lại, ${data.email}!`, { position: 'top-right' });
+                    toast.success(`Chào mừng bạn, ${data.email}!`, { position: 'top-right' });
+
                     setTimeout(() => {
                          window.location.href = '/taskmaneger';
                     }, 1000);

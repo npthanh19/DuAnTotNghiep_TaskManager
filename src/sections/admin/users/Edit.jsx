@@ -14,7 +14,7 @@ export const Edit = () => {
      const [imagePreview, setImagePreview] = useState(null);
      const [roles, setRoles] = useState([]);
      const [showModal, setShowModal] = useState(false);
-     const [selectedImage, setSelectedImage] = useState(null); 
+     const [selectedImage, setSelectedImage] = useState(null);
 
      const {
           register,
@@ -34,7 +34,7 @@ export const Edit = () => {
                          ...fetchedUser,
                          role_id: fetchedUser.role_id,
                     });
-                    setImagePreview(getAvatarUrl(fetchedUser.avatar)); 
+                    setImagePreview(getAvatarUrl(fetchedUser.avatar));
 
                     const fetchedRoles = await getAllRoles();
                     setRoles(fetchedRoles);
@@ -45,13 +45,13 @@ export const Edit = () => {
           fetchData();
      }, [id, reset, t]);
 
-
      const onSubmit = async (data) => {
           try {
                const updatedData = {
                     fullname: data.fullname,
                     email: data.email,
-                    role_id: data.role_id, 
+                    role_id: data.role_id,
+                    phone_number: data.phone_number,
                };
 
                if (data.avatar && data.avatar.length > 0) {
@@ -60,7 +60,7 @@ export const Edit = () => {
 
                     await updateAvatar(id, avatarData);
                } else if (user.avatar) {
-                    updatedData.avatar = user.avatar; 
+                    updatedData.avatar = user.avatar;
                }
 
                await updateUser(id, updatedData);
@@ -73,7 +73,6 @@ export const Edit = () => {
                toast.error(t('Update failed!') + (error.message || ''));
           }
      };
-
 
      const handleImageChange = (e) => {
           const file = e.target.files[0];
@@ -110,7 +109,9 @@ export const Edit = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                          {/* Full name */}
                          <div className="mb-3">
-                              <label htmlFor="fullname" className="form-label">{t('Full Name')}</label>
+                              <label htmlFor="fullname" className="form-label">
+                                   {t('Full Name')}
+                              </label>
                               <input
                                    type="text"
                                    id="fullname"
@@ -122,7 +123,9 @@ export const Edit = () => {
 
                          {/* Email */}
                          <div className="mb-3">
-                              <label htmlFor="email" className="form-label">{t('Email')}</label>
+                              <label htmlFor="email" className="form-label">
+                                   {t('Email')}
+                              </label>
                               <input
                                    type="email"
                                    id="email"
@@ -137,7 +140,9 @@ export const Edit = () => {
 
                          {/* Password */}
                          <div className="mb-3">
-                              <label htmlFor="password" className="form-label">{t('Password')}</label>
+                              <label htmlFor="password" className="form-label">
+                                   {t('Password')}
+                              </label>
                               <input
                                    type="password"
                                    id="password"
@@ -148,14 +153,29 @@ export const Edit = () => {
                               {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                          </div>
 
+                         {/* Phone Number */}
+                         <div className="mb-3">
+                              <label htmlFor="phone_number" className="form-label">
+                                   {t('Phone Number')}
+                              </label>
+                              <input
+                                   type="text"
+                                   id="phone_number"
+                                   className={`form-control form-control-sm ${errors.phone_number ? 'is-invalid' : ''}`}
+                                   {...register('phone_number')}
+                              />
+                              {errors.phone_number && <div className="invalid-feedback">{errors.phone_number.message}</div>}
+                         </div>
+
                          {/* Role */}
                          <div className="mb-3">
-                              <label htmlFor="role_id" className="form-label">{t('Role')}</label>
+                              <label htmlFor="role_id" className="form-label">
+                                   {t('Role')}
+                              </label>
                               <select
                                    id="role_id"
                                    className={`form-control form-control-sm ${errors.role_id ? 'is-invalid' : ''}`}
-                                   {...register('role_id', { required: t('Role is required!') })}
-                              >
+                                   {...register('role_id', { required: t('Role is required!') })}>
                                    <option value="">{t('Select Role')}</option>
                                    {roles.map((role) => (
                                         <option key={role.id} value={role.id}>
@@ -166,10 +186,11 @@ export const Edit = () => {
                               {errors.role_id && <div className="invalid-feedback">{errors.role_id.message}</div>}
                          </div>
 
-
                          {/* Avatar */}
                          <div className="mb-3">
-                              <label htmlFor="avatar" className="form-label">{t('Avatar')}</label>
+                              <label htmlFor="avatar" className="form-label">
+                                   {t('Avatar')}
+                              </label>
                               <input
                                    type="file"
                                    id="avatar"

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2'; 
 import { useNavigate } from 'react-router-dom';
+import { requestPasswordReset } from '../../services/authService';
 
 const ResetPassword = () => {
      const {
@@ -14,12 +14,44 @@ const ResetPassword = () => {
      const [resetMethod, setResetMethod] = useState('email');
      const navigate = useNavigate();
 
-     const onSubmit = () => {
-          toast.success(`Mã OTP đặt lại mật khẩu đã được gửi đến ${resetMethod === 'email' ? 'email' : 'số điện thoại'} của bạn!`, {
-               position: 'top-right',
-          });
+     const onSubmit = async (data) => {
+          const value = resetMethod === 'email' ? data.email : data.phone_number;
+          try {
+               const response = await requestPasswordReset(value, resetMethod);
 
-          navigate('/taskmaneger/otp', { state: { resetMethod } });
+               if (response.status === 404) {
+                    Swal.fire({
+                         icon: 'error',
+                         title: 'Không tìm thấy người dùng với thông tin này!',
+                         position: 'top-end',
+                         toast: true,
+                         timer: 2000,
+                         showConfirmButton: false,
+                    });
+                    return;
+               }
+
+               Swal.fire({
+                    icon: 'success',
+                    title: `Mã OTP đã được gửi đến ${resetMethod === 'email' ? 'email' : 'số điện thoại'} của bạn!`,
+                    position: 'top-end',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+
+               navigate('/taskmaneger/otp', { state: { resetMethod, contact: value } });
+          } catch (error) {
+               console.error('API error:', error);
+               Swal.fire({
+                    icon: 'error',
+                    title: error?.response?.data?.message || 'Đã xảy ra lỗi. Vui lòng thử lại!',
+                    position: 'top-end',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+          }
      };
 
      const handleResetMethodChange = (e) => {
@@ -27,7 +59,7 @@ const ResetPassword = () => {
           setResetMethod(selectedMethod);
 
           if (selectedMethod === 'email') {
-               setValue('phone', '');
+               setValue('phone_number', '');
           } else {
                setValue('email', '');
           }
@@ -52,7 +84,7 @@ const ResetPassword = () => {
                                         <label className="form-label">Chọn Phương thức:</label>
                                         <select className="form-select form-select-sm" onChange={handleResetMethodChange} value={resetMethod}>
                                              <option value="email">Email</option>
-                                             <option value="phone">Số điện thoại</option>
+                                             <option value="phone_number">Số điện thoại</option>
                                         </select>
                                    </div>
 
@@ -81,9 +113,9 @@ const ResetPassword = () => {
                                              <input
                                                   type="tel"
                                                   id="resetPhone"
-                                                  className={`form-control form-control-sm ${errors.phone ? 'is-invalid' : ''}`}
+                                                  className={`form-control form-control-sm ${errors.phone_number ? 'is-invalid' : ''}`}
                                                   placeholder="Nhập số điện thoại của bạn"
-                                                  {...register('phone', {
+                                                  {...register('phone_number', {
                                                        required: 'Số điện thoại là bắt buộc',
                                                        minLength: {
                                                             value: 10,
@@ -102,10 +134,38 @@ const ResetPassword = () => {
                                              <label className="form-label" htmlFor="resetPhone">
                                                   Số điện thoại
                                              </label>
-                                             {errors.phone && <div className="invalid-feedback">{errors.phone.message}</div>}
+                                             {errors.phone_number && <div className="invalid-feedback">{errors.phone_number.message}</div>}
+
+                                             <div className="mt-3 text-center">
+                                                  <p>
+                                                       <strong>
+                                                            Bạn cần quét mã QR hoặc tham gia vào đường link Telegram dưới đây để nhận mã OTP:
+                                                       </strong>
+                                                  </p>
+                                                  <div className="d-flex flex-column align-items-center">
+                                                       <p>
+                                                            <a
+                                                                 href="https://t.me/nhdtTotNghiep2025"
+                                                                 target="_blank"
+                                                                 rel="noopener noreferrer"
+                                                                 className="btn btn-primary">
+                                                                 Tham gia Telegram
+                                                            </a>
+                                                       </p>
+                                                       <p>OR:</p>
+                                                       <img
+                                                            src="/assets/admin/img/NHDT_TEAM.jpg"
+                                                            alt="QR Code"
+                                                            className="qr-image d-block mx-auto mt-2"
+                                                            width="150"
+                                                       />
+                                                  </div>
+                                                  <p className="note my-3 text-danger">
+                                                       <strong>Lưu ý:</strong> Người dùng nhấp chọn vào Link bắt buộc phải đăng nhập TELEGRAM.
+                                                  </p>
+                                             </div>
                                         </div>
                                    )}
-
                                    <div className="text-center mt-4 pt-2">
                                         <button
                                              type="submit"
@@ -118,8 +178,6 @@ const ResetPassword = () => {
                          </div>
                     </div>
                </div>
-
-               <ToastContainer />
           </section>
      );
 };

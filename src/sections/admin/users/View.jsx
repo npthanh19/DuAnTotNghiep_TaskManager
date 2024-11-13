@@ -37,7 +37,7 @@ export function View() {
 
      const handleDeleteClick = (id, userName) => {
           const deleteTitle = t('Delete User:') + ` ${userName}`;
-          
+
           Swal.fire({
                title: deleteTitle,
                text: t('Are you sure you want to delete this user?'),
@@ -46,7 +46,7 @@ export function View() {
                confirmButtonColor: '#d33',
                cancelButtonColor: '#3085d6',
                confirmButtonText: t('Delete'),
-               cancelButtonText: t('Cancel')
+               cancelButtonText: t('Cancel'),
           }).then(async (result) => {
                if (result.isConfirmed) {
                     try {
@@ -59,7 +59,6 @@ export function View() {
                }
           });
      };
-     
 
      const handleEdit = (id) => {
           navigate(`/taskmaneger/users/edit/${id}`);
@@ -68,9 +67,7 @@ export function View() {
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-     const filteredUsers = users.filter((user) =>
-          user.fullname && user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
-     );
+     const filteredUsers = users.filter((user) => user.fullname && user.fullname.toLowerCase().includes(searchTerm.toLowerCase()));
      const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
      const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
@@ -95,7 +92,6 @@ export function View() {
                          <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
-
           );
      }
 
@@ -123,7 +119,9 @@ export function View() {
                               onChange={handleSearchChange}
                          />
 
-                         <button className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2" onClick={() => navigate('/taskmaneger/users/trashed')}>
+                         <button
+                              className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
+                              onClick={() => navigate('/taskmaneger/users/trashed')}>
                               <i className="bi bi-trash me-2"></i>
                          </button>
 
@@ -141,20 +139,24 @@ export function View() {
                                    <th>{t('Full Name')}</th>
                                    <th>{t('Avatar')}</th>
                                    <th>{t('Email')}</th>
+                                   <th>{t('Phone')}</th>
                                    <th>{t('Role')}</th>
                                    <th>{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
                               {currentUsers.map((user) => (
-
                                    <tr key={user.id} className="text-center">
                                         <td>{user.id}</td>
                                         <td>{user.fullname}</td>
                                         <td>
                                              <div className="d-flex justify-content-center">
                                                   <img
-                                                       src={user.avatar ? `${process.env.REACT_APP_BASE_URL}/storage/${user.avatar}` : 'https://i.pinimg.com/474x/c5/21/64/c52164749f7460c1ededf8992cd9a6ec--page-design-design-web.jpg'}
+                                                       src={
+                                                            user.avatar
+                                                                 ? `${process.env.REACT_APP_BASE_URL}/storage/${user.avatar}`
+                                                                 : 'https://i.pinimg.com/474x/c5/21/64/c52164749f7460c1ededf8992cd9a6ec--page-design-design-web.jpg'
+                                                       }
                                                        alt={user.fullname}
                                                        className="img-thumbnail"
                                                        style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '50%' }}
@@ -162,6 +164,7 @@ export function View() {
                                              </div>
                                         </td>
                                         <td>{user.email}</td>
+                                        <td>{user.phone_number || 'N/A'}</td>
                                         <td>{getRoleNameById(user.role_id)}</td>
                                         <td>
                                              <div className="dropdown">
@@ -180,7 +183,9 @@ export function View() {
                                                             </button>
                                                        </li>
                                                        <li>
-                                                            <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(user.id, user.fullname)}>
+                                                            <button
+                                                                 className="dropdown-item text-danger"
+                                                                 onClick={() => handleDeleteClick(user.id, user.fullname)}>
                                                                  <i className="bi bi-trash me-2"></i> {t('Delete')}
                                                             </button>
                                                        </li>

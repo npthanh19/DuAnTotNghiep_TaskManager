@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { logout } from '../../services/authService';
 
 const Navbar = ({ onToggleSidebar }) => {
      const { t, i18n } = useTranslation();
      const [isDarkMode, setIsDarkMode] = useState(false);
      const [language, setLanguage] = useState('vi');
      const navigate = useNavigate();
+
      const handleDarkModeToggle = () => {
           setIsDarkMode(!isDarkMode);
      };
@@ -20,9 +22,13 @@ const Navbar = ({ onToggleSidebar }) => {
           document.body.className = isDarkMode ? 'dark-mode' : '';
      }, [isDarkMode]);
 
-     const handleLogout = () => {
-          localStorage.removeItem('isAuthenticated');
-          navigate('/taskmaneger/login');
+     const handleLogout = async () => {
+          try {
+               await logout();
+               navigate('/taskmaneger/login');
+          } catch (error) {
+               console.error('Logout error:', error);
+          }
      };
 
      const truncateText = (text, maxLength) => {

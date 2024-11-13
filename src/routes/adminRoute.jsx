@@ -11,6 +11,8 @@ import UpdateProfile from '../components/admin/Update_profile';
 import ResetPassword from '../components/admin/ResetPassword';
 import OtpReset from '../components/admin/otp';
 import NewPasswordPage from '../components/admin/NewPasswordPage';
+import ConfirmEmail from '../components/admin/ConfirmEmail';
+import VerifyEmaill from '../components/admin/VerifyEmail';
 
 // Admin Users
 import ViewUser from '../pages/admin/Users/List';
@@ -69,6 +71,9 @@ export const AdminRoutes = () => (
           <Route path="reset-password" element={<ResetPassword />} />
           <Route path="otp" element={<OtpReset />} />
           <Route path="/new-password" element={<NewPasswordPage />} />
+          <Route path="/confirm-email" element={<ConfirmEmail />} />
+          <Route path="/verify-email/:userId/:hash" element={<VerifyEmaill />} />
+
 
           {/* Dashboard */}
           <Route path="/" element={<PrivateRoute><AdminLayout><Dashboard /></AdminLayout></PrivateRoute>} />

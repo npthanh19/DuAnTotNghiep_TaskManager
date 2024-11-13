@@ -11,16 +11,18 @@ function Register() {
           register: formRegister,
           handleSubmit,
           formState: { errors },
+          getValues,
      } = useForm();
      const [loading, setLoading] = useState(false);
      const [agreeToTerms, setAgreeToTerms] = useState(false);
      const navigate = useNavigate();
-
      const handleCheckboxChange = (e) => {
           setAgreeToTerms(e.target.checked);
      };
 
      const onSubmit = async (data) => {
+          sessionStorage.setItem('user_email', data.email);
+
           if (!agreeToTerms) {
                toast.error('Bạn phải đồng ý với các điều khoản và điều kiện.');
                return;
@@ -34,21 +36,18 @@ function Register() {
           try {
                setLoading(true);
                const response = await register({
-                    name: data.name,
+                    fullname: data.fullname,
                     email: data.email,
                     password: data.password,
-                    password_confirmation: data.confirmPassword,
                });
                console.log('Đăng ký thành công:', response);
-               toast.success('Đăng ký thành công!');
-
-               toast.info('Vui lòng xác nhận Email của bạn.');
+               toast.info('Vui lòng kiểm tra email của bạn để xác nhận tài khoản.');
 
                setTimeout(() => {
-                    navigate('/taskmaneger/login');
+                    navigate('/taskmaneger/confirm-email');
                }, 1000);
           } catch (err) {
-               toast.error(err.message || 'Đăng ký thất bại.');
+               toast.error(err.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại Email.');
                console.error('Lỗi đăng ký:', err);
           } finally {
                setLoading(false);
@@ -86,14 +85,14 @@ function Register() {
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
                                              type="text"
-                                             {...formRegister('name', { required: 'Tên là bắt buộc' })}
+                                             {...formRegister('fullname', { required: 'Tên là bắt buộc' })}
                                              className="form-control form-control-sm"
                                              placeholder="Nhập tên của bạn"
                                         />
                                         <label className="form-label" htmlFor="form3ExampleName">
                                              Họ và tên
                                         </label>
-                                        {errors.name && <p className="text-danger">{errors.name.message}</p>}
+                                        {errors.fullname && <p className="text-danger">{errors.fullname.message}</p>}
                                    </div>
                                    <div data-mdb-input-init className="form-outline mb-4">
                                         <input
@@ -127,8 +126,7 @@ function Register() {
                                              type="password"
                                              {...formRegister('confirmPassword', {
                                                   required: 'Vui lòng xác nhận mật khẩu',
-                                                  validate: (value) =>
-                                                       value === document.querySelector('[name="password"]').value || 'Mật khẩu không khớp',
+                                                  validate: (value) => value === getValues('password') || 'Mật khẩu không khớp',
                                              })}
                                              className="form-control form-control-sm"
                                              placeholder="Xác nhận mật khẩu"
@@ -138,6 +136,7 @@ function Register() {
                                         </label>
                                         {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>}
                                    </div>
+
                                    <div className="d-flex justify-content-between align-items-center">
                                         <div className="form-check mb-0">
                                              <input
@@ -154,7 +153,7 @@ function Register() {
                                    </div>
                                    <div className="text-center text-lg-start pt-2">
                                         <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-                                             {loading ? 'Đang đăng ký...' : 'Đăng ký tài khoản'}
+                                             {loading ? 'Đang đăng ký...' : 'Đăng ký '}
                                         </button>
                                         <p className="small fw-bold mt-2 pt-1 mb-0">
                                              Đã có tài khoản?{' '}
