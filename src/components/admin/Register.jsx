@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../../services/authService';
-import { toast, ToastContainer } from 'react-toastify';
-import { useForm } from 'react-hook-form';
 import 'react-toastify/dist/ReactToastify.css';
-import { signInWithGooglePopup } from '../../utils/firebase-untils';
+import Swal from 'sweetalert2';
+import { useForm } from 'react-hook-form';
 
 function Register() {
      const {
@@ -24,12 +23,26 @@ function Register() {
           sessionStorage.setItem('user_email', data.email);
 
           if (!agreeToTerms) {
-               toast.error('Bạn phải đồng ý với các điều khoản và điều kiện.');
+               Swal.fire({
+                    icon: 'warning',
+                    text: 'Bạn phải đồng ý với các điều khoản và điều kiện.',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
                return;
           }
 
           if (data.password !== data.confirmPassword) {
-               toast.error('Mật khẩu không khớp.');
+               Swal.fire({
+                    icon: 'error',
+                    text: 'Mật khẩu không khớp.',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
                return;
           }
 
@@ -41,36 +54,36 @@ function Register() {
                     password: data.password,
                });
                console.log('Đăng ký thành công:', response);
-               toast.info('Vui lòng kiểm tra email của bạn để xác nhận tài khoản.');
+               Swal.fire({
+                    icon: 'info',
+                    title: 'Thông báo',
+                    text: 'Vui lòng kiểm tra email của bạn để xác nhận tài khoản.',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
 
                setTimeout(() => {
                     navigate('/taskmaneger/confirm-email');
                }, 1000);
           } catch (err) {
-               toast.error(err.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại Email.');
+               Swal.fire({
+                    icon: 'error',
+                    text: err.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại Email.',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
                console.error('Lỗi đăng ký:', err);
           } finally {
                setLoading(false);
           }
      };
 
-     const logGoogleUser = async () => {
-          try {
-               const response = await signInWithGooglePopup();
-               console.log(response);
-          } catch (error) {
-               if (error.code === 'auth/popup-closed-by-user') {
-                    toast.error('Bạn đã đóng cửa sổ đăng nhập. Vui lòng thử lại.', { position: 'top-right' });
-               } else {
-                    toast.error('Đăng nhập thất bại. Vui lòng thử lại.', { position: 'top-right' });
-               }
-               console.error('Lỗi đăng nhập Google:', error);
-          }
-     };
-
      return (
           <section className="vh-100">
-               <ToastContainer position="top-right" autoClose={2000} />
                <div className="container-fluid h-custom">
                     <div className="row d-flex justify-content-center align-items-center h-100">
                          <div className="col-md-9 col-lg-6 col-xl-5">
@@ -80,9 +93,9 @@ function Register() {
                                    alt="Ảnh minh họa"
                               />
                          </div>
-                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1 border rounded-4 shadow-lg bg-white p-4">
                               <form onSubmit={handleSubmit(onSubmit)}>
-                                   <div data-mdb-input-init className="form-outline mb-4">
+                                   <div data-mdb-input-init className="form-outline">
                                         <input
                                              type="text"
                                              {...formRegister('fullname', { required: 'Tên là bắt buộc' })}
@@ -94,7 +107,7 @@ function Register() {
                                         </label>
                                         {errors.fullname && <p className="text-danger">{errors.fullname.message}</p>}
                                    </div>
-                                   <div data-mdb-input-init className="form-outline mb-4">
+                                   <div data-mdb-input-init className="form-outline ">
                                         <input
                                              type="email"
                                              {...formRegister('email', { required: 'Email là bắt buộc' })}
@@ -106,7 +119,7 @@ function Register() {
                                         </label>
                                         {errors.email && <p className="text-danger">{errors.email.message}</p>}
                                    </div>
-                                   <div data-mdb-input-init className="form-outline mb-4">
+                                   <div data-mdb-input-init className="form-outline ">
                                         <input
                                              type="password"
                                              {...formRegister('password', {
@@ -121,7 +134,7 @@ function Register() {
                                         </label>
                                         {errors.password && <p className="text-danger">{errors.password.message}</p>}
                                    </div>
-                                   <div data-mdb-input-init className="form-outline mb-3">
+                                   <div data-mdb-input-init className="form-outline">
                                         <input
                                              type="password"
                                              {...formRegister('confirmPassword', {
@@ -151,11 +164,14 @@ function Register() {
                                              </label>
                                         </div>
                                    </div>
-                                   <div className="text-center text-lg-start pt-2">
-                                        <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
+                                   <div className="text-center text-lg-start pt-2 d-flex justify-content-center">
+                                        <button type="submit" className="btn btn-secondary btn-sm w-100 " disabled={loading}>
                                              {loading ? 'Đang đăng ký...' : 'Đăng ký '}
                                         </button>
-                                        <p className="small fw-bold mt-2 pt-1 mb-0">
+                                   </div>
+                                   <div className="text-center text-lg-start pt-2">
+                                        {' '}
+                                        <p className="small fw-bold pt-1 mb-0">
                                              Đã có tài khoản?{' '}
                                              <Link to="/taskmaneger/login" className="link-danger">
                                                   Đăng nhập
@@ -163,21 +179,6 @@ function Register() {
                                         </p>
                                    </div>
                               </form>
-                              <div className="divider d-flex align-items-center my-4">
-                                   <p className="text-center fw-bold mx-3 mb-0">Hoặc</p>
-                              </div>
-                              <div className="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                                   <p className="lead fw-normal mb-0 me-3">Đăng nhập với</p>
-                                   <button type="button" onClick={logGoogleUser} className="btn btn-lg btn-floating mx-1 social-btn google-btn">
-                                        <i className="bi bi-google" />
-                                   </button>
-                                   <button type="button" className="btn btn-lg btn-floating mx-1 social-btn facebook-btn">
-                                        <i className="bi bi-facebook" />
-                                   </button>
-                                   <button type="button" className="btn btn-lg btn-floating mx-1 social-btn linkedin-btn">
-                                        <i className="bi bi-linkedin" />
-                                   </button>
-                              </div>
                          </div>
                     </div>
                </div>

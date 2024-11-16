@@ -1,13 +1,11 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
 import './Login.css';
 import { Link } from 'react-router-dom';
 import { axiosi } from '../../config/axios';
 import { login } from '../../services/authService';
-import { auth, signInWithGooglePopup } from '../../utils/firebase-untils';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
      const {
@@ -23,59 +21,107 @@ const Login = () => {
                     localStorage.setItem('isAuthenticated', 'true');
                     localStorage.setItem('token', response.access_token);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
-                    toast.success(`Chào mừng bạn, ${data.email}!`, { position: 'top-right' });
+
+                    Swal.fire({
+                         icon: 'success',
+                         title: `Chào mừng bạn, ${data.email}!`,
+                         position: 'top-right',
+                         toast: true,
+                         timer: 2000,
+                         showConfirmButton: false,
+                    });
 
                     setTimeout(() => {
                          window.location.href = '/taskmaneger';
                     }, 1000);
                }
           } catch (error) {
-               toast.error(error.response && error.response.status === 401 ? 'Email hoặc Mật khẩu đã sai' : 'Đăng nhập thất bại. Vui lòng thử lại.', {
+               Swal.fire({
+                    icon: 'error',
+                    title: error.response && error.response.status === 401 ? 'Email hoặc Mật khẩu đã sai' : 'Đăng nhập thất bại. Vui lòng thử lại.',
                     position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
                });
           }
      };
 
-     const logGoogleUser = async () => {
-          const provider = new GoogleAuthProvider();
+     const handleGGLogin = async (credentialResponse) => {
           try {
-               const response = await signInWithPopup(auth, provider);
-               const credential = GoogleAuthProvider.credentialFromResult(response);
-               const token = credential.accessToken;
+               const response = await axiosi.post('/api/auth/google', {
+                    credential: credentialResponse.credential,
+               });
 
-               const result = await axiosi.post('/api/google-login', { token });
-               if (result && result.data.access_token) {
+               if (response.data.status === 'verification_required') {
+                    sessionStorage.setItem('user_email', response.data.email);
+
+                    Swal.fire({
+                         icon: 'info',
+                         title: 'Vui lòng kiểm tra email để xác minh tài khoản.',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 2000,
+                         showConfirmButton: false,
+                    });
+
+                    setTimeout(() => {
+                         window.location.href = `/taskmaneger/confirm-email`;
+                    }, 2000);
+               } else if (response.data.status === 'verified') {
                     localStorage.setItem('isAuthenticated', 'true');
-                    localStorage.setItem('token', result.data.access_token);
-                    axiosi.defaults.headers.common['Authorization'] = `Bearer ${result.data.access_token}`;
-                    window.location.href = '/taskmaneger';
-               } else {
-                    toast.error('Phản hồi đăng nhập không hợp lệ', { position: 'top-right' });
+                    localStorage.setItem('token', response.data.access_token);
+                    axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
+
+                    Swal.fire({
+                         icon: 'success',
+                         title: 'Đăng nhập thành công!',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    }).then(() => {
+                         window.location.href = '/taskmaneger';
+                    });
                }
           } catch (error) {
-               if (error.code === 'auth/popup-closed-by-user') {
-                    toast.error('Bạn đã đóng cửa sổ đăng nhập. Vui lòng thử lại.', { position: 'top-right' });
-               } else {
-                    toast.error('Đăng nhập thất bại. Vui lòng thử lại.', { position: 'top-right' });
-               }
-               console.error('Google login error:', error);
+               Swal.fire({
+                    icon: 'error',
+                    title: 'Đăng nhập Google thất bại. Vui lòng thử lại.',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
           }
      };
 
+     const handleGGError = () => {
+          Swal.fire({
+               icon: 'error',
+               title: 'Đăng nhập Google thất bại.',
+               position: 'top-right',
+               toast: true,
+               timer: 2000,
+               showConfirmButton: false,
+          });
+     };
+
      return (
-          <section className="vh-100">
-               <div className="container-fluid h-custom">
+          <section className="vh-100 bg-light">
+               <div className="container-fluid h-100">
                     <div className="row d-flex justify-content-center align-items-center h-100">
-                         <div className="col-md-9 col-lg-6 col-xl-5">
+                         <div className="col-md-7 col-lg-6 col-xl-5">
                               <img
                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-                                   className="img-fluid"
+                                   className="img-fluid rounded-3"
                                    alt="Sample image"
                               />
                          </div>
-                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                         <div className="col-md-7 col-lg-6 col-xl-4 offset-xl-1 border rounded-4 shadow-lg bg-white p-4">
                               <form onSubmit={handleSubmit(onSubmit)}>
-                                   <div data-mdb-input-init className="form-outline mb-4">
+                                   {/* Email Input */}
+                                   <div className="form-outline mb-4 mt-3">
                                         <input
                                              type="email"
                                              id="form3Example3"
@@ -95,7 +141,8 @@ const Login = () => {
                                         {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
                                    </div>
 
-                                   <div data-mdb-input-init className="form-outline mb-3">
+                                   {/* Password Input */}
+                                   <div className="form-outline mb-4">
                                         <input
                                              type="password"
                                              id="form3Example4"
@@ -115,22 +162,26 @@ const Login = () => {
                                         {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                                    </div>
 
-                                   <div className="d-flex justify-content-between align-items-center">
+                                   {/* Forgot Password Link */}
+                                   <div className="d-flex justify-content-between">
                                         <Link
                                              to="/taskmaneger/reset-password"
                                              className="text-decoration-none text-primary fw-semibold d-flex align-items-center">
-                                             <i className="bi bi-question-circle me-2"></i> Quên mật khẩu?
+                                             <i className="bi bi-question-circle me-2"></i>
+                                             <span>Quên mật khẩu?</span>
                                         </Link>
                                    </div>
 
-                                   <div className="text-center text-lg-start mt-4 pt-2">
-                                        <button
-                                             type="submit"
-                                             className="btn btn-primary btn-lg"
-                                             style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}>
+                                   {/* Submit Button */}
+                                   <div className="text-center text-lg-start pt-2 d-flex justify-content-center">
+                                        <button type="submit" className="btn btn-primary btn-lg w-100">
                                              Đăng nhập
                                         </button>
-                                        <p className="small fw-bold mt-2 pt-1 mb-0">
+                                   </div>
+
+                                   {/* Register Link */}
+                                   <div className="text-center mt-2">
+                                        <p className="small fw-bold mb-0">
                                              Bạn không có tài khoản?{' '}
                                              <Link to="/taskmaneger/register" className="link-danger">
                                                   Đăng ký
@@ -139,26 +190,31 @@ const Login = () => {
                                    </div>
                               </form>
 
+                              {/* Divider */}
                               <div className="divider d-flex align-items-center my-4">
                                    <p className="text-center fw-bold mx-3 mb-0">Hoặc</p>
                               </div>
 
-                              <div className="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                                   <p className="lead fw-normal mb-0 me-3">Đăng nhập với</p>
-                                   <button type="button" onClick={logGoogleUser} className="btn btn-lg btn-floating mx-1 social-btn google-btn">
-                                        <i className="bi bi-google" />
-                                   </button>
-                                   <button type="button" className="btn btn-lg btn-floating mx-1 social-btn facebook-btn">
-                                        <i className="bi bi-facebook" />
-                                   </button>
-                                   <button type="button" className="btn btn-lg btn-floating mx-1 social-btn linkedin-btn">
-                                        <i className="bi bi-linkedin" />
-                                   </button>
+                              {/* Google Login Button */}
+                              <div className="d-flex justify-content-center my-4">
+                                   <GoogleLogin
+                                        onSuccess={handleGGLogin}
+                                        onError={handleGGError}
+                                        render={(renderProps) => (
+                                             <button
+                                                  type="button"
+                                                  className="btn btn-lg btn-outline-danger social-btn google-btn w-100 d-flex align-items-center justify-content-center"
+                                                  onClick={renderProps.onClick}
+                                                  disabled={renderProps.disabled}>
+                                                  <i className="bi bi-google me-2"></i>
+                                                  Đăng nhập với Google
+                                             </button>
+                                        )}
+                                   />
                               </div>
                          </div>
                     </div>
                </div>
-               <ToastContainer />
           </section>
      );
 };

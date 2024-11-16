@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css'; 
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 import { verifyResetCode } from '../../services/authService';
 
@@ -37,7 +37,7 @@ const OtpPage = () => {
                     Swal.fire({
                          icon: 'success',
                          title: 'Mã OTP hợp lệ! Bạn có thể đặt lại mật khẩu của mình.',
-                         position: 'top-end',
+                         position: 'top-right',
                          toast: true,
                          timer: 2000,
                          showConfirmButton: false,
@@ -51,7 +51,7 @@ const OtpPage = () => {
                     Swal.fire({
                          icon: 'error',
                          title: response?.message || 'Mã OTP không hợp lệ. Vui lòng thử lại.',
-                         position: 'top-end',
+                         position: 'top-right',
                          toast: true,
                          timer: 2000,
                          showConfirmButton: false,
@@ -62,7 +62,7 @@ const OtpPage = () => {
                Swal.fire({
                     icon: 'error',
                     title: error?.response?.data?.message || 'Mã OTP không hợp lệ hoặc có lỗi trong quá trình xử lý. Vui lòng thử lại.',
-                    position: 'top-end',
+                    position: 'top-right',
                     toast: true,
                     timer: 2000,
                     showConfirmButton: false,
@@ -81,7 +81,7 @@ const OtpPage = () => {
                                    alt="Sample"
                               />
                          </div>
-                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1 border rounded-4 shadow-lg bg-white p-4">
                               <h2 className="text-center mb-4">Nhập mã OTP</h2>
                               <form onSubmit={handleVerifyOtp}>
                                    <div className="form-outline mb-4">

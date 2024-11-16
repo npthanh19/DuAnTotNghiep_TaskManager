@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { verifyEmail } from '../../services/authService';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 function VerifyEmail() {
      const { userId, hash } = useParams();
      const [loading, setLoading] = useState(true);
      const [verified, setVerified] = useState(false);
      const [error, setError] = useState(null);
-     const [tokenExpired, setTokenExpired] = useState(false); 
+     const [tokenExpired, setTokenExpired] = useState(false);
      const navigate = useNavigate();
 
      useEffect(() => {
@@ -21,18 +22,63 @@ function VerifyEmail() {
 
                     if (response.message === 'Email verified and subscription updated successfully!') {
                          setVerified(true);
+                         Swal.fire({
+                              icon: 'success',
+                              title: 'Xác minh thành công!',
+                              text: 'Tài khoản của bạn đã được xác minh thành công!',
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
                     } else if (response.message === 'Email already verified.') {
                          setVerified(true);
+                         Swal.fire({
+                              icon: 'info',
+                              title: 'Email đã được xác minh.',
+                              text: 'Tài khoản của bạn đã được xác minh trước đó.',
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
                     } else if (response.message === 'Token has expired') {
                          setError('Token hết hạn. Vui lòng yêu cầu một liên kết xác minh mới.');
                          setTokenExpired(true);
+                         Swal.fire({
+                              icon: 'error',
+                              title: 'Token hết hạn!',
+                              text: 'Token đã hết hạn. Vui lòng yêu cầu một liên kết xác minh mới.',
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
                     } else {
                          setError('Xác minh email thất bại. Vui lòng thử lại sau.');
+                         Swal.fire({
+                              icon: 'error',
+                              title: 'Xác minh thất bại!',
+                              text: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
                     }
                } catch (err) {
                     setLoading(false);
                     setError('Đã có lỗi xảy ra. Vui lòng thử lại sau.');
                     setTokenExpired(true);
+                    Swal.fire({
+                         icon: 'error',
+                         title: 'Đã có lỗi xảy ra!',
+                         text: 'Vui lòng thử lại sau.',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
                }
           };
 
@@ -54,7 +100,7 @@ function VerifyEmail() {
                                    alt="Ảnh minh họa"
                               />
                          </div>
-                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1 border rounded-4 shadow-lg bg-white p-4">
                               <div className="text-center">
                                    <h2>Xác minh tài khoản</h2>
                                    {loading ? (

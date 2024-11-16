@@ -18,3 +18,4 @@ axiosi.interceptors.request.use(
 );
 
 export { axiosi };
+export const GOOGLE_CLIENT_ID = process.env.REACT_APP_GG__CLIENT_ID;

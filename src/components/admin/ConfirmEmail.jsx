@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
 import { resendVerificationCode } from '../../services/authService';
 
 function ConfirmEmail() {
@@ -10,7 +9,15 @@ function ConfirmEmail() {
      useEffect(() => {
           const email = sessionStorage.getItem('user_email');
           if (!email) {
-               toast.error('Không tìm thấy thông tin người dùng. Vui lòng đăng ký lại.', { position: 'top-right' });
+               Swal.fire({
+                    icon: 'error',
+                    title: 'Không tìm thấy thông tin người dùng',
+                    text: 'Vui lòng đăng ký lại.',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
                navigate('/taskmaneger/register');
           }
      }, [navigate]);
@@ -19,7 +26,15 @@ function ConfirmEmail() {
           const email = sessionStorage.getItem('user_email');
 
           if (!email) {
-               toast.error('Không tìm thấy email. Vui lòng thử lại.', { position: 'top-right' });
+               Swal.fire({
+                    icon: 'error',
+                    title: 'Không tìm thấy email',
+                    text: 'Vui lòng thử lại.',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
                return;
           }
 
@@ -27,12 +42,33 @@ function ConfirmEmail() {
                const response = await resendVerificationCode(email);
 
                if (response.status === 'warning') {
-                    toast.warning(response.message, { position: 'top-right' });
+                    Swal.fire({
+                         icon: 'warning',
+                         text: response.message,
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
                } else {
-                    toast.success(response.message, { position: 'top-right' });
+                    Swal.fire({
+                         icon: 'success',
+                         text: response.message,
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
                }
           } catch (error) {
-               toast.error(error.message || 'Không thể gửi lại email xác nhận.', { position: 'top-right' });
+               Swal.fire({
+                    icon: 'error',
+                    text: error.message || 'Không thể gửi lại email xác nhận.',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           }
      };
 
@@ -47,7 +83,7 @@ function ConfirmEmail() {
                                    alt="Ảnh minh họa"
                               />
                          </div>
-                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1 border rounded-4 shadow-lg bg-white p-4">
                               <div className="text-center">
                                    <h2>Hãy kiểm tra Email của bạn!</h2>
                                    <p>
@@ -64,7 +100,6 @@ function ConfirmEmail() {
                          </div>
                     </div>
                </div>
-               <ToastContainer />
           </section>
      );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { requestPasswordReset } from '../../services/authService';
 
@@ -23,7 +23,7 @@ const ResetPassword = () => {
                     Swal.fire({
                          icon: 'error',
                          title: 'Không tìm thấy người dùng với thông tin này!',
-                         position: 'top-end',
+                         position: 'top-right',
                          toast: true,
                          timer: 2000,
                          showConfirmButton: false,
@@ -34,7 +34,7 @@ const ResetPassword = () => {
                Swal.fire({
                     icon: 'success',
                     title: `Mã OTP đã được gửi đến ${resetMethod === 'email' ? 'email' : 'số điện thoại'} của bạn!`,
-                    position: 'top-end',
+                    position: 'top-right',
                     toast: true,
                     timer: 2000,
                     showConfirmButton: false,
@@ -46,7 +46,7 @@ const ResetPassword = () => {
                Swal.fire({
                     icon: 'error',
                     title: error?.response?.data?.message || 'Đã xảy ra lỗi. Vui lòng thử lại!',
-                    position: 'top-end',
+                    position: 'top-right',
                     toast: true,
                     timer: 2000,
                     showConfirmButton: false,
@@ -76,7 +76,7 @@ const ResetPassword = () => {
                                    alt="Sample"
                               />
                          </div>
-                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1 border rounded-4 shadow-lg bg-white p-4">
                               <h2 className="text-center mb-4">Reset Password</h2>
 
                               <form onSubmit={handleSubmit(onSubmit)}>
@@ -136,41 +136,45 @@ const ResetPassword = () => {
                                              </label>
                                              {errors.phone_number && <div className="invalid-feedback">{errors.phone_number.message}</div>}
 
-                                             <div className="mt-3 text-center">
+                                             <div className=" text-center">
                                                   <p>
                                                        <strong>
                                                             Bạn cần quét mã QR hoặc tham gia vào đường link Telegram dưới đây để nhận mã OTP:
                                                        </strong>
                                                   </p>
-                                                  <div className="d-flex flex-column align-items-center">
-                                                       <p>
-                                                            <a
-                                                                 href="https://t.me/nhdtTotNghiep2025"
-                                                                 target="_blank"
-                                                                 rel="noopener noreferrer"
-                                                                 className="btn btn-primary">
-                                                                 Tham gia Telegram
-                                                            </a>
-                                                       </p>
-                                                       <p>OR:</p>
+                                                  <div className="d-flex justify-content-center align-items-center mt-4">
+                                                       {/* Telegram Button */}
+                                                       <a
+                                                            href="https://t.me/nhdtTotNghiep2025"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="btn btn-secondary btn-sm me-3">
+                                                            Tham gia Telegram
+                                                       </a>
+
+                                                       {/* OR Text */}
+                                                       <p className="my-auto mx-3">OR</p>
+
+                                                       {/* QR Code */}
                                                        <img
                                                             src="/assets/admin/img/NHDT_TEAM.jpg"
                                                             alt="QR Code"
-                                                            className="qr-image d-block mx-auto mt-2"
+                                                            className="qr-image ms-4"
                                                             width="150"
                                                        />
                                                   </div>
+
                                                   <p className="note my-3 text-danger">
                                                        <strong>Lưu ý:</strong> Người dùng nhấp chọn vào Link bắt buộc phải đăng nhập TELEGRAM.
                                                   </p>
                                              </div>
                                         </div>
                                    )}
-                                   <div className="text-center mt-4 pt-2">
+                                   <div className="text-center pt-2">
                                         <button
                                              type="submit"
                                              className="btn btn-primary btn-sm"
-                                             style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}>
+                                             style={{ paddingLeft: '5rem', paddingRight: '5rem' }}>
                                              Lấy lại mật khẩu
                                         </button>
                                    </div>

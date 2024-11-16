@@ -23,7 +23,7 @@ const NewPasswordPage = () => {
                     Swal.fire({
                          icon: 'error',
                          title: 'Thông tin xác minh không hợp lệ hoặc đã hết hạn!',
-                         position: 'top-end',
+                         position: 'top-right',
                          toast: true,
                          timer: 2000,
                          showConfirmButton: false,
@@ -42,7 +42,7 @@ const NewPasswordPage = () => {
                     Swal.fire({
                          icon: 'success',
                          title: response.data?.message || 'Mật khẩu đã được thay đổi thành công!',
-                         position: 'top-end',
+                         position: 'top-right',
                          toast: true,
                          timer: 2000,
                          showConfirmButton: false,
@@ -54,14 +54,14 @@ const NewPasswordPage = () => {
                     Swal.fire({
                          icon: 'error',
                          title: response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại!',
-                         position: 'top-end',
+                         position: 'top-right',
                          toast: true,
                          timer: 2000,
                          showConfirmButton: false,
                     });
                }
           } catch (error) {
-               console.error('API call error:', error); 
+               console.error('API call error:', error);
                Swal.fire({
                     icon: 'error',
                     title: 'Có lỗi xảy ra, vui lòng thử lại!',
@@ -84,7 +84,7 @@ const NewPasswordPage = () => {
                                    alt="Sample"
                               />
                          </div>
-                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                         <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1 border rounded-4 shadow-lg bg-white p-4">
                               <h2 className="text-center mb-4">Nhập Mật Khẩu Mới</h2>
 
                               <form onSubmit={handleSubmit(onSubmit)}>
