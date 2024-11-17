@@ -5,7 +5,7 @@ import { Delete } from './Delete';
 import { CommentForm } from '../comment/View';
 import { getAllTasks, deleteTask as deleteTaskService } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
-import { getTaskFiles } from '../../../services/fileService';
+import { getFilesByTaskId } from '../../../services/fileService';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -79,13 +79,17 @@ export const View = () => {
 
      const handleFileViewClick = async (taskId) => {
           try {
-               const files = await getTaskFiles(taskId);
-               setTaskFiles(files);
-               setShowFilePopup(true);
+               // Fetch all files related to the task using a new service function
+               const files = await getFilesByTaskId(taskId); // Replace with the actual service function to get files for a task
+               setTaskFiles(files); // Set the files to state
+               setShowFilePopup(true); // Show the popup with files
           } catch (error) {
+               setError('Error fetching files. Please try again later.');
                console.error('Error fetching task files:', error);
           }
      };
+     
+        
 
      const getProjectNameById = (projectId) => {
           const project = projects.find((proj) => proj.id === projectId);
@@ -260,33 +264,38 @@ export const View = () => {
                {showCommentForm && <CommentForm taskId={selectedTaskId} showModal={showCommentForm} handleCloseModal={handleCloseCommentForm} />}
 
                {showFilePopup && (
-                    <div className="modal show" style={{ display: 'block' }}>
-                         <div className="modal-dialog">
-                              <div className="modal-content">
-                                   <div className="modal-header">
-                                        <h5 className="modal-title">Danh sách file</h5>
-                                        <button type="button" className="btn-close" onClick={() => setShowFilePopup(false)}></button>
-                                   </div>
-                                   <div className="modal-body">
-                                        <ul className="list-group">
-                                             {taskFiles.map((file) => (
-                                                  <li key={file.id} className="list-group-item">
-                                                       <a href={file.url} target="_blank" rel="noopener noreferrer">
-                                                            {file.file_name}
-                                                       </a>
-                                                  </li>
-                                             ))}
-                                        </ul>
-                                   </div>
-                                   <div className="modal-footer">
-                                        <button type="button" className="btn btn-secondary" onClick={() => setShowFilePopup(false)}>
-                                             Đóng
-                                        </button>
-                                   </div>
-                              </div>
-                         </div>
+     <div className="modal show" style={{ display: 'block' }}>
+          <div className="modal-dialog">
+               <div className="modal-content">
+                    <div className="modal-header">
+                         <h5 className="modal-title">Danh sách file</h5>
+                         <button type="button" className="btn-close" onClick={() => setShowFilePopup(false)}></button>
                     </div>
-               )}
+                    <div className="modal-body">
+                         {taskFiles.length > 0 ? (
+                              <ul className="list-group">
+                                   {taskFiles.map((file) => (
+                                        <li key={file.id} className="list-group-item">
+                                             <a href={file.url} target="_blank" rel="noopener noreferrer">
+                                                  {file.file_name}
+                                             </a>
+                                        </li>
+                                   ))}
+                              </ul>
+                         ) : (
+                              <p>{t('No files available for this task.')}</p>
+                         )}
+                    </div>
+                    <div className="modal-footer">
+                         <button type="button" className="btn btn-secondary" onClick={() => setShowFilePopup(false)}>
+                              {t('Close')}
+                         </button>
+                    </div>
+               </div>
+          </div>
+     </div>
+)}
+
           </div>
      );
 };
