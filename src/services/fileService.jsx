@@ -1,6 +1,8 @@
 import { axiosi } from '../config/axios';
 
 const apiEndpoint = '/api/files';
+const taskApiEndpoint = '/api/tasks';
+
 
 // Lấy danh sách file của một task cụ thể
 export const getTaskFiles = async (taskId) => {
@@ -84,6 +86,19 @@ export const getFileById = async (id) => {
      }
 };
 
+
+export const getFilesByTaskId = async (taskId) => {
+     try {
+          const response = await axiosi.get(`${taskApiEndpoint}/${taskId}/files`); // Adjust the API endpoint accordingly
+          return response.data; // Assuming response contains the file data
+     } catch (error) {
+          console.error('Error fetching files:', error);
+          throw error;
+     }
+};
+
+
+
 // Xóa file
 export const deleteFile = async (id) => {
      try {
@@ -122,4 +137,5 @@ export default {
      getFileById,
      deleteFile,
      updateFile,
+     getFilesByTaskId,
 };
