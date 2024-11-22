@@ -1,14 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { resendVerificationCode } from '../../services/authService';
 
 function ConfirmEmail() {
      const navigate = useNavigate();
+     const [email, setEmail] = useState('');
 
      useEffect(() => {
-          const email = sessionStorage.getItem('user_email');
-          if (!email) {
+          const storedEmail = sessionStorage.getItem('user_email');
+          console.log('Stored Email: ', storedEmail);
+
+          if (storedEmail) {
+               setEmail(storedEmail);
+          } else {
                Swal.fire({
                     icon: 'error',
                     title: 'Không tìm thấy thông tin người dùng',

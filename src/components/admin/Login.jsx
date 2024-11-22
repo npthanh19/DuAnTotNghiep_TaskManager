@@ -2,10 +2,11 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import './Login.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { axiosi } from '../../config/axios';
 import { login } from '../../services/authService';
 import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
      const {
@@ -13,6 +14,8 @@ const Login = () => {
           handleSubmit,
           formState: { errors },
      } = useForm();
+
+     const navigate = useNavigate();
 
      const onSubmit = async (data) => {
           try {
@@ -27,12 +30,12 @@ const Login = () => {
                          title: `Chào mừng bạn, ${data.email}!`,
                          position: 'top-right',
                          toast: true,
-                         timer: 2000,
+                         timer: 1000,
                          showConfirmButton: false,
                     });
 
                     setTimeout(() => {
-                         window.location.href = '/taskmaneger';
+                         navigate('/taskmaneger');
                     }, 1000);
                }
           } catch (error) {
@@ -49,12 +52,17 @@ const Login = () => {
 
      const handleGGLogin = async (credentialResponse) => {
           try {
+               const token = credentialResponse.credential;
+               const decoded = jwtDecode(token);
+
+               const userEmail = decoded.email;
+
                const response = await axiosi.post('/api/auth/google', {
-                    credential: credentialResponse.credential,
+                    credential: token,
                });
 
                if (response.data.status === 'verification_required') {
-                    sessionStorage.setItem('user_email', response.data.email);
+                    sessionStorage.setItem('user_email', userEmail);
 
                     Swal.fire({
                          icon: 'info',
@@ -66,7 +74,7 @@ const Login = () => {
                     });
 
                     setTimeout(() => {
-                         window.location.href = `/taskmaneger/confirm-email`;
+                         navigate('/taskmaneger/confirm-email');
                     }, 2000);
                } else if (response.data.status === 'verified') {
                     localStorage.setItem('isAuthenticated', 'true');
@@ -81,7 +89,7 @@ const Login = () => {
                          timer: 3000,
                          showConfirmButton: false,
                     }).then(() => {
-                         window.location.href = '/taskmaneger';
+                         navigate('/taskmaneger');
                     });
                }
           } catch (error) {
@@ -122,6 +130,9 @@ const Login = () => {
                               <form onSubmit={handleSubmit(onSubmit)}>
                                    {/* Email Input */}
                                    <div className="form-outline mb-4 mt-3">
+                                        <label className="form-label" htmlFor="form3Example3">
+                                             Địa chỉ Email
+                                        </label>
                                         <input
                                              type="email"
                                              id="form3Example3"
@@ -135,14 +146,14 @@ const Login = () => {
                                                   },
                                              })}
                                         />
-                                        <label className="form-label" htmlFor="form3Example3">
-                                             Địa chỉ Email
-                                        </label>
                                         {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
                                    </div>
 
                                    {/* Password Input */}
                                    <div className="form-outline mb-4">
+                                        <label className="form-label" htmlFor="form3Example4">
+                                             Mật khẩu
+                                        </label>
                                         <input
                                              type="password"
                                              id="form3Example4"
@@ -156,9 +167,6 @@ const Login = () => {
                                                   },
                                              })}
                                         />
-                                        <label className="form-label" htmlFor="form3Example4">
-                                             Mật khẩu
-                                        </label>
                                         {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                                    </div>
 

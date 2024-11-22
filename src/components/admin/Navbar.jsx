@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { logout } from '../../services/authService';
 import { axiosi } from '../../config/axios';
+import Swal from 'sweetalert2';
+
 const Navbar = ({ onToggleSidebar }) => {
      const { t, i18n } = useTranslation();
      const [isDarkMode, setIsDarkMode] = useState(false);
@@ -25,13 +27,21 @@ const Navbar = ({ onToggleSidebar }) => {
      const handleLogout = async () => {
           try {
                await logout();
-
                localStorage.removeItem('isAuthenticated');
                localStorage.removeItem('token');
                sessionStorage.removeItem('user_email');
                axiosi.defaults.headers.common['Authorization'] = '';
 
-               navigate('/taskmaneger/login');
+               Swal.fire({
+                    icon: 'success',
+                    title: 'Đăng xuất thành công!',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               }).then(() => {
+                    navigate('/taskmaneger/login');
+               });
           } catch (error) {
                console.error('Logout error:', error);
           }
