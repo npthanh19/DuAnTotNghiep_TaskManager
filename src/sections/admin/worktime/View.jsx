@@ -7,6 +7,11 @@ import { DeleteWorktime } from './Delete';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './worktime.css';
+import Swal from 'sweetalert2';
+import { useTranslation } from 'react-i18next';
+
+
+
 export const View = () => {
     const [worktimes, setWorktimes] = useState([]);
     const [projects, setProjects] = useState([]);
@@ -24,6 +29,7 @@ export const View = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentWorktimes = worktimes.slice(indexOfFirstItem, indexOfLastItem);
 
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -48,9 +54,46 @@ export const View = () => {
     }, []);
 
     const handleDeleteClick = (id) => {
-        setSelectedWorktimeId(id);
-        setShowDeleteModal(true);
-    };
+        const deleteTitle = t('Delete Worktime');
+   
+        Swal.fire({
+             title: deleteTitle,
+             text: t('Are you sure you want to delete this worktime?'),
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonColor: '#d33',
+             cancelButtonColor: '#3085d6',
+             confirmButtonText: t('Delete'),
+             cancelButtonText: t('Cancel'),
+        }).then(async (result) => {
+             if (result.isConfirmed) {
+                  try {
+                       await deleteWorktime(id);
+                       setWorktimes((prevWorktimes) => prevWorktimes.filter((worktime) => worktime.id !== id));
+   
+                       Swal.fire({
+                            icon: 'success',
+                            text: t('The worktime has been moved to the trash!'),
+                            position: 'top-right',
+                            toast: true,
+                            timer: 3000,
+                            showConfirmButton: false,
+                       });
+                  } catch (error) {
+                       Swal.fire({
+                            icon: 'error',
+                            text: t('An error occurred while deleting the worktime.'),
+                            position: 'top-right',
+                            toast: true,
+                            timer: 3000,
+                            showConfirmButton: false,
+                       });
+                  }
+             }
+        });
+   };
+    
+
 
     const handleDeleteSuccess = (id) => {
         setWorktimes((prevWorktimes) => prevWorktimes.filter((worktime) => worktime.id !== id));
@@ -97,23 +140,23 @@ export const View = () => {
     return (
         <div className="card">
             <div className="card-header d-flex justify-content-between align-items-center">
-                <h3 className="fw-bold py-3 mb-4">Worktimes</h3>
+                <h3 className="fw-bold py-3 mb-4">{t('Worktimes')}</h3>
                 <Link to="/taskmaneger/worktimes/add" className="btn btn-primary">
-                    <i className="bi bi-plus me-2"></i> Add
+                    <i className="bi bi-plus me-2"></i> {t('Add')}
                 </Link>
             </div>
             <div className="card-body" style={{ padding: 0 }}>
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Project</th>
-                            <th>Người tạo</th> 
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Description</th>
-                            <th>Actions</th>
+                            <th>{t('ID')}</th>
+                            <th>{t('Name')}</th>
+                            <th>{t('Projects')}</th>
+                            <th>{t('User Create')}</th> 
+                            <th>{t('Start Date')}</th>
+                            <th>{t('End Date')}</th>
+                            <th>{t('Description')}</th>
+                            <th>{t('Actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -193,7 +236,7 @@ export const View = () => {
                                                         className="dropdown-item text-warning" 
                                                         onClick={() => handleEdit(worktime)}
                                                     >
-                                                        <i className="bi bi-pencil me-2"></i> Edit
+                                                        <i className="bi bi-pencil me-2"></i> {t('Edit')}
                                                     </button>
                                                 </li>
                                                 <li>
@@ -201,7 +244,7 @@ export const View = () => {
                                                         className="dropdown-item text-danger" 
                                                         onClick={() => handleDeleteClick(worktime.id)}
                                                     >
-                                                        <i className="bi bi-trash me-2"></i> Delete
+                                                        <i className="bi bi-trash me-2"></i> {t('Delete')}
                                                     </button>
                                                 </li>
                                             </ul>
@@ -216,7 +259,7 @@ export const View = () => {
                     <ul className="pagination mt-2">
                         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                             <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                                Previous
+                            {t('Previous')}
                             </button>
                         </li>
                         {[...Array(totalPages)].map((_, index) => (
@@ -228,7 +271,7 @@ export const View = () => {
                         ))}
                         <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                             <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                                Next
+                            {t('Next')}
                             </button>
                         </li>
                     </ul>

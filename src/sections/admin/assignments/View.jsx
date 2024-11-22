@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
 import { getAllAssignments, deleteAssignment } from '../../../services/assignmentService';
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from 'react-toastify';
 
 export const View = () => {
      const [currentPage, setCurrentPage] = useState(1);
@@ -33,8 +35,43 @@ export const View = () => {
      }, []);
 
      const handleDeleteClick = (id) => {
-          setSelectedAssignmentId(id);
-          setShowDeleteModal(true);
+          const deleteTitle = t('Delete Assignments');
+     
+          Swal.fire({
+               title: deleteTitle,
+               text: t('Are you sure you want to delete this assignments?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#d33',
+               cancelButtonColor: '#3085d6',
+               confirmButtonText: t('Delete'),
+               cancelButtonText: t('Cancel'),
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    try {
+                         await deleteAssignment(id);
+                         setAssignments((prevWorktimes) => prevWorktimes.filter((worktime) => worktime.id !== id));
+     
+                         Swal.fire({
+                              icon: 'success',
+                              text: t('The assignments has been moved to the trash!'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
+                    } catch (error) {
+                         Swal.fire({
+                              icon: 'error',
+                              text: t('An error occurred while deleting the assignments.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
+                    }
+               }
+          });
      };
 
      const handleCloseModal = () => {

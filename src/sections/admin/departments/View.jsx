@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { DeleteDepartment } from '../../../sections/admin/departments/Delete';
-import { getAllDepartments } from '../../../services/deparmentsService';
-import { ToastContainer } from 'react-toastify';
+import { getAllDepartments, deleteDepartment } from '../../../services/deparmentsService';
 import AddUserToDepartment from './AddUserToDepartment';
 import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from 'react-toastify';
 
 export function View() {
      const [currentPage, setCurrentPage] = useState(1);
@@ -36,9 +37,45 @@ export function View() {
      }, []);
 
      const handleDeleteClick = (id) => {
-          setSelectedDepartmentId(id);
-          setShowDeleteModal(true);
+          const deleteTitle = t('Delete Departments');
+     
+          Swal.fire({
+               title: deleteTitle,
+               text: t('Are you sure you want to delete this departments?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#d33',
+               cancelButtonColor: '#3085d6',
+               confirmButtonText: t('Delete'),
+               cancelButtonText: t('Cancel'),
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    try {
+                         await deleteDepartment(id);
+                         setDepartments((prevDepartments) => prevDepartments.filter((department) => department.id !== id));
+     
+                         Swal.fire({
+                              icon: 'success',
+                              text: t('The departments has been moved to the trash!'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
+                    } catch (error) {
+                         Swal.fire({
+                              icon: 'error',
+                              text: t('An error occurred while deleting the departments.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
+                    }
+               }
+          });
      };
+      
 
      const handleCloseModal = () => {
           setShowDeleteModal(false);

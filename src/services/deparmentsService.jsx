@@ -48,14 +48,14 @@ export const updateDepartment = async (id, departmentData) => {
 
 // Xóa phòng ban
 export const deleteDepartment = async (id) => {
-     try {
-          const response = await axiosi.delete(`${apiEndpoint}/${id}`);
-          return response.data;
-     } catch (error) {
-          console.error(`Error deleting department with ID ${id}:`, error);
-          throw error.response ? error.response.data : new Error('Network error');
-     }
+  try {
+    const response = await axiosi.delete(`${apiEndpoint}/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error deleting department with ID ${id}: ${error.message}`);
+  }
 };
+
 
 // Thêm một người dùng vào phòng ban
 export const addUserToDepartment = async (departmentId, userId) => {

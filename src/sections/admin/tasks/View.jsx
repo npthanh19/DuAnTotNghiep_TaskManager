@@ -6,6 +6,8 @@ import { CommentForm } from '../comment/View';
 import { getAllTasks, deleteTask as deleteTaskService } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getFilesByTaskId } from '../../../services/fileService';
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from 'react-toastify';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -44,9 +46,46 @@ export const View = () => {
      }, []);
 
      const handleDeleteClick = (id) => {
-          setSelectedTaskId(id);
-          setShowDeleteModal(true);
+          const deleteTitle = t('Delete Tasks');
+     
+          Swal.fire({
+               title: deleteTitle,
+               text: t('Are you sure you want to delete this task?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#d33',
+               cancelButtonColor: '#3085d6',
+               confirmButtonText: t('Delete'),
+               cancelButtonText: t('Cancel'),
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    try {
+                         await deleteTask(id);
+                         setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+     
+                         Swal.fire({
+                              icon: 'success',
+                              text: t('The task has been moved to the trash!'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
+                    } catch (error) {
+                         Swal.fire({
+                              icon: 'error',
+                              text: t('An error occurred while deleting the task.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
+                    }
+               }
+          });
      };
+     
+     
 
      const handleCloseModal = () => {
           setShowDeleteModal(false);

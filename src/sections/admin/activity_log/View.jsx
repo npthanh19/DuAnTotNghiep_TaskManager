@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 import { DeleteActivity } from '../../../sections/admin/activity_log/Delete';
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from 'react-toastify';
+
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,10 +20,28 @@ export const View = () => {
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [SelectedActivityId, setSelectedActivityId] = useState(null);
 
-     const handleDeleteClick = (id) => {
-          setSelectedActivityId(id);
-          setShowDeleteModal(true);
+     const handleDeleteClick = async (id) => {
+          Swal.fire({
+               title: t('Delete Activity'),
+               text: t('Are you sure you want to delete this activity?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#d33',
+               cancelButtonColor: '#3085d6',
+               confirmButtonText: t('Delete'),
+               cancelButtonText: t('Cancel'),
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    try {
+                         setFilteredActivityLog((prevLogs) => prevLogs.filter((log) => log.id !== id));
+                         toast.success(t('Activity has been successfully deleted!'));
+                    } catch (error) {
+                         toast.error(t('An error occurred while deleting the activity.'));
+                    }
+               }
+          });
      };
+  
 
      const handleCloseModal = () => {
           setShowDeleteModal(false);
