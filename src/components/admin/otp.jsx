@@ -107,12 +107,6 @@ const OtpPage = () => {
                                              Xác thực OTP
                                         </button>
                                    </div>
-
-                                   <div className="text-center mt-3">
-                                        <a type="text" className="text-danger" style={{ textDecoration: 'underline', cursor: 'pointer' }}>
-                                             Chưa nhận được mã? Gửi lại OTP
-                                        </a>
-                                   </div>
                               </form>
                          </div>
                     </div>

@@ -96,30 +96,33 @@ function Register() {
                          <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1 border rounded-4 shadow-lg bg-white p-4">
                               <form onSubmit={handleSubmit(onSubmit)}>
                                    <div data-mdb-input-init className="form-outline">
+                                        <label className="form-label" htmlFor="form3ExampleName">
+                                             Họ và tên
+                                        </label>
                                         <input
                                              type="text"
                                              {...formRegister('fullname', { required: 'Tên là bắt buộc' })}
                                              className="form-control form-control-sm"
                                              placeholder="Nhập tên của bạn"
                                         />
-                                        <label className="form-label" htmlFor="form3ExampleName">
-                                             Họ và tên
-                                        </label>
                                         {errors.fullname && <p className="text-danger">{errors.fullname.message}</p>}
                                    </div>
                                    <div data-mdb-input-init className="form-outline ">
+                                        <label className="form-label" htmlFor="form3Example2">
+                                             Địa chỉ Email
+                                        </label>
                                         <input
                                              type="email"
                                              {...formRegister('email', { required: 'Email là bắt buộc' })}
                                              className="form-control form-control-sm"
                                              placeholder="Nhập địa chỉ email hợp lệ"
                                         />
-                                        <label className="form-label" htmlFor="form3Example2">
-                                             Địa chỉ Email
-                                        </label>
                                         {errors.email && <p className="text-danger">{errors.email.message}</p>}
                                    </div>
                                    <div data-mdb-input-init className="form-outline ">
+                                        <label className="form-label" htmlFor="form3Example3">
+                                             Mật khẩu
+                                        </label>
                                         <input
                                              type="password"
                                              {...formRegister('password', {
@@ -129,12 +132,12 @@ function Register() {
                                              className="form-control form-control-sm"
                                              placeholder="Nhập mật khẩu"
                                         />
-                                        <label className="form-label" htmlFor="form3Example3">
-                                             Mật khẩu
-                                        </label>
                                         {errors.password && <p className="text-danger">{errors.password.message}</p>}
                                    </div>
                                    <div data-mdb-input-init className="form-outline">
+                                        <label className="form-label" htmlFor="form3Example4">
+                                             Xác nhận mật khẩu
+                                        </label>
                                         <input
                                              type="password"
                                              {...formRegister('confirmPassword', {
@@ -144,13 +147,10 @@ function Register() {
                                              className="form-control form-control-sm"
                                              placeholder="Xác nhận mật khẩu"
                                         />
-                                        <label className="form-label" htmlFor="form3Example4">
-                                             Xác nhận mật khẩu
-                                        </label>
                                         {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>}
                                    </div>
 
-                                   <div className="d-flex justify-content-between align-items-center">
+                                   <div className="d-flex justify-content-between align-items-center mt-3">
                                         <div className="form-check mb-0">
                                              <input
                                                   className="form-check-input me-2"
