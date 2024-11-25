@@ -2,6 +2,8 @@ import { axiosi } from '../config/axios';
 
 const apiEndpoint = '/api/worktimes';
 
+//bắt đầu worktime
+//kết thúc worktime -> kết thúc nếu còn task trong worktime thì cho phép dời sang wortime khác
 export const getAllWorktimes = async () => {
      try {
           const response = await axiosi.get(apiEndpoint);

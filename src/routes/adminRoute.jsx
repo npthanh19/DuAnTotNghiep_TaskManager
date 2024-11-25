@@ -25,8 +25,7 @@ import ViewRoles from '../pages/admin/Roles/List';
 import AddRoles from '../pages/admin/Roles/Add';
 import EditRoles from '../pages/admin/Roles/Edit';
 
-// Admin Activity Log
-import ViewActivityLog from '../pages/admin/Activity_log/List';
+
 
 // Admin Drag & Drop Board
 import ViewBoard from '../pages/admin/Board/Board';
@@ -104,9 +103,6 @@ export const AdminRoutes = () => (
 
           {/* Recently Deleted */}
           <Route path="recentlydelete" element={<PrivateRoute><AdminLayout><ViewRecentlyDeleted /></AdminLayout></PrivateRoute>} />
-
-          {/* Activity Log */}
-          <Route path="log" element={<PrivateRoute><AdminLayout><ViewActivityLog /></AdminLayout></PrivateRoute>} />
 
           {/* Drag & Drop Board */}
           <Route path="board" element={<PrivateRoute><AdminLayout><ViewBoard /></AdminLayout></PrivateRoute>} />

@@ -1,27 +1,65 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './board_log.css';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { getAllWorktimes } from '../../../services/worktimeService';
+import { getAllTasks } from '../../../services/tasksService';
 
 export function View() {
      const [newTask, setNewTask] = useState('');
      const [isCreatedFormVisible, setIsCreatedFormVisible] = useState(false);
      const [showDropdown, setShowDropdown] = useState(false);
      const [selectedUsers, setSelectedUsers] = useState([]);
+     /* const [initialSprints, setInitialSprints] = useState(); */
      const users = [
           { id: 1, name: 'User 1', avatar: '/assets/admin/img/avatars/1.png' },
           { id: 2, name: 'User 2', avatar: '/assets/admin/img/avatars/2.png' },
           { id: 3, name: 'User 3', avatar: '/assets/admin/img/avatars/3.png' },
      ];
 
-     const initialSprints = [
+     useEffect(() => {
+          const fetchWorkTimes = async () => {
+               const worktimes = await getAllWorktimes();
+
+               const formattedData = worktimes.map((worktime) => {
+                    const startDate = new Date(worktime.start_date);
+                    const endDate = new Date(worktime.end_date);
+
+                    const dateRange = `${startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} – ${endDate.toLocaleDateString(
+                         'en-GB',
+                         { day: '2-digit', month: 'short' },
+                    )}`;
+
+                    return {
+                         id: `FE-${worktime.id.toString().padStart(4, '0')}`,
+                         dateRange,
+                         tasks: [],
+                    };
+               });
+
+               setSprints(formattedData);
+               console.log(sprints);
+          };
+
+          const fetchTask = async () => {
+               const tasks = await getAllTasks();
+               console.log('tasks', tasks);
+               setTaskNotWorkTime(tasks);
+          };
+
+          fetchWorkTimes();
+          fetchTask();
+     }, []);
+
+     /* const initialSprints = [
           { id: 'FE-0001', dateRange: '26 Aug – 2 Sep', tasks: [ 
                { id: 'SCRUM-1', name: 'Cắt theme trang admin', status: 'REVIEW', assignee: '/assets/admin/img/avatars/2.png', priority: 5, completed: false }, 
                { id: 'SCRUM-2', name: 'Sửa lỗi giao diện', status: 'IN PROGRESS', assignee: '/assets/admin/img/avatars/3.png', priority: 3, completed: false }, 
                { id: 'SCRUM-3', name: 'Tối ưu hóa tốc độ tải trang', status: 'TO DO', assignee: '/assets/admin/img/avatars/1.png', priority: 4, completed: false } 
           ]},
-     ];
+     ]; */
 
-     const [sprints, setSprints] = useState(initialSprints);
+     const [sprints, setSprints] = useState();
+     const [taskNotWorkTime, setTaskNotWorkTime] = useState();
      const [isInputVisible, setIsInputVisible] = useState({});
 
      const handleToggleDropdown = () => {
@@ -56,7 +94,17 @@ export function View() {
                if (sprint.id === sprintId) {
                     return {
                          ...sprint,
-                         tasks: [...sprint.tasks, { id: `SCRUM-${sprint.tasks.length + 1}`, name: newTask, status: 'TO DO', assignee: '/assets/admin/img/avatars/1.png', priority: 1, completed: false }]
+                         tasks: [
+                              ...sprint.tasks,
+                              {
+                                   id: `SCRUM-${sprint.tasks.length + 1}`,
+                                   name: newTask,
+                                   status: 'TO DO',
+                                   assignee: '/assets/admin/img/avatars/1.png',
+                                   priority: 1,
+                                   completed: false,
+                              },
+                         ],
                     };
                }
                return sprint;
@@ -120,7 +168,7 @@ export function View() {
 
      return (
           <div className="container-fluid py-4">
-                <h2 className="mb-4">
+               <h2 className="mb-4">
                     <div className="d-flex align-items-center justify-content-between">
                          {/* Project name nằm bên trái */}
                          <small className="mb-0">Backlog</small>
@@ -172,7 +220,6 @@ export function View() {
                          </div>
                     </div>
                </h2>
-               
 
                {isCreatedFormVisible && (
                     <div className="created-form mb-3">
@@ -191,7 +238,7 @@ export function View() {
                     </div>
                )}
 
-               {sprints.map((sprint) => (
+               {sprints?.map((sprint) => (
                     <div key={sprint.id} className="mb-4">
                          <h4 className="mb-3 d-flex align-items-center">
                               <div className="form-check me-2">
@@ -240,7 +287,10 @@ export function View() {
                                                                       <option value="REVIEW">Review</option>
                                                                       <option value="DONE">Done</option>
                                                                  </select>
-                                                                 <span className={`badge bg-${task.status === 'DONE' ? 'success' : 'primary'} me-3 status-badge`}>
+                                                                 <span
+                                                                      className={`badge bg-${
+                                                                           task.status === 'DONE' ? 'success' : 'primary'
+                                                                      } me-3 status-badge`}>
                                                                       {task.status}
                                                                  </span>
                                                                  <span className="me-3">
@@ -259,10 +309,10 @@ export function View() {
                               </Droppable>
                          </DragDropContext>
 
-                         <span className="text-muted cursor-pointer" onClick={() => toggleInputVisibility(sprint.id)}>
+                         {/* <span className="text-muted cursor-pointer" onClick={() => toggleInputVisibility(sprint.id)}>
                               + Created
                          </span>
-
+ */}
                          {isInputVisible[sprint.id] && (
                               <div className="input-group mt-2">
                                    <input
@@ -279,6 +329,64 @@ export function View() {
                          )}
                     </div>
                ))}
+
+               {/* Phần "Unassigned Tasks" */}
+               <DragDropContext onDragEnd={(result) => handleDragEnd(result, null)}>
+                    <Droppable droppableId="unassigned-tasks">
+                         {(provided) => (
+                              <div ref={provided.innerRef} {...provided.droppableProps} className="task-column">
+                                   <h4>Unassigned Tasks</h4>
+                                   {taskNotWorkTime?.map((task, index) => (
+                                        <Draggable key={task.id} draggableId={String(task.id)} index={index}>
+                                             {(provided) => (
+                                                  <div
+                                                       {...provided.draggableProps}
+                                                       {...provided.dragHandleProps}
+                                                       ref={provided.innerRef}
+                                                       className="d-flex align-items-center py-2 border-bottom">
+                                                       {/* Task Content */}
+                                                       <div className="form-check me-3">
+                                                            <input
+                                                                 className="form-check-input"
+                                                                 type="checkbox"
+                                                                 checked={task.completed}
+                                                                 onChange={() => handleTaskCompletionToggle(null, task.id)}
+                                                            />
+                                                       </div>
+                                                       <div className="me-auto">
+                                                            <span className="me-2">{task.id}</span>
+                                                            <span>{task.name}</span>
+                                                       </div>
+                                                       <select
+                                                            className="form-select board-list form-select-sm me-4 select-status"
+                                                            value={task.status}
+                                                            onChange={(e) => handleStatusChange(null, task.id, e.target.value)}>
+                                                            <option value="TO DO">To Do</option>
+                                                            <option value="IN PROGRESS">In Progress</option>
+                                                            <option value="REVIEW">Review</option>
+                                                            <option value="DONE">Done</option>
+                                                       </select>
+                                                       <span
+                                                            className={`badge bg-${
+                                                                 task.status === 'DONE' ? 'success' : 'primary'
+                                                            } me-3 status-badge`}>
+                                                            {task.status}
+                                                       </span>
+                                                       <span className="me-3">
+                                                            <span className="badge bg-secondary">{task.priority}</span>
+                                                       </span>
+                                                       <span className="me-3 user-id">
+                                                            <img src={task.assignee} className="w-50 rounded-circle" alt="User Avatar" />
+                                                       </span>
+                                                  </div>
+                                             )}
+                                        </Draggable>
+                                   ))}
+                                   {provided.placeholder}
+                              </div>
+                         )}
+                    </Droppable>
+               </DragDropContext>
           </div>
      );
 }

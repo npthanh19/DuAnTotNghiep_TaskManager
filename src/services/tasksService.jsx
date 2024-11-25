@@ -3,6 +3,10 @@ import { axiosi } from '../config/axios';
 const taskApiEndpoint = '/api/tasks';
 const projectApiEndpoint = '/api/projects';
 
+//bổ sung api lất task chưa có WorkTime
+//cập nhật vị trí Task
+//lấy task theo workTime id
+
 export const getAllTasks = async () => {
      try {
           const response = await axiosi.get(taskApiEndpoint);

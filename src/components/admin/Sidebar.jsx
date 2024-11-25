@@ -26,12 +26,6 @@ const Sidebar = ({ isOpen }) => {
                     <li className="menu-header fw-medium">
                          <span className="menu-header-text">{t('Task Manager')}</span>
                     </li>
-                    <li className={`menu-item ${isActive('/taskmaneger/log')}`}>
-                         <Link to="/taskmaneger/log" className="menu-link text-decoration-none">
-                              <i className="bi bi-file-earmark-text menu-icon"></i>
-                              <span>{t('Activity Log')}</span>
-                         </Link>
-                    </li>
                     <li className={`menu-item ${isActive('/taskmaneger/board')}`}>
                          <Link to="/taskmaneger/board" className="menu-link text-decoration-none">
                               <i className="bi bi-kanban menu-icon"></i>
