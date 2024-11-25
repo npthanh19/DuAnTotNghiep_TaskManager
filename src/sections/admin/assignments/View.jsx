@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Delete } from './Delete';
 import { getAllAssignments, deleteAssignment } from '../../../services/assignmentService';
 import Swal from 'sweetalert2';
-import { toast, ToastContainer } from 'react-toastify';
 
 export const View = () => {
      const [currentPage, setCurrentPage] = useState(1);
@@ -36,7 +34,7 @@ export const View = () => {
 
      const handleDeleteClick = (id) => {
           const deleteTitle = t('Delete Assignments');
-     
+
           Swal.fire({
                title: deleteTitle,
                text: t('Are you sure you want to delete this assignments?'),
@@ -51,7 +49,7 @@ export const View = () => {
                     try {
                          await deleteAssignment(id);
                          setAssignments((prevWorktimes) => prevWorktimes.filter((worktime) => worktime.id !== id));
-     
+
                          Swal.fire({
                               icon: 'success',
                               text: t('The assignments has been moved to the trash!'),
@@ -72,20 +70,6 @@ export const View = () => {
                     }
                }
           });
-     };
-
-     const handleCloseModal = () => {
-          setShowDeleteModal(false);
-          setSelectedAssignmentId(null);
-     };
-
-     const deleteAssignmentHandler = async (id) => {
-          try {
-               await deleteAssignment(id);
-               setAssignments(assignments.filter((assignment) => assignment.id !== id));
-          } catch (error) {
-               console.error(t('Failed:'), error);
-          }
      };
 
      const handleEdit = (id) => {
@@ -126,11 +110,12 @@ export const View = () => {
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th className="col-1">ID</th>
-                                   <th className="col-2">{t('User Name')}</th>
-                                   <th className="col-2">{t('Task Name')}</th>
-                                   <th className="col-2">{t('Department Name')}</th>
-                                   <th className="col-2">{t('Status')}</th>
+                                   <th className="">ID</th>
+                                   <th className="">{t('User Name')}</th>
+                                   <th className="">{t('Task Name')}</th>
+                                   <th className="">{t('Department Name')}</th>
+                                   <th className="">{t('Note')}</th>
+                                   <th className="">{t('Status')}</th>
                                    <th className="col-1">{t('Actions')}</th>
                               </tr>
                          </thead>
@@ -141,20 +126,30 @@ export const View = () => {
                                         <td>{assignment.user_name}</td>
                                         <td>{assignment.task_name}</td>
                                         <td>{assignment.department_name}</td>
+                                        <td>{assignment.note}</td>
                                         <td>
                                              {assignment.status === 'to do' && (
-                                                  <span className="badge bg-secondary">{t('To Do')}</span>
+                                                  <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('To Do')}
+                                                  </span>
                                              )}
                                              {assignment.status === 'in progress' && (
-                                                  <span className="badge bg-warning text-dark">{t('In Progress')}</span>
+                                                  <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('In Progress')}
+                                                  </span>
                                              )}
                                              {assignment.status === 'preview' && (
-                                                  <span className="badge bg-info text-dark">{t('Preview')}</span>
+                                                  <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('Preview')}
+                                                  </span>
                                              )}
                                              {assignment.status === 'done' && (
-                                                  <span className="badge bg-success">{t('Done')}</span>
+                                                  <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('Done')}
+                                                  </span>
                                              )}
                                         </td>
+
                                         <td>
                                              <div className="dropdown">
                                                   <button
@@ -211,10 +206,6 @@ export const View = () => {
                          </ul>
                     </nav>
                </div>
-
-               {showDeleteModal && (
-                    <Delete assignmentId={selectedAssignmentId} onClose={handleCloseModal} deleteAssignment={deleteAssignmentHandler} />
-               )}
           </div>
      );
 };

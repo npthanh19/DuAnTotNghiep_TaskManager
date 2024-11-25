@@ -24,7 +24,7 @@ export const getAllAssignments = async () => {
           const tasks = tasksResponse.data || [];
           const departments = departmentsResponse.data || [];
 
-          const userMap = Object.fromEntries(users.map((user) => [user.id, user.name]));
+          const userMap = Object.fromEntries(users.map((user) => [user.id, user.fullname]));
           const taskMap = Object.fromEntries(tasks.map((task) => [task.id, task.task_name]));
           const departmentMap = Object.fromEntries(departments.map((department) => [department.id, department.department_name]));
 

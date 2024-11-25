@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
 import { createAssignment } from '../../../services/assignmentService';
 import { getAllTasks } from '../../../services/tasksService';
 import { getDepartmentsByTask } from '../../../services/assignmentService';
@@ -83,22 +82,35 @@ export const Add = () => {
      };
 
      const onSubmit = async (data) => {
+          console.log('Form data:', data);
           const assignmentData = {
                task_id: data.taskId,
                user_ids: [data.userId],
                department_id: selectedDepartmentId,
-               status: status,
+               status: data.status,
+               note: data.note,
           };
 
           try {
                await createAssignment(assignmentData);
-               toast.success(t('Added successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
                reset();
                setTimeout(() => {
                     navigate('/taskmaneger/assignments');
-               }, 1000);
+               }, 1500);
           } catch (error) {
-               toast.error(t('Added Failed!'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Added Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
           }
      };
 
@@ -162,7 +174,7 @@ export const Add = () => {
                                         <option value="">{t('Select User')}</option>
                                         {users.map((user) => (
                                              <option key={user.id} value={user.id}>
-                                                  {user.name}
+                                                  {user.fullname}
                                              </option>
                                         ))}
                                    </select>
@@ -187,13 +199,28 @@ export const Add = () => {
                                    {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
                          </div>
+                         <div className="row mb-3">
+                              <div className="col">
+                                   <label htmlFor="note" className="form-label">
+                                        {t('Note')}
+                                   </label>
+                                   <textarea
+                                        id="note"
+                                        className={`form-control form-control-sm ${errors.note ? 'is-invalid' : ''}`}
+                                        rows="3"
+                                        {...register('note', {
+                                             required: t('Note is required'),
+                                             maxLength: { value: 500, message: t('Note must be less than 500 characters') },
+                                        })}></textarea>
+                                   {errors.note && <div className="invalid-feedback">{errors.note.message}</div>}
+                              </div>
+                         </div>
 
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-3"></i> {t('Add')}
                          </button>
                     </form>
                </div>
-               <ToastContainer position="top-right" autoClose={1000} />
           </div>
      );
 };

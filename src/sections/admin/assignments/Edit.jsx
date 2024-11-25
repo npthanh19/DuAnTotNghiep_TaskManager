@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
 import { getAssignmentById, updateAssignment, getDepartmentsByTask, getUsersByDepartment } from '../../../services/assignmentService';
 import { getAllTasks } from '../../../services/tasksService';
 
@@ -17,6 +16,7 @@ export const Edit = () => {
      const [departments, setDepartments] = useState([]);
      const [users, setUsers] = useState([]);
      const [status, setStatus] = useState(1);
+     const [note, setNote] = useState('');
 
      const {
           register,
@@ -32,11 +32,13 @@ export const Edit = () => {
                     const fetchedAssignment = await getAssignmentById(id);
                     if (fetchedAssignment) {
                          setAssignment(fetchedAssignment);
+                         setNote(fetchedAssignment.note || '');
                          reset({
                               taskId: fetchedAssignment.task_id || '',
                               userId: fetchedAssignment.user.id || '',
                               status: fetchedAssignment.status || '1',
                               departmentId: fetchedAssignment.department.id || '',
+                              note: fetchedAssignment.note || '',
                          });
                          await fetchDepartments(fetchedAssignment.task_id);
                          await fetchUsers(fetchedAssignment.department.id);
@@ -117,16 +119,30 @@ export const Edit = () => {
                user_ids: [data.userId],
                department_id: data.departmentId,
                status: status,
+               note: data.note,
           };
 
           try {
                await updateAssignment(id, assignmentData);
-               toast.success(t('Assignment updated successfully!'));
-               setTimeout(() => {
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Assignment updated successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               }).then(() => {
                     navigate('/taskmaneger/assignments');
-               }, 1000);
+               });
           } catch (error) {
-               toast.error(t('Failed to update assignment.'));
+               Swal.fire({
+                    icon: 'error',
+                    text: t('Failed to update assignment.'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
                console.error('Error updating assignment:', error);
           }
      };
@@ -203,7 +219,7 @@ export const Edit = () => {
                                         <option value="">{t('Select User')}</option>
                                         {users.map((user) => (
                                              <option key={user.id} value={user.id}>
-                                                  {user.name}
+                                                  {user.fullname}
                                              </option>
                                         ))}
                                    </select>
@@ -228,13 +244,28 @@ export const Edit = () => {
                                    {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
                          </div>
+                         <div className="row mb-3">
+                              <div className="col">
+                                   <label htmlFor="note" className="form-label">
+                                        {t('Note')}
+                                   </label>
+                                   <textarea
+                                        id="note"
+                                        className={`form-control ${errors.note ? 'is-invalid' : ''}`}
+                                        {...register('note', { required: t('Note is required') })}
+                                        value={note} // Lấy giá trị note từ state
+                                        onChange={(e) => setNote(e.target.value)} // Cập nhật giá trị khi thay đổi
+                                        rows="3" // Cấu hình chiều cao cho textarea
+                                   />
+                                   {errors.note && <div className="invalid-feedback">{errors.note.message}</div>}
+                              </div>
+                         </div>
 
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-2"></i> {t('Update Assignment')}
                          </button>
                     </form>
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
           </div>
      );
 };
