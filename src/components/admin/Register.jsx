@@ -28,7 +28,7 @@ function Register() {
                     text: 'Bạn phải đồng ý với các điều khoản và điều kiện.',
                     position: 'top-right',
                     toast: true,
-                    timer: 3000,
+                    timer: 2000,
                     showConfirmButton: false,
                });
                return;
@@ -40,7 +40,7 @@ function Register() {
                     text: 'Mật khẩu không khớp.',
                     position: 'top-right',
                     toast: true,
-                    timer: 3000,
+                    timer: 2000,
                     showConfirmButton: false,
                });
                return;
@@ -60,7 +60,7 @@ function Register() {
                     text: 'Vui lòng kiểm tra email của bạn để xác nhận tài khoản.',
                     position: 'top-right',
                     toast: true,
-                    timer: 3000,
+                    timer: 2000,
                     showConfirmButton: false,
                });
 
@@ -68,17 +68,24 @@ function Register() {
                     navigate('/taskmaneger/confirm-email');
                }, 1000);
           } catch (err) {
+               setLoading(false);
+               let errorMessage = 'Đăng ký thất bại. Vui lòng kiểm tra lại Email.';
+
+               if (err.response && err.response.data && err.response.data.errors) {
+                    const errors = err.response.data.errors;
+                    const errorMessages = Object.values(errors).flat().join(', ');
+                    errorMessage = errorMessages || errorMessage;
+               }
+
                Swal.fire({
                     icon: 'error',
-                    text: err.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại Email.',
+                    text: errorMessage,
                     position: 'top-right',
                     toast: true,
-                    timer: 3000,
+                    timer: 2000,
                     showConfirmButton: false,
                });
                console.error('Lỗi đăng ký:', err);
-          } finally {
-               setLoading(false);
           }
      };
 

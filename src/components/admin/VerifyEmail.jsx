@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { verifyEmail } from '../../services/authService';
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from 'sweetalert2';
 
 function VerifyEmail() {
      const { userId, hash } = useParams();
@@ -20,7 +20,7 @@ function VerifyEmail() {
 
                     setLoading(false);
 
-                    if (response.message === 'Email verified and subscription updated successfully!') {
+                    if (response.message === 'Email already verified.') {
                          setVerified(true);
                          Swal.fire({
                               icon: 'success',
@@ -36,7 +36,7 @@ function VerifyEmail() {
                          Swal.fire({
                               icon: 'info',
                               title: 'Email đã được xác minh.',
-                              text: 'Tài khoản của bạn đã được xác minh trước đó.',
+                              text: 'Tài khoản của bạn đã được xác minh.',
                               position: 'top-right',
                               toast: true,
                               timer: 3000,
