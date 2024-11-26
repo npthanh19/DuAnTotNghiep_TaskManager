@@ -32,13 +32,12 @@ export const createUser = async (userData) => {
      }
 };
 
-export const updateUser = async (id, userData) => {
+export const updateUser = async (userId, data) => {
      try {
-          const response = await axiosi.put(`${apiEndpoint}/${id}`, userData);
+          const response = await axiosi.put(`${apiEndpoint}/${userId}`, data);
           return response.data;
      } catch (error) {
-          console.error(`Error updating user with ID ${id}:`, error);
-          throw error.response ? error.response.data : new Error('Network error');
+          throw error;
      }
 };
 
@@ -110,5 +109,5 @@ export default {
      restoreUser,
      getTrashedUsers,
      updateAvatar,
-     getAvatarUrl
+     getAvatarUrl,
 };
