@@ -7,6 +7,8 @@ import { createRole } from '../../../services/rolesService';
 import { getAllPermissions } from '../../../services/permissionService';
 import Select from 'react-select';
 import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
+
 
 export const Add = () => {
      const { t } = useTranslation();
@@ -41,14 +43,25 @@ export const Add = () => {
           try {
                const roleData = { ...data, permissions: selectedPermissions.map((perm) => perm.value) };
                await createRole(roleData);
-               toast.success(t('Added successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
                reset();
                setSelectedPermissions([]);
                setTimeout(() => {
                     navigate('/taskmaneger/roles');
                }, 1000);
           } catch (error) {
-               toast.error(t('Added Failed!'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Added Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
                console.error('Failed to add role:', error);
           }
      };

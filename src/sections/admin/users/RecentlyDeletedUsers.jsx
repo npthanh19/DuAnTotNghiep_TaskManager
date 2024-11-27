@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getTrashedUsers, restoreUser, forceDelete } from '../../../services/usersService';
+import { useForm } from 'react-hook-form';
 
 function RecentlyDeletedUsers() {
      const [users, setUsers] = useState([]);
@@ -13,6 +14,12 @@ function RecentlyDeletedUsers() {
      const [currentPage, setCurrentPage] = useState(1);
      const itemsPerPage = 9;
      const [searchTerm, setSearchTerm] = useState('');
+     const {
+          register,
+          handleSubmit,
+          formState: { errors },
+          reset,
+     } = useForm();
 
      useEffect(() => {
           const fetchTrashedUsers = async () => {
@@ -45,9 +52,21 @@ function RecentlyDeletedUsers() {
                try {
                     await restoreUser(id);
                     setUsers(users.filter((user) => user.id !== id));
-                    toast.success(t('Người dùng đã được khôi phục thành công.'));
+                    Swal.fire({
+                         icon: 'success',
+                         text: t('Người dùng đã được khôi phục thành công.'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 2000,
+                         showConfirmButton: false,
+                    });
+                    reset();
                } catch (error) {
-                    toast.error(t('Đã xảy ra lỗi khi khôi phục người dùng.'));
+                    Swal.fire({
+                         icon: 'error',
+                         title: t('Added Failed!'),
+                         text: error.message || t('Something went wrong'),
+                    });
                }
           }
      };
@@ -68,9 +87,23 @@ function RecentlyDeletedUsers() {
                try {
                     await forceDelete(id);
                     setUsers(users.filter((user) => user.id !== id));
-                    toast.success(t('Người dùng đã được xóa vĩnh viễn.'));
+                    Swal.fire({
+                         icon: 'success',
+                         text: t('Người dùng đã được xóa vĩnh viễn.'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
                } catch (error) {
-                    toast.error(t('Đã xảy ra lỗi khi xóa người dùng.'));
+                    Swal.fire({
+                         icon: 'error',
+                         text: t('Đã xảy ra lỗi khi xóa người dùng'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
                }
           }
      };

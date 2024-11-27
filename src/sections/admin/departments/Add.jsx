@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
+import Swal from 'sweetalert2';
 import { createDepartment, addUserToDepartment } from '../../../services/deparmentsService';
-import 'react-toastify/dist/ReactToastify.css';
 
 export const Add = () => {
      const { t } = useTranslation();
@@ -22,13 +21,24 @@ export const Add = () => {
      const onSubmit = async (departmentData) => {
           try {
                await createDepartment(departmentData);
-               toast.success(t('Added successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
                reset();
                setTimeout(() => {
                     navigate('/taskmaneger/departments');
                }, 1000);
           } catch (error) {
-               toast.error(t('Added Failed!'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Added Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
           }
      };
 
@@ -38,11 +48,22 @@ export const Add = () => {
                     throw new Error(t('User ID is required'));
                }
                await addUserToDepartment(departmentId, [userIds]);
-               toast.success(t('Added successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
                setShowModal(false);
                setUserId('');
           } catch (error) {
-               toast.error(t('Added Failed!'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Added Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
           }
      };
 
@@ -120,7 +141,6 @@ export const Add = () => {
                          </div>
                     )}
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
           </div>
      );
 };

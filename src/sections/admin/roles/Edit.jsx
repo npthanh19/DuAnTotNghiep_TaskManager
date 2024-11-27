@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getRoleById, updateRole } from '../../../services/rolesService';
+import Swal from 'sweetalert2';
+
 
 export const Edit = () => {
      const { id } = useParams();
@@ -39,13 +41,25 @@ export const Edit = () => {
                };
 
                await updateRole(id, roleData);
-               toast.success(t('Updated successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Update successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+               reset();
                setTimeout(() => {
                     navigate('/taskmaneger/roles');
                }, 1000);
           } catch (error) {
                console.error('Failed:', error);
-               toast.error(t('Failed: ') + (error.message || ''));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Update Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
           }
      };
 

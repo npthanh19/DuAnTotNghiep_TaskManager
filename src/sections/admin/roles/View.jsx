@@ -35,9 +35,23 @@ export function View() {
           try {
                await deleteRole(id);
                setRoles((prevRoles) => prevRoles.filter((role) => role.id !== id));
-               toast.success(t('Role has been deleted!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('The role has been moved to the trash!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           } catch (error) {
-               toast.error(t('An error occurred while deleting the role'));
+               Swal.fire({
+                    icon: 'error',
+                    text: t('An error occurred while deleting the role.'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           }
      };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
 import { ToastContainer, toast } from 'react-toastify';
+import { useForm } from 'react-hook-form';
 import 'react-toastify/dist/ReactToastify.css';
 import { getTrashedPermissions, restorePermission, forceDeletePermission } from '../../../services/permissionService';
 
@@ -13,6 +14,12 @@ function RecentlyDeletedPermissions() {
      const [currentPage, setCurrentPage] = useState(1);
      const itemsPerPage = 9;
      const [searchTerm, setSearchTerm] = useState('');
+     const {
+          register,
+          handleSubmit,
+          formState: { errors },
+          reset,
+     } = useForm();
 
      useEffect(() => {
           const fetchTrashedPermissions = async () => {
@@ -46,9 +53,21 @@ function RecentlyDeletedPermissions() {
                try {
                     await restorePermission(id);
                     setPermissions(permissions.filter((permission) => permission.id !== id));
-                    toast.success(t('Permissions have been restored successfully!'));
+                    Swal.fire({
+                         icon: 'success',
+                         text: t('restoring successfully!'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 2000,
+                         showConfirmButton: false,
+                    });
+                    reset();
                } catch (error) {
-                    toast.error(t('An error occurred while restoring permissions.'));
+                    Swal.fire({
+                         icon: 'error',
+                         title: t('restoring Failed!'),
+                         text: error.message || t('Something went wrong'),
+                    });
                }
           }
      };
@@ -69,10 +88,20 @@ function RecentlyDeletedPermissions() {
                try {
                     await forceDeletePermission(id);
                     setPermissions(permissions.filter((permission) => permission.id !== id));
-                    toast.success(t('Permissions have been permanently removed.'));
+                    Swal.fire({
+                         icon: 'success',
+                         text: t('Permissions have been permanently removed!'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
                } catch (error) {
-                    toast.error(t('An error occurred while removing permissions.'));
-               }
+                    Swal.fire({
+                         icon: 'error',
+                         title: t('An error occurred while removing permissions!'),
+                         text: error.message || t('Something went wrong'),
+                    });               }
           }
      };
 

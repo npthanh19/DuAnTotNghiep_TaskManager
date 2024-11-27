@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { DeleteDepartment } from '../../../sections/admin/departments/Delete';
 import { getAllDepartments, deleteDepartment } from '../../../services/deparmentsService';
 import AddUserToDepartment from './AddUserToDepartment';
 import 'react-toastify/dist/ReactToastify.css';
@@ -211,14 +210,7 @@ export function View() {
                     </nav>
                </div>
                <ToastContainer position="top-right" autoClose={2000} />
-               {showDeleteModal && (
-                    <DeleteDepartment
-                         show={showDeleteModal}
-                         onClose={handleCloseModal}
-                         departmentId={selectedDepartmentId}
-                         onDeleteSuccess={handleDeleteSuccess}
-                    />
-               )}
+               
                {showAddDepartmentForm && (
                     <AddUserToDepartment
                          departmentId={selectedDepartmentId}

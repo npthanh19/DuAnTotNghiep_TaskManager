@@ -52,9 +52,23 @@ export function View() {
                     try {
                          await deleteUser(id);
                          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-                         toast.success(t('User has been moved to the trash!'));
+                         Swal.fire({
+                              icon: 'success',
+                              text: t('The users has been moved to the trash!'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
                     } catch (error) {
-                         toast.error(t('An error occurred while deleting the user.'));
+                         Swal.fire({
+                              icon: 'error',
+                              text: t('An error occurred while deleting the users.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
                     }
                }
           });

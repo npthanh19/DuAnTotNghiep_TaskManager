@@ -6,6 +6,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAllRoles } from '../../../services/rolesService';
 import { createUser } from '../../../services/usersService';
+import Swal from 'sweetalert2';
+
 
 export const Add = () => {
      const { t } = useTranslation();
@@ -45,7 +47,14 @@ export const Add = () => {
 
           try {
                await createUser(formData);
-               toast.success(t('Added successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
                reset();
                setImagePreview(null);
                setTimeout(() => {
@@ -53,7 +62,11 @@ export const Add = () => {
                }, 1000);
           } catch (error) {
                const errorData = error.response ? error.response.data : { message: 'Unknown error occurred' };
-               toast.error(t('Failed to create user'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Added Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
           }
      };
 

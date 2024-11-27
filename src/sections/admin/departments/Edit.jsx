@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getDepartmentById, updateDepartment } from '../../../services/deparmentsService';
+import Swal from 'sweetalert2';
+
 
 export const Edit = () => {
      const { id } = useParams();
@@ -34,13 +36,25 @@ export const Edit = () => {
      const onSubmit = async (data) => {
           try {
                await updateDepartment(id, data);
-               toast.success(t('Updated successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Edit successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+               reset();
                setTimeout(() => {
                     navigate('/taskmaneger/departments');
                }, 1000);
           } catch (error) {
                console.error('Failed:', error);
-               toast.error(t('Failed: ') + (error.message || ''));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Edit Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
           }
      };
 

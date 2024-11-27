@@ -11,6 +11,7 @@ export function View() {
           register,
           handleSubmit,
           formState: { errors },
+          reset,
      } = useForm();
      const [currentPage, setCurrentPage] = useState(1);
      const itemsPerPage = 5;
@@ -50,9 +51,23 @@ export function View() {
           try {
                await deletePermission(id);
                setPermissions((prevPermissions) => prevPermissions.filter((permission) => permission.id !== id));
-               toast.success(t('Permission has been deleted!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('The permissions has been moved to the trash!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           } catch (error) {
-               toast.error(t('An error occurred while deleting the permission'));
+               Swal.fire({
+                    icon: 'error',
+                    text: t('An error occurred while deleting the permissions.'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           }
      };
 
@@ -84,11 +99,23 @@ export function View() {
           try {
                const updatedPermission = await updatePermission(editingPermission.id, { name: editingPermission.name });
                setPermissions((prevPermissions) => prevPermissions.map((perm) => (perm.id === updatedPermission.id ? updatedPermission : perm)));
-               toast.success(t('Permission has been updated!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Update successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+               reset();
                setEditingPermission({ id: null, name: '' });
                setIsEditing(false);
           } catch (error) {
-               toast.error(t('An error occurred while updating the permission'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Update Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
           }
      };
 
@@ -96,11 +123,23 @@ export function View() {
           try {
                const newPermission = await createPermission({ name: data.name });
                setPermissions((prevPermissions) => [newPermission, ...prevPermissions]);
-               toast.success(t('Permission has been added!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+               reset();
                setIsAddingPermission(false);
           } catch (error) {
                console.error('Error creating permission:', error);
-               toast.error(t('An error occurred while adding the permission'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Added Failed!'),
+                    text: error.message || t('Something went wrong'),
+               });
           }
      };
 
@@ -130,9 +169,23 @@ export function View() {
 
                setChildrenPermissions((prevChildrenPermissions) => prevChildrenPermissions.filter((child) => child.id !== childId));
 
-               toast.success(t('Child Permission has been deleted!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('The child Permission has been moved to the trash!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           } catch (error) {
-               toast.error(t('An error occurred while deleting the child permission'));
+               Swal.fire({
+                    icon: 'error',
+                    text: t('An error occurred while deleting the child Permission.'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           }
      };
 
@@ -182,11 +235,22 @@ export function View() {
                     parent_id: isAddingChild,
                });
                setChildrenPermissions((prev) => [newChildPermission, ...prev]);
-               toast.success(t('Child Permission has been added!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Child Permission has been added!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+               reset();
                setIsAddingChild(null);
           } catch (error) {
-               toast.error(t('An error occurred while adding the child permission'));
-          }
+               Swal.fire({
+                    icon: 'error',
+                    title: t('An error occurred while adding the child permission'),
+                    text: error.message || t('Something went wrong'),
+               });          }
      };
 
      return (
@@ -336,7 +400,6 @@ export function View() {
                                              required
                                              placeholder={t('Enter permission name')}
                                         />
-                                        
                                    </div>
                                    <div className="d-flex justify-content-end">
                                         <button type="submit" className="btn btn-success btn-sm me-2">
