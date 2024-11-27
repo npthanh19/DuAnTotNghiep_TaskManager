@@ -93,7 +93,7 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => { 
                             <div className="mb-3">
                                 <label htmlFor="existingUsers" className="form-label">{t('Select Available Users')}</label>
                                 <Select
-                                    options={availableUsers.map((user) => ({ value: user.id, label: user.name }))}
+                                    options={availableUsers.map((user) => ({ value: user.id, label: user.fullname }))}
                                     onChange={handleUserChange}
                                     className="basic-multi-select"
                                     classNamePrefix="select"
@@ -112,7 +112,7 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => { 
                                     const user = users.find((usr) => usr.id === id);
                                     return (
                                         <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
-                                            {user ? user.name : t('Undefined User')}
+                                            {user ? user.fullname : t('Undefined User')}
                                             <button className="btn btn-danger btn-sm" onClick={() => handleRemoveUser(id)}>{t('Remove')}</button>
                                         </li>
                                     );
