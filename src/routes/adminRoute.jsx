@@ -41,6 +41,7 @@ import RecentlyDeletedProjects from '../sections/admin/projects/RecentlyDeletedP
 import ViewTasks from '../pages/admin/Tasks/List';
 import AddTasks from '../pages/admin/Tasks/Add';
 import EditTasks from '../pages/admin/Tasks/Edit';
+import RecentlyDeletedTasks from '../sections/admin/tasks/RecentlyDeletedTasks';
 
 // Admin Assignments
 import ViewAssignments from '../pages/admin/Assignments/List';
@@ -97,6 +98,7 @@ export const AdminRoutes = () => (
           <Route path="tasks" element={<PrivateRoute><AdminLayout><ViewTasks /></AdminLayout></PrivateRoute>} />
           <Route path="tasks/add" element={<PrivateRoute><AdminLayout><AddTasks /></AdminLayout></PrivateRoute>} />
           <Route path="tasks/edit/:id" element={<PrivateRoute><AdminLayout><EditTasks /></AdminLayout></PrivateRoute>} />
+          <Route path="tasks/trashed" element={<PrivateRoute><AdminLayout><RecentlyDeletedTasks /></AdminLayout></PrivateRoute>} />
 
           {/* Project Management */}
           <Route path="projects" element={<PrivateRoute><AdminLayout><ViewProjects /></AdminLayout></PrivateRoute>} />

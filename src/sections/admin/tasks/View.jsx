@@ -7,7 +7,6 @@ import { getAllTasks, deleteTask as deleteTaskService } from '../../../services/
 import { getAllProjects } from '../../../services/projectsService';
 import { getFilesByTaskId } from '../../../services/fileService';
 import Swal from 'sweetalert2';
-import { toast, ToastContainer } from 'react-toastify';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -47,7 +46,7 @@ export const View = () => {
 
      const handleDeleteClick = (id) => {
           const deleteTitle = t('Delete Tasks');
-     
+
           Swal.fire({
                title: deleteTitle,
                text: t('Are you sure you want to delete this task?'),
@@ -62,7 +61,7 @@ export const View = () => {
                     try {
                          await deleteTask(id);
                          setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-     
+
                          Swal.fire({
                               icon: 'success',
                               text: t('The task has been moved to the trash!'),
@@ -84,8 +83,6 @@ export const View = () => {
                }
           });
      };
-     
-     
 
      const handleCloseModal = () => {
           setShowDeleteModal(false);
@@ -127,8 +124,6 @@ export const View = () => {
                console.error('Error fetching task files:', error);
           }
      };
-     
-        
 
      const getProjectNameById = (projectId) => {
           const project = projects.find((proj) => proj.id === projectId);
@@ -187,9 +182,16 @@ export const View = () => {
                               value={searchTerm}
                               onChange={handleSearchChange}
                          />
-                         <Link to="/taskmaneger/tasks/add" className="btn btn-primary">
-                              <i className="bi bi-plus me-2"></i> {t('Add')}
-                         </Link>
+                         <div className="d-flex align-items-center ms-auto">
+                              <Link to="/taskmaneger/tasks/add" className="btn btn-primary">
+                                   <i className="bi bi-plus me-2"></i> {t('Add')}
+                              </Link>
+                              <button
+                                   className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
+                                   onClick={() => navigate('/taskmaneger/tasks/trashed')}>
+                                   <i className="bi bi-trash me-2"></i>
+                              </button>
+                         </div>
                     </div>
                </div>
 
@@ -199,7 +201,6 @@ export const View = () => {
                               <tr>
                                    <th className="col">ID</th>
                                    <th className="col">{t('Task Name')}</th>
-                                   <th className="col">{t('Description')}</th>
                                    <th className="col">{t('Start Date')}</th>
                                    <th className="col">{t('End Date')}</th>
                                    <th className="col">{t('Status')}</th>
@@ -211,22 +212,29 @@ export const View = () => {
                               {currentTasks.map((task) => (
                                    <tr key={task.id}>
                                         <td>{task.id}</td>
-                                        <td>{truncateText(task.task_name, 25)}</td>
-                                        <td>{truncateText(task.description, 25)}</td>
+                                        <td>{task.task_name}</td>
                                         <td>{task.start_date}</td>
                                         <td>{task.end_date}</td>
                                         <td>
                                              {task.status === 'to do' && (
-                                                  <span className="badge bg-secondary">{t('To Do')}</span>
+                                                  <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('To Do')}
+                                                  </span>
                                              )}
                                              {task.status === 'in progress' && (
-                                                  <span className="badge bg-warning text-dark">{t('In Progress')}</span>
+                                                  <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('In Progress')}
+                                                  </span>
                                              )}
                                              {task.status === 'preview' && (
-                                                  <span className="badge bg-info text-dark">{t('Preview')}</span>
+                                                  <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('Preview')}
+                                                  </span>
                                              )}
                                              {task.status === 'done' && (
-                                                  <span className="badge bg-success">{t('Done')}</span>
+                                                  <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('Done')}
+                                                  </span>
                                              )}
                                         </td>
 
@@ -303,38 +311,37 @@ export const View = () => {
                {showCommentForm && <CommentForm taskId={selectedTaskId} showModal={showCommentForm} handleCloseModal={handleCloseCommentForm} />}
 
                {showFilePopup && (
-     <div className="modal show" style={{ display: 'block' }}>
-          <div className="modal-dialog">
-               <div className="modal-content">
-                    <div className="modal-header">
-                         <h5 className="modal-title">Danh sách file</h5>
-                         <button type="button" className="btn-close" onClick={() => setShowFilePopup(false)}></button>
+                    <div className="modal show" style={{ display: 'block' }}>
+                         <div className="modal-dialog">
+                              <div className="modal-content">
+                                   <div className="modal-header">
+                                        <h5 className="modal-title">Danh sách file</h5>
+                                        <button type="button" className="btn-close" onClick={() => setShowFilePopup(false)}></button>
+                                   </div>
+                                   <div className="modal-body">
+                                        {taskFiles.length > 0 ? (
+                                             <ul className="list-group">
+                                                  {taskFiles.map((file) => (
+                                                       <li key={file.id} className="list-group-item">
+                                                            <a href={file.url} target="_blank" rel="noopener noreferrer">
+                                                                 {file.file_name}
+                                                            </a>
+                                                       </li>
+                                                  ))}
+                                             </ul>
+                                        ) : (
+                                             <p>{t('No files available for this task.')}</p>
+                                        )}
+                                   </div>
+                                   <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" onClick={() => setShowFilePopup(false)}>
+                                             {t('Close')}
+                                        </button>
+                                   </div>
+                              </div>
+                         </div>
                     </div>
-                    <div className="modal-body">
-                         {taskFiles.length > 0 ? (
-                              <ul className="list-group">
-                                   {taskFiles.map((file) => (
-                                        <li key={file.id} className="list-group-item">
-                                             <a href={file.url} target="_blank" rel="noopener noreferrer">
-                                                  {file.file_name}
-                                             </a>
-                                        </li>
-                                   ))}
-                              </ul>
-                         ) : (
-                              <p>{t('No files available for this task.')}</p>
-                         )}
-                    </div>
-                    <div className="modal-footer">
-                         <button type="button" className="btn btn-secondary" onClick={() => setShowFilePopup(false)}>
-                              {t('Close')}
-                         </button>
-                    </div>
-               </div>
-          </div>
-     </div>
-)}
-
+               )}
           </div>
      );
 };

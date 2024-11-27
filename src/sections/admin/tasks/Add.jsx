@@ -109,7 +109,7 @@ export const Add = () => {
                                         className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                                         {...register('status', { required: t('Status is required!') })}>
                                         <option value="">{t('Select Status')}</option>
-                                        <option value="1">{t('To do')}</option>
+                                        <option value="1">{t('To Do')}</option>
                                         <option value="2">{t('In Progress')}</option>
                                         <option value="3">{t('Priview')}</option>
                                         <option value="4">{t('Done')}</option>
@@ -179,21 +179,9 @@ export const Add = () => {
                                    </label>
                                    <input
                                         type="date"
-                                        id="startDate"
-                                        className={`form-control form-control-sm ${errors.startDate ? 'is-invalid' : ''}`}
-                                        {...register('startDate', {
-                                             required: t('Start date is required!'),
-                                             validate: (value) => {
-                                                  const today = new Date();
-                                                  today.setHours(0, 0, 0, 0);
-                                                  const selectedDate = new Date(value);
-                                                  selectedDate.setHours(0, 0, 0, 0);
-                                                  if (selectedDate.getTime() !== today.getTime()) {
-                                                       return t('Start date must be today');
-                                                  }
-                                                  return true;
-                                             },
-                                        })}
+                                        id="start_date"
+                                        className={`form-control form-control-sm ${errors.start_date ? 'is-invalid' : ''}`}
+                                        {...register('start_date', { required: t('Start date is required!') })}
                                    />
                                    {errors.startDate && <div className="invalid-feedback">{errors.startDate.message}</div>}
                               </div>
@@ -204,19 +192,9 @@ export const Add = () => {
                                    </label>
                                    <input
                                         type="date"
-                                        id="endDate"
-                                        className={`form-control form-control-sm ${errors.endDate ? 'is-invalid' : ''}`}
-                                        {...register('endDate', {
-                                             required: t('End date is required!'),
-                                             validate: (value) => {
-                                                  const startDate = new Date(getValues('startDate'));
-                                                  const endDate = new Date(value);
-                                                  if (endDate < startDate) {
-                                                       return t('End date cannot be earlier than start date');
-                                                  }
-                                                  return true;
-                                             },
-                                        })}
+                                        id="end_date"
+                                        className={`form-control form-control-sm ${errors.end_date ? 'is-invalid' : ''}`}
+                                        {...register('end_date', { required: t('End date is required!') })}
                                    />
                                    {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
                               </div>
