@@ -11,114 +11,77 @@ export const Edit = () => {
      const { t } = useTranslation();
      const navigate = useNavigate();
 
-     const [assignment, setAssignment] = useState(null);
      const [tasks, setTasks] = useState([]);
      const [departments, setDepartments] = useState([]);
      const [users, setUsers] = useState([]);
-     const [status, setStatus] = useState(1);
-     const [note, setNote] = useState('');
 
      const {
           register,
           handleSubmit,
-          formState: { errors },
+          setValue,
           reset,
-          getValues,
+          watch,
+          formState: { errors },
      } = useForm();
+     const selectedTask = watch('taskId');
+     const selectedDepartment = watch('departmentId');
 
      useEffect(() => {
-          const fetchAssignment = async () => {
+          const initData = async () => {
                try {
-                    const fetchedAssignment = await getAssignmentById(id);
-                    if (fetchedAssignment) {
-                         setAssignment(fetchedAssignment);
-                         setNote(fetchedAssignment.note || '');
-                         reset({
-                              taskId: fetchedAssignment.task_id || '',
-                              userId: fetchedAssignment.user.id || '',
-                              status: fetchedAssignment.status || '1',
-                              departmentId: fetchedAssignment.department.id || '',
-                              note: fetchedAssignment.note || '',
-                         });
-                         await fetchDepartments(fetchedAssignment.task_id);
-                         await fetchUsers(fetchedAssignment.department.id);
+                    const [assignment, tasks] = await Promise.all([getAssignmentById(id), getAllTasks()]);
+                    setTasks(tasks);
+                    reset({
+                         taskId: assignment.task_id || '',
+                         departmentId: assignment.department?.id || '',
+                         userId: assignment.user?.id || '',
+                         status: assignment.status || '1',
+                         note: assignment.note || '',
+                    });
+                    if (assignment.task_id) {
+                         const departments = await getDepartmentsByTask(assignment.task_id);
+                         setDepartments(departments.departments || []);
+                    }
+                    if (assignment.department?.id) {
+                         const users = await getUsersByDepartment(assignment.department.id);
+                         setUsers(users.users || []);
                     }
                } catch (error) {
-                    console.error('Failed to fetch assignment:', error);
+                    console.error('Failed to initialize data:', error);
                }
           };
-
-          const fetchTasks = async () => {
-               try {
-                    const fetchedTasks = await getAllTasks();
-                    setTasks(fetchedTasks);
-               } catch (error) {
-                    console.error('Failed to fetch tasks:', error);
-               }
-          };
-
-          fetchAssignment();
-          fetchTasks();
+          initData();
      }, [id, reset]);
 
-     const fetchUsers = async (departmentId) => {
-          try {
-               const response = await getUsersByDepartment(departmentId);
-               setUsers(Array.isArray(response.users) ? response.users : []);
-          } catch (error) {
-               console.error('Failed to fetch users:', error);
-               setUsers([]);
-          }
-     };
+     useEffect(() => {
+          const fetchDepartments = async () => {
+               if (selectedTask) {
+                    const response = await getDepartmentsByTask(selectedTask);
+                    setDepartments(response.departments || []);
+                    setValue('departmentId', '');
+                    setUsers([]);
+               }
+          };
+          if (selectedTask) fetchDepartments();
+     }, [selectedTask, setValue]);
 
-     const fetchDepartments = async (taskId) => {
-          try {
-               const response = await getDepartmentsByTask(taskId);
-               setDepartments(Array.isArray(response.departments) ? response.departments : []);
-          } catch (error) {
-               setDepartments([]);
-          }
-     };
-
-     const handleTaskChange = async (e) => {
-          const taskId = e.target.value;
-          if (taskId) {
-               await fetchDepartments(taskId);
-               reset({
-                    taskId: taskId,
-                    userId: '',
-                    departmentId: '',
-               });
-               setUsers([]);
-          } else {
-               setDepartments([]);
-               setUsers([]);
-          }
-     };
-
-     const handleDepartmentChange = async (e) => {
-          const departmentId = e.target.value;
-          if (departmentId) {
-               await fetchUsers(departmentId);
-               reset({
-                    ...getValues(),
-                    userId: '',
-               });
-          } else {
-               setUsers([]);
-               reset({
-                    ...getValues(),
-                    userId: '',
-               });
-          }
-     };
+     useEffect(() => {
+          const fetchUsers = async () => {
+               if (selectedDepartment) {
+                    const response = await getUsersByDepartment(selectedDepartment);
+                    setUsers(response.users || []);
+                    setValue('userId', '');
+               }
+          };
+          if (selectedDepartment) fetchUsers();
+     }, [selectedDepartment, setValue]);
 
      const onSubmit = async (data) => {
           const assignmentData = {
                task_id: data.taskId,
-               user_ids: [data.userId],
                department_id: data.departmentId,
-               status: status,
+               user_ids: [data.userId],
+               status: data.status,
                note: data.note,
           };
 
@@ -131,9 +94,7 @@ export const Edit = () => {
                     toast: true,
                     timer: 2000,
                     showConfirmButton: false,
-               }).then(() => {
-                    navigate('/taskmaneger/assignments');
-               });
+               }).then(() => navigate('/taskmaneger/assignments'));
           } catch (error) {
                Swal.fire({
                     icon: 'error',
@@ -143,18 +104,8 @@ export const Edit = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
-               console.error('Error updating assignment:', error);
           }
      };
-
-     if (!assignment)
-          return (
-               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                    <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
-                    </div>
-               </div>
-          );
 
      return (
           <div className="card my-4">
@@ -165,17 +116,13 @@ export const Edit = () => {
                </div>
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
+                         {/* Task Selection */}
                          <div className="row mb-3">
                               <div className="col">
-                                   <label htmlFor="taskId" className="form-label">
-                                        {t('Task')}
-                                   </label>
+                                   <label className="form-label">{t('Task')}</label>
                                    <select
-                                        id="taskId"
-                                        className={`form-select form-select-sm ${errors.taskId ? 'is-invalid' : ''}`}
                                         {...register('taskId', { required: t('Task is required') })}
-                                        onChange={handleTaskChange}
-                                        value={assignment.task_id || ''}>
+                                        className={`form-select form-select-sm ${errors.taskId ? 'is-invalid' : ''}`}>
                                         <option value="">{t('Select Task')}</option>
                                         {tasks.map((task) => (
                                              <option key={task.id} value={task.id}>
@@ -185,37 +132,30 @@ export const Edit = () => {
                                    </select>
                                    {errors.taskId && <div className="invalid-feedback">{errors.taskId.message}</div>}
                               </div>
-
+                              {/* Department Selection */}
                               <div className="col">
-                                   <label htmlFor="departmentId" className="form-label">
-                                        {t('Department')}
-                                   </label>
+                                   <label className="form-label">{t('Department')}</label>
                                    <select
-                                        id="departmentId"
-                                        className={`form-select form-select-sm ${errors.departmentId ? 'is-invalid' : ''}`}
                                         {...register('departmentId', { required: t('Department is required') })}
-                                        onChange={handleDepartmentChange}
-                                        value={assignment.department.id || ''}>
+                                        className={`form-select form-select-sm ${errors.departmentId ? 'is-invalid' : ''}`}>
                                         <option value="">{t('Select Department')}</option>
-                                        {departments.map((department) => (
-                                             <option key={department.id} value={department.id}>
-                                                  {department.department_name}
+                                        {departments.map((dept) => (
+                                             <option key={dept.id} value={dept.id}>
+                                                  {dept.department_name}
                                              </option>
                                         ))}
                                    </select>
                                    {errors.departmentId && <div className="invalid-feedback">{errors.departmentId.message}</div>}
                               </div>
                          </div>
+
+                         {/* User Selection */}
                          <div className="row mb-3">
                               <div className="col">
-                                   <label htmlFor="userId" className="form-label">
-                                        {t('User')}
-                                   </label>
+                                   <label className="form-label">{t('User')}</label>
                                    <select
-                                        id="userId"
-                                        className={`form-select form-select-sm ${errors.userId ? 'is-invalid' : ''}`}
                                         {...register('userId', { required: t('User is required') })}
-                                        value={assignment.user.id || ''}>
+                                        className={`form-select form-select-sm ${errors.userId ? 'is-invalid' : ''}`}>
                                         <option value="">{t('Select User')}</option>
                                         {users.map((user) => (
                                              <option key={user.id} value={user.id}>
@@ -225,44 +165,23 @@ export const Edit = () => {
                                    </select>
                                    {errors.userId && <div className="invalid-feedback">{errors.userId.message}</div>}
                               </div>
-
+                              {/* Status and Note */}
                               <div className="col">
-                                   <label htmlFor="status" className="form-label">
-                                        {t('Status')}
-                                   </label>
-                                   <select
-                                        id="status"
-                                        className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
-                                        {...register('status', { required: t('Status is required') })}
-                                        onChange={(e) => setStatus(e.target.value)}
-                                        value={assignment.status || '1'}>
-                                        <option value="1">To do</option>
-                                        <option value="2">In progress</option>
-                                        <option value="3">Preview</option>
-                                        <option value="4">Done</option>
+                                   <label className="form-label">{t('Status')}</label>
+                                   <select {...register('status')} className="form-select form-select-sm">
+                                        <option value="1">{t('To Do')}</option>
+                                        <option value="2">{t('In Progress')}</option>
+                                        <option value="3">{t('Preview')}</option>
+                                        <option value="4">{t('Done')}</option>
                                    </select>
-                                   {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
                          </div>
-                         <div className="row mb-3">
-                              <div className="col">
-                                   <label htmlFor="note" className="form-label">
-                                        {t('Note')}
-                                   </label>
-                                   <textarea
-                                        id="note"
-                                        className={`form-control ${errors.note ? 'is-invalid' : ''}`}
-                                        {...register('note', { required: t('Note is required') })}
-                                        value={note} // Lấy giá trị note từ state
-                                        onChange={(e) => setNote(e.target.value)} // Cập nhật giá trị khi thay đổi
-                                        rows="3" // Cấu hình chiều cao cho textarea
-                                   />
-                                   {errors.note && <div className="invalid-feedback">{errors.note.message}</div>}
-                              </div>
+                         <div className="col">
+                              <label className="form-label">{t('Note')}</label>
+                              <textarea {...register('note')} className="form-control" rows="3" />
                          </div>
-
-                         <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-2"></i> {t('Update Assignment')}
+                         <button type="submit" className="btn btn-success mt-3">
+                              {t('Confirm')}
                          </button>
                     </form>
                </div>

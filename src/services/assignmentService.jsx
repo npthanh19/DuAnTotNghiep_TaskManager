@@ -100,6 +100,39 @@ export const getUsersByDepartment = async (departmentId) => {
      }
 };
 
+// Xóa vĩnh viễn Assignment
+export const forceDeleteAssignment = async (id) => {
+     try {
+          const response = await axiosi.delete(`/api/assignments/${id}/force`);
+          return response.data;
+     } catch (error) {
+          console.error('Error force deleting assignment:', error);
+          throw error;
+     }
+};
+
+// Lấy danh sách Assignments đã bị xóa (thùng rác)
+export const getTrashedAssignments = async () => {
+     try {
+          const response = await axiosi.get(`/api/assignments-trashed`);
+          return response.data;
+     } catch (error) {
+          console.error('Error fetching trashed assignments:', error);
+          throw error;
+     }
+};
+
+// Khôi phục Assignment từ thùng rác
+export const restoreAssignment = async (id) => {
+     try {
+          const response = await axiosi.put(`/api/assignments/${id}/restore`);
+          return response.data;
+     } catch (error) {
+          console.error('Error restoring assignment:', error);
+          throw error;
+     }
+};
+
 export default {
      getAllAssignments,
      getAssignmentById,

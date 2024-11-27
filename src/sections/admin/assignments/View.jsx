@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { getAllAssignments, deleteAssignment } from '../../../services/assignmentService';
 import Swal from 'sweetalert2';
+import RecentlyDeletedAssignment from './RecentlyDeletedAssignment';
 
 export const View = () => {
      const [currentPage, setCurrentPage] = useState(1);
@@ -102,9 +103,16 @@ export const View = () => {
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
                          <span className="marquee">{t('Assignments')}</span>
                     </h3>
-                    <Link to="/taskmaneger/assignments/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add')}
-                    </Link>
+                    <div className="d-flex align-items-center ms-auto">
+                         <Link to="/taskmaneger/assignments/add" className="btn btn-primary btn-sm me-2">
+                              <i className="bi bi-plus me-2"></i> {t('Add')}
+                         </Link>
+                         <button
+                              className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
+                              onClick={() => navigate('/taskmaneger/assignments/trashed')}>
+                              <i className="bi bi-trash me-2"></i>
+                         </button>
+                    </div>
                </div>
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">

@@ -45,7 +45,7 @@ import EditTasks from '../pages/admin/Tasks/Edit';
 import ViewAssignments from '../pages/admin/Assignments/List';
 import AddAssignments from '../pages/admin/Assignments/Add';
 import EditAssignments from '../pages/admin/Assignments/Edit';
-
+import RecentlyDeletedAssignment from '../sections/admin/assignments/RecentlyDeletedAssignment';
 // Recently Deleted
 import ViewRecentlyDeleted from '../pages/admin/Recentlydelete/List';
 
@@ -112,7 +112,8 @@ export const AdminRoutes = () => (
           <Route path="assignments" element={<PrivateRoute><AdminLayout><ViewAssignments /></AdminLayout></PrivateRoute>} />
           <Route path="assignments/add" element={<PrivateRoute><AdminLayout><AddAssignments /></AdminLayout></PrivateRoute>} />
           <Route path="assignments/edit/:id" element={<PrivateRoute><AdminLayout><EditAssignments /></AdminLayout></PrivateRoute>} />
-
+          <Route path="/assignments/trashed" element={<PrivateRoute><AdminLayout><RecentlyDeletedAssignment /></AdminLayout></PrivateRoute>} />
+          
           {/* Department Management */}
           <Route path="departments" element={<PrivateRoute><AdminLayout><ViewDepartments /></AdminLayout></PrivateRoute>} />
           <Route path="departments/add" element={<PrivateRoute><AdminLayout><AddDepartments /></AdminLayout></PrivateRoute>} />
