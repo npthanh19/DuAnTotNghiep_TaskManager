@@ -64,8 +64,8 @@ function RecentlyDeletedUsers() {
                } catch (error) {
                     Swal.fire({
                          icon: 'error',
-                         title: t('Added Failed!'),
-                         text: error.message || t('Something went wrong'),
+                         title: t('User recovery failed!'),
+                         text: t('Something went wrong'),
                     });
                }
           }
@@ -89,7 +89,7 @@ function RecentlyDeletedUsers() {
                     setUsers(users.filter((user) => user.id !== id));
                     Swal.fire({
                          icon: 'success',
-                         text: t('Người dùng đã được xóa vĩnh viễn.'),
+                         text: t('The user has been permanently deleted.'),
                          position: 'top-right',
                          toast: true,
                          timer: 3000,
@@ -98,7 +98,7 @@ function RecentlyDeletedUsers() {
                } catch (error) {
                     Swal.fire({
                          icon: 'error',
-                         text: t('Đã xảy ra lỗi khi xóa người dùng'),
+                         text: t('An error occurred while deleting the user.'),
                          position: 'top-right',
                          toast: true,
                          timer: 3000,

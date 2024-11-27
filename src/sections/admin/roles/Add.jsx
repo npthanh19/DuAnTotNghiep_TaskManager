@@ -32,7 +32,10 @@ export const Add = () => {
                     }));
                     setPermissions(formattedPermissions);
                } catch (error) {
-                    toast.error(t('Failed to fetch permissions!'));
+                    Swal.fire({
+                         icon: 'error',
+                         title: t('Failed to fetch permissions!'),
+                    });
                }
           };
 
@@ -60,7 +63,7 @@ export const Add = () => {
                Swal.fire({
                     icon: 'error',
                     title: t('Added Failed!'),
-                    text: error.message || t('Something went wrong'),
+                    text: t('Something went wrong'),
                });
                console.error('Failed to add role:', error);
           }
@@ -111,7 +114,7 @@ export const Add = () => {
                                    value={selectedPermissions}
                                    onChange={setSelectedPermissions}
                                    classNamePrefix="select"
-                                   placeholder={t('Select permissions...')}
+                                   placeholder={t('Select permissions')}
                               />
                          </div>
 

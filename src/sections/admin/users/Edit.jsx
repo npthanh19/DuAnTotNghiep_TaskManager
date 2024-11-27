@@ -68,7 +68,7 @@ export const Edit = () => {
                await updateUser(id, updatedData);
                Swal.fire({
                     icon: 'success',
-                    text: t('Update successfully!'),
+                    text: t('Edit successfully!'),
                     position: 'top-right',
                     toast: true,
                     timer: 2000,
@@ -82,8 +82,8 @@ export const Edit = () => {
           } catch (error) {
                Swal.fire({
                     icon: 'error',
-                    title: t('Update Failed!'),
-                    text: error.message || t('Something went wrong'),
+                    title: t('Edit Failed!'),
+                    text: t('Something went wrong'),
                });
           }
      };

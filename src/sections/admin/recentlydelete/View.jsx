@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 import { DeleteRecently } from './Delete';
+import { useTranslation } from 'react-i18next';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -11,6 +12,8 @@ export function View() {
      const [currentPage, setCurrentPage] = useState(1);
      const [modalItem, setModalItem] = useState(null);
      const itemsPerPage = 9;
+     const { t } = useTranslation();
+
 
      const [tasksAndProjects, setTasksAndProjects] = useState([
           { id: 1, name: 'Task 1', type: 'Task', path: '/tasks/task1', date: 'Sep 26, 2024' },
@@ -88,12 +91,12 @@ export function View() {
      return (
           <div className="card container-fluid mt-4">
                <header className="d-flex justify-content-between align-items-center mb-3">
-                    <h1>Thùng Rác</h1>
+                    <h1>{t('Trash')}</h1>
                </header>
 
                <div>
                     {tasksAndProjects.length === 0 ? (
-                         <p className="text-center">Thùng rác của bạn trống.</p>
+                         <p className="text-center">{t('Your trash is empty.')}</p>
                     ) : (
                          <>
                               <div className="form-check mb-3 d-flex align-items-center">
@@ -103,19 +106,19 @@ export function View() {
                                         onChange={handleSelectAll}
                                         checked={selectedItems.length === tasksAndProjects.length}
                                    />
-                                   <label className="form-check-label me-3">Chọn tất cả</label>
+                                   <label className="form-check-label me-3">{t('Select all')}</label>
                                    <div className="ms-auto">
                                         <button
                                              className={`btn btn-primary btn-sm me-2 ${selectedItems.length === 0 ? 'disabled' : ''}`}
                                              disabled={selectedItems.length === 0}
                                              onClick={handleRestore}>
-                                             Khôi phục
+                                             {t('Restore')}
                                         </button>
                                         <button
                                              className={`btn btn-danger btn-sm ${selectedItems.length === 0 ? 'disabled' : ''}`}
                                              disabled={selectedItems.length === 0}
                                              onClick={handleDeleteClick}>
-                                             Xóa vĩnh viễn
+                                             {t('Delete permanently')}
                                         </button>
                                    </div>
                               </div>
@@ -139,7 +142,7 @@ export function View() {
                                                        {item.type}: {item.name}
                                                   </strong>
                                                   <br />
-                                                  <span>Đường dẫn: {item.path}</span>
+                                                  <span>{t('Path')}: {item.path}</span>
                                              </div>
                                              <span className="badge bg-secondary">{item.date}</span>
                                         </div>
@@ -153,7 +156,7 @@ export function View() {
                                                   className="page-link"
                                                   onClick={() => handlePageChange(currentPage - 1)}
                                                   disabled={currentPage === 1}>
-                                                  Previous
+                                                  {t('Previous')}
                                              </button>
                                         </li>
                                         {[...Array(totalPages)].map((_, index) => (
@@ -168,7 +171,7 @@ export function View() {
                                                   className="page-link"
                                                   onClick={() => handlePageChange(currentPage + 1)}
                                                   disabled={currentPage === totalPages}>
-                                                  Next
+                                                  {t('Next')}
                                              </button>
                                         </li>
                                    </ul>

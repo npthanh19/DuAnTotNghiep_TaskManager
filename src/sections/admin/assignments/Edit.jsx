@@ -119,7 +119,7 @@ export const Edit = () => {
                          {/* Task Selection */}
                          <div className="row mb-3">
                               <div className="col">
-                                   <label className="form-label">{t('Task')}</label>
+                                   <label className="form-label">{t('Tasks')}</label>
                                    <select
                                         {...register('taskId', { required: t('Task is required') })}
                                         className={`form-select form-select-sm ${errors.taskId ? 'is-invalid' : ''}`}>

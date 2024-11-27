@@ -27,7 +27,10 @@ export const Edit = () => {
                     setRole(fetchedRole);
                     reset(fetchedRole);
                } catch (error) {
-                    toast.error(t('Failed!'));
+                    Swal.fire({
+                         icon: 'error',
+                         title: t('Failed!'),
+                    });
                }
           };
           fetchRole();
@@ -43,7 +46,7 @@ export const Edit = () => {
                await updateRole(id, roleData);
                Swal.fire({
                     icon: 'success',
-                    text: t('Update successfully!'),
+                    text: t('Edit successfully!'),
                     position: 'top-right',
                     toast: true,
                     timer: 2000,
@@ -57,8 +60,8 @@ export const Edit = () => {
                console.error('Failed:', error);
                Swal.fire({
                     icon: 'error',
-                    title: t('Update Failed!'),
-                    text: error.message || t('Something went wrong'),
+                    title: t('Edit Failed!'),
+                    text: t('Something went wrong'),
                });
           }
      };
