@@ -71,9 +71,41 @@ export const addDepartmentToProject = async (projectId, data) => {
           throw error.response ? error.response.data : new Error('Network error');
      }
 };
+
 export const removeDepartmentFromProject = async (projectId, data) => {
      const response = await axiosi.post(`${apiEndpoint}/${projectId}/remove-departments`, data);
      return response.data;
+};
+
+// Bổ sung các phương thức mới để lấy dự án đã xóa, phục hồi và xóa vĩnh viễn
+export const getTrashedProjects = async () => {
+     try {
+          const response = await axiosi.get('/api/projects-trashed');
+          return response.data;
+     } catch (error) {
+          console.error('Error fetching trashed projects:', error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+export const restoreProject = async (id) => {
+     try {
+          const response = await axiosi.post(`/api/projects/${id}/restore`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error restoring project with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+export const forceDeleteProject = async (id) => {
+     try {
+          const response = await axiosi.delete(`/api/projects/${id}/force`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error permanently deleting project with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
 };
 
 export default {
@@ -84,4 +116,7 @@ export default {
      deleteProject,
      addTasksToProject,
      removeDepartmentFromProject,
+     getTrashedProjects,
+     restoreProject,
+     forceDeleteProject,
 };

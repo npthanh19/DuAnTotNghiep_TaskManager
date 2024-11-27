@@ -62,7 +62,7 @@ export const View = () => {
 
      const handleDeleteClick = (id) => {
           const deleteTitle = t('Delete Project');
-     
+
           Swal.fire({
                title: deleteTitle,
                text: t('Are you sure you want to delete this project?'),
@@ -77,7 +77,7 @@ export const View = () => {
                     try {
                          await deleteProject(id);
                          setProjects((prevTasks) => prevTasks.filter((task) => task.id !== id));
-     
+
                          Swal.fire({
                               icon: 'success',
                               text: t('The projects has been moved to the trash!'),
@@ -148,9 +148,16 @@ export const View = () => {
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
                          <span className="marquee">{t('Projects')}</span>
                     </h3>
-                    <Link to="/taskmaneger/projects/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add')}
-                    </Link>
+                    <div className="d-flex align-items-center ms-auto">
+                         <Link to="/taskmaneger/projects/add" className="btn btn-primary">
+                              <i className="bi bi-plus me-2"></i> {t('Add')}
+                         </Link>
+                         <button
+                              className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
+                              onClick={() => navigate('/taskmaneger/projects/trashed')}>
+                              <i className="bi bi-trash me-2"></i>
+                         </button>
+                    </div>
                </div>
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
@@ -158,7 +165,6 @@ export const View = () => {
                               <tr>
                                    <th className="col">ID</th>
                                    <th className="col">{t('Project Name')}</th>
-                                   <th className="col">{t('Description')}</th>
                                    <th className="col">{t('Start Date')}</th>
                                    <th className="col">{t('End Date')}</th>
                                    <th className="col">{t('Status')}</th>
@@ -171,19 +177,31 @@ export const View = () => {
                                    <tr key={project.id}>
                                         <td>{project.id}</td>
                                         <td>{project.project_name}</td>
-                                        <td>{project.description}</td>
                                         <td>{project.start_date}</td>
                                         <td>{project.end_date}</td>
                                         <td>
-                                             {project.status === 'to do' && <span className="badge bg-secondary">{t('To Do')}</span>}
-                                             {project.status === 'in progress' && (
-                                                  <span className="badge bg-warning text-dark">{t('In Progress')}</span>
+                                             {project.status === 'to do' && (
+                                                  <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('To Do')}
+                                                  </span>
                                              )}
-                                             {project.status === 'preview' && <span className="badge bg-info text-dark">{t('Preview')}</span>}
-                                             {project.status === 'done' && <span className="badge bg-success">{t('Done')}</span>}
+                                             {project.status === 'in progress' && (
+                                                  <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('In Progress')}
+                                                  </span>
+                                             )}
+                                             {project.status === 'preview' && (
+                                                  <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('Preview')}
+                                                  </span>
+                                             )}
+                                             {project.status === 'done' && (
+                                                  <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('Done')}
+                                                  </span>
+                                             )}
                                         </td>
-
-                                        <td>{users[project.user_id]}</td>
+                                        <td>{users[project.user_id] ? users[project.user_id] : <span className="badge bg-secondary">none</span>}</td>
                                         <td>
                                              <div className="dropdown">
                                                   <button

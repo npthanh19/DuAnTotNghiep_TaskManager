@@ -186,7 +186,7 @@ export const Add = () => {
                                    {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
                               </div>
                          </div>
-
+{/* 
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="projectManager" className="form-label">
@@ -205,7 +205,7 @@ export const Add = () => {
                                    </select>
                                    {errors.projectManager && <div className="invalid-feedback">{errors.projectManager.message}</div>}
                               </div>
-                         </div>
+                         </div> */}
 
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-2"></i> {t('Add')}
