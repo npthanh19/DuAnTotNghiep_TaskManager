@@ -37,7 +37,7 @@ export const Add = () => {
                Swal.fire({
                     icon: 'error',
                     title: t('Added Failed!'),
-                    text: error.message || t('Something went wrong'),
+                    text: t('Something went wrong'),
                });
           }
      };

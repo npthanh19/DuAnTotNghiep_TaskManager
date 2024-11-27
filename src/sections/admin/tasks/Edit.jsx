@@ -7,6 +7,8 @@ import { getTaskById, updateTask as updateTaskService } from '../../../services/
 import { getAllProjects } from '../../../services/projectsService';
 import { getDepartmentsByProjectId } from '../../../services/tasksService';
 import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
+
 
 export const Edit = () => {
      const { id } = useParams();
@@ -36,7 +38,14 @@ export const Edit = () => {
                     reset(fetchedTask);
                } catch (err) {
                     console.error('Failed to fetch data:', err);
-                    toast.error(t('Failed to fetch task, projects, or departments.'));
+                    Swal.fire({
+                         icon: 'error',
+                         text: t('Failed to fetch task, projects, or departments.'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
                }
           };
           fetchData();
@@ -51,20 +60,39 @@ export const Edit = () => {
                const departmentData = await getDepartmentsByProjectId(projectId);
                setDepartments(departmentData.departments || []);
           } catch (error) {
-               toast.error(t('Failed to load departments.'));
+               Swal.fire({
+                    icon: 'error',
+                    text: t('Failed to load departments.'),
+                    position: 'top-right',   
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           }
      };
 
      const onSubmit = async (data) => {
           try {
                await updateTaskService(id, data);
-               toast.success(t('Task updated successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Edit successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+               reset();
                setTimeout(() => {
                     navigate('/taskmaneger/tasks');
                }, 1000);
           } catch (error) {
                console.error('Error updating task:', error);
-               toast.error(t('Failed to update the task.'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Edit Failed!'),
+                    text: t('Something went wrong'),
+               });
           }
      };
 
@@ -72,7 +100,7 @@ export const Edit = () => {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
           );

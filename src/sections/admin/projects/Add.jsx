@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { createProject } from '../../../services/projectsService';
 import { getAllUsers } from '../../../services/usersService';
 import { getAllDepartments } from '../../../services/deparmentsService';
+import Swal from 'sweetalert2';
+
 
 export const Add = () => {
      const { t } = useTranslation();
@@ -28,7 +30,11 @@ export const Add = () => {
                     setUsers(userData);
                } catch (error) {
                     console.error('Error fetching users:', error);
-                    toast.error(t('Failed to load users'));
+                    Swal.fire({
+                         icon: 'error',
+                         title: t('Failed to load users'),
+                         text: t('Something went wrong'),
+                    });
                }
           };
 
@@ -38,7 +44,11 @@ export const Add = () => {
                     setDepartments(departmentData);
                } catch (error) {
                     console.error('Error fetching departments:', error);
-                    toast.error(t('Failed to load departments'));
+                    Swal.fire({
+                         icon: 'error',
+                         title: t('Failed to load departments'),
+                         text: t('Something went wrong'),
+                    });
                }
           };
 
@@ -58,14 +68,25 @@ export const Add = () => {
 
           try {
                await createProject(mappedData);
-               toast.success(t('Project and department added successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Project and department added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
                reset();
                setTimeout(() => {
                     navigate('/taskmaneger/projects');
                }, 1000);
           } catch (error) {
                console.error('Error adding project or department:', error.response?.data || error);
-               toast.error(t('Error adding project or department! Please try again.'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Error adding project or department! Please try again.'),
+                    text: t('Something went wrong'),
+               });
           }
      };
 

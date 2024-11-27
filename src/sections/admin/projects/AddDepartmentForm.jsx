@@ -6,6 +6,8 @@ import Select from 'react-select';
 import { useForm } from 'react-hook-form';
 import { addDepartmentToProject, removeDepartmentFromProject, getProjectById } from '../../../services/projectsService';
 import { getAllDepartments } from '../../../services/deparmentsService';
+import Swal from 'sweetalert2';
+
 
 const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }) => {
     const { t } = useTranslation();
@@ -25,7 +27,11 @@ const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }
                 setValue('projectName', projectData.project_name);
             } catch (error) {
                 console.error('Error fetching project:', error);
-                toast.error(t('Error fetching project!'));
+                Swal.fire({
+                    icon: 'error',
+                    title: t('Error fetching project!'),
+                    text: t('Something went wrong'),
+               });
             }
         };
 
@@ -35,7 +41,11 @@ const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }
                 setDepartments(data);
             } catch (error) {
                 console.error('Error fetching departments:', error);
-                toast.error(t('Error fetching departments!'));
+                Swal.fire({
+                    icon: 'error',
+                    title: t('Error fetching departments!'),
+                    text: t('Something went wrong'),
+               });
             }
         };
 
@@ -56,28 +66,50 @@ const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }
 
     const handleAddSubmit = async (data) => {
         if (selectedDepartmentIds.length === 0) {
-            toast.error(t('At least one department must be selected!'));
+            Swal.fire({
+                icon: 'error',
+                title: t('At least one department must be selected!'),
+                text: t('Something went wrong'),
+           });
             return;
         }
 
         try {
             await addDepartmentToProject(projectId, { department_ids: selectedDepartmentIds });
             setAddedDepartmentIds((prev) => [...prev, ...selectedDepartmentIds]);
-            toast.success(t('Departments added successfully!'));
+            Swal.fire({
+                icon: 'success',
+                text: t('Departments added successfully!'),
+                position: 'top-right',
+                toast: true,
+                timer: 2000,
+                showConfirmButton: false,
+           });
 
             if (typeof onAddSuccess === 'function') {
                 onAddSuccess();
             }
         } catch (error) {
-            console.error('Error adding departments:', error);
-            toast.error(t('Error adding departments! Please try again.'));
+            console.error('Error adding departments! Please try again.', error);
+            Swal.fire({
+                icon: 'error',
+                title: t('Error adding departments! Please try again.'),
+                text: t('Something went wrong'),
+           });
         }
     };
 
     const handleRemoveDepartment = async (departmentId) => {
         try {
             await removeDepartmentFromProject(projectId, { department_ids: [departmentId] });
-            toast.success(t('Department removed successfully!'));
+            Swal.fire({
+                icon: 'success',
+                text: t('Department removed successfully!'),
+                position: 'top-right',
+                toast: true,
+                timer: 2000,
+                showConfirmButton: false,
+           });
 
             if (typeof onRemoveSuccess === 'function') {
                 onRemoveSuccess();
@@ -86,7 +118,11 @@ const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }
             setAddedDepartmentIds((prev) => prev.filter((id) => id !== departmentId));
         } catch (error) {
             console.error('Error removing department:', error);
-            toast.error(t('Error removing department! Please try again.'));
+            Swal.fire({
+                icon: 'error',
+                title: t('Error removing department! Please try again.'),
+                text: t('Something went wrong'),
+           });
         }
     };
 

@@ -54,7 +54,7 @@ function RecentlyDeletedProjects() {
                     setProjects(projects.filter((project) => project.id !== id));
                     Swal.fire({
                          icon: 'success',
-                         title: t('Restored'),
+                         title: t('Restore'),
                          text: t('Project restored successfully.'),
                          showConfirmButton: false,
                          timer: 2000,
@@ -66,7 +66,7 @@ function RecentlyDeletedProjects() {
                     Swal.fire({
                          icon: 'error',
                          title: t('Restore Failed!'),
-                         text: error.message || t('Something went wrong'),
+                         text: t('Something went wrong'),
                     });
                }
           }
@@ -90,7 +90,7 @@ function RecentlyDeletedProjects() {
                     setProjects(projects.filter((project) => project.id !== id));
                     Swal.fire({
                          icon: 'success',
-                         title: t('Deleted'),
+                         title: t('Delete'),
                          text: t('Project permanently deleted.'),
                          showConfirmButton: false,
                          timer: 3000,

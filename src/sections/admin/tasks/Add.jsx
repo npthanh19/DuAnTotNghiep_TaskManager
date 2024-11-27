@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { createTask } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getDepartmentsByProjectId } from '../../../services/tasksService';
+import Swal from 'sweetalert2';
+
 
 export const Add = () => {
      const { t } = useTranslation();
@@ -27,7 +29,11 @@ export const Add = () => {
                     const projectData = await getAllProjects();
                     setProjects(projectData);
                } catch (error) {
-                    toast.error(t('Failed to load projects.'));
+                    Swal.fire({
+                         icon: 'error',
+                         title: t('Failed to load projects.'),
+                         text: t('Something went wrong'),
+                    });
                }
           };
 
@@ -43,7 +49,11 @@ export const Add = () => {
                const departmentData = await getDepartmentsByProjectId(projectId);
                setDepartments(departmentData.departments || []);
           } catch (error) {
-               toast.error(t('Failed to load departments.'));
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Failed to load departments.'),
+                    text: t('Something went wrong'),
+               });
           }
      };
 
@@ -67,14 +77,25 @@ export const Add = () => {
 
                console.log('Payload to be sent:', payload);
                await createTask(payload);
-               toast.success(t('Task added successfully!'));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
                reset();
                setTimeout(() => {
                     navigate('/taskmaneger/tasks');
                }, 1000);
           } catch (error) {
-               toast.error(t('Failed to add task.'));
                console.error('Error details:', error.response ? error.response.data : error);
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Added Failed!'),
+                    text: t('Something went wrong'),
+               });
           }
      };
 

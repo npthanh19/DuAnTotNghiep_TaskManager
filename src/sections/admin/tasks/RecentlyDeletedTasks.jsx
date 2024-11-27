@@ -53,7 +53,7 @@ function RecentlyDeletedTasks() {
                     setTasks(tasks.filter((task) => task.id !== id));
                     Swal.fire({
                          icon: 'success',
-                         title: t('Restored'),
+                         title: t('Restore'),
                          text: t('Task restored successfully.'),
                          showConfirmButton: false,
                          timer: 2000,
@@ -65,7 +65,7 @@ function RecentlyDeletedTasks() {
                     Swal.fire({
                          icon: 'error',
                          title: t('Restore Failed!'),
-                         text: error.message || t('Something went wrong'),
+                         text: t('Something went wrong'),
                     });
                }
           }
@@ -89,7 +89,7 @@ function RecentlyDeletedTasks() {
                     setTasks(tasks.filter((task) => task.id !== id));
                     Swal.fire({
                          icon: 'success',
-                         title: t('Deleted'),
+                         title: t('Delete'),
                          text: t('Task permanently deleted.'),
                          showConfirmButton: false,
                          timer: 3000,

@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { getProjectById, updateProject } from '../../../services/projectsService';
 import { getAllUsers } from '../../../services/usersService';
 import { getAllDepartments } from '../../../services/deparmentsService';
+import Swal from 'sweetalert2';
+
 
 export const Edit = () => {
     const { id } = useParams();
@@ -45,7 +47,11 @@ export const Edit = () => {
                 // Optionally call setValue if needed for individual fields
                 setValue('status', fetchedProject.status || '1'); // Ensure status is set
             } catch (error) {
-                toast.error(t('Lỗi khi lấy thông tin dự án!'));
+                Swal.fire({
+                    icon: 'error',
+                    title: t('Error retrieving project information!'),
+                    text: t('Something went wrong'),
+               });
             }
         };
         fetchProject();
@@ -58,7 +64,11 @@ export const Edit = () => {
                 const fetchedUsers = await getAllUsers();
                 setUsers(fetchedUsers);
             } catch (error) {
-                toast.error(t('Lỗi khi lấy danh sách người dùng!'));
+                Swal.fire({
+                    icon: 'error',
+                    title: t('Error getting user list!'),
+                    text: t('Something went wrong'),
+               });
             }
         };
         fetchUsers();
@@ -71,7 +81,11 @@ export const Edit = () => {
                 const fetchedDepartments = await getAllDepartments();
                 setDepartments(fetchedDepartments);
             } catch (error) {
-                toast.error(t('Lỗi khi lấy danh sách phòng ban!'));
+                Swal.fire({
+                    icon: 'error',
+                    title: t('Error retrieving department list!'),
+                    text: t('Something went wrong'),
+               });
             }
         };
         fetchDepartments();
@@ -89,12 +103,24 @@ export const Edit = () => {
         };
         try {
             await updateProject(id, mappedData);
-            toast.success(t('Cập nhật thành công!'));
+            Swal.fire({
+                icon: 'success',
+                text: t('Edit successfully!'),
+                position: 'top-right',
+                toast: true,
+                timer: 2000,
+                showConfirmButton: false,
+           });
+           reset();
             setTimeout(() => {
                 navigate('/taskmaneger/projects');
             }, 1000);
         } catch (error) {
-            toast.error(t('Cập nhật thất bại!'));
+            Swal.fire({
+                icon: 'error',
+                title: t('Edit Failed!'),
+                text: t('Something went wrong'),
+           });
         }
     };
 
@@ -102,7 +128,7 @@ export const Edit = () => {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                 <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">{t('Loading...')}</span>
                 </div>
             </div>
         );

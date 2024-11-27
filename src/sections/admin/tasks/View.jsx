@@ -149,7 +149,7 @@ export const View = () => {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
           );
@@ -204,7 +204,7 @@ export const View = () => {
                                    <th className="col">{t('Start Date')}</th>
                                    <th className="col">{t('End Date')}</th>
                                    <th className="col">{t('Status')}</th>
-                                   <th className="col">{t('Project')}</th>
+                                   <th className="col">{t('Projects')}</th>
                                    <th className="col">{t('Actions')}</th>
                               </tr>
                          </thead>
