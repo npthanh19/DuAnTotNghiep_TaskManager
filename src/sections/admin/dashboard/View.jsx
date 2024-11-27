@@ -9,6 +9,8 @@ import { getAllTasks } from '../../../services/tasksService';
 import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllDepartments } from '../../../services/deparmentsService';
 import { getAllActivityLogs } from '../../../services/activityService';
+import { useTranslation } from 'react-i18next';
+
 
 const MainContainer = styled.main`
      padding: 2rem;
@@ -122,6 +124,9 @@ const DateRangePicker = styled.div`
 `;
 
 export const View = () => {
+
+     const { t } = useTranslation();
+
      const taskData = [
           {
                name: 'Dự Án Alpha1',
@@ -310,22 +315,22 @@ export const View = () => {
      return (
           <MainContainer>
                <Header>
-                    <Title>Dashboard</Title>
+                    <Title>{t('Dashboard')}</Title>
                     <div className="btn-toolbar mb-2 mb-md-0">
                          <ButtonGroup>
-                              <Button>Share</Button>
-                              <Button>Export</Button>
+                              <Button>{t('Share')}</Button>
+                              <Button>{t('Export')}</Button>
                               <DropdownButton data-bs-toggle="dropdown" aria-expanded="false">
-                                   <i className="bi bi-calendar"></i> Chọn khoảng thời gian
+                                   <i className="bi bi-calendar"></i>{t('Choose a time period')}
                               </DropdownButton>
                               <DateRangePicker>
                                    <div className="dropdown-menu" id="dateRangePicker">
-                                        <label htmlFor="startDate">Từ ngày:</label>
+                                        <label htmlFor="startDate">{t('From date:')}</label>
                                         <input type="date" id="startDate" className="form-control mb-2" />
-                                        <label htmlFor="endDate">Đến ngày:</label>
+                                        <label htmlFor="endDate">{t('To date:')}</label>
                                         <input type="date" id="endDate" className="form-control mb-2" />
                                         <button type="button" className="btn btn-primary" onClick={handleDateRangeApply}>
-                                             Áp dụng
+                                             {t('Apply')}
                                         </button>
                                    </div>
                               </DateRangePicker>
@@ -339,7 +344,7 @@ export const View = () => {
                               <CardHeader>
                                    <div>
                                         <Number>{role1Count}</Number>
-                                        <Label>Quản trị website</Label>
+                                        <Label>{t('Website administration')}</Label>
                                    </div>
                                    <div>
                                         <Icon className="bi bi-house-door text-success" />
@@ -347,7 +352,7 @@ export const View = () => {
                               </CardHeader>
                               <CardBody>
                                    <ShowInfoLink href="#" onClick={() => handleShowInfoClick('admin')}>
-                                        {showUserInfo['admin'] ? 'Ẩn thông tin' : 'Show info'}
+                                        {showUserInfo['admin'] ? t('Hide Info') : t('Show info')}
                                    </ShowInfoLink>
                               </CardBody>
                          </Card>
@@ -359,7 +364,7 @@ export const View = () => {
                               <CardHeader>
                                    <div>
                                         <Number>{otherRolesCount}</Number>
-                                        <Label>Người dùng</Label>
+                                        <Label>{t('User')}</Label>
                                    </div>
                                    <div>
                                         <Icon className="bi bi-person text-warning" />
@@ -367,7 +372,7 @@ export const View = () => {
                               </CardHeader>
                               <CardBody>
                                    <ShowInfoLink href="#" onClick={() => handleShowInfoClick('others')}>
-                                        {showUserInfo['others'] ? 'Ẩn thông tin' : 'Show info'}
+                                        {showUserInfo['others'] ? t('Hide Info') : t('Show info')}
                                    </ShowInfoLink>
                               </CardBody>
                          </Card>
@@ -378,7 +383,7 @@ export const View = () => {
                               <CardHeader>
                                    <div>
                                         <Number>{projectsCount}</Number>
-                                        <Label>Dự án</Label>
+                                        <Label>{t('Projects')}</Label>
                                    </div>
                                    <div>
                                         <Icon className="bi bi-briefcase text-info" />
@@ -386,7 +391,7 @@ export const View = () => {
                               </CardHeader>
                               <CardBody>
                                    <ShowInfoLink href="#" onClick={() => handleShowInfoClick('projects')}>
-                                        {showUserInfo['projects'] ? 'Ẩn thông tin' : 'Show info'}
+                                        {showUserInfo['projects'] ? t('Hide Info') : t('Show info')}
                                    </ShowInfoLink>
                               </CardBody>
                          </Card>
@@ -397,7 +402,7 @@ export const View = () => {
                               <CardHeader>
                                    <div>
                                         <Number>{tasksCount}</Number>
-                                        <Label>Nhiệm vụ</Label>
+                                        <Label>{t('Tasks')}</Label>
                                    </div>
                                    <div>
                                         <Icon className="bi bi-list-check text-danger" />
@@ -405,7 +410,7 @@ export const View = () => {
                               </CardHeader>
                               <CardBody>
                                    <ShowInfoLink href="#" onClick={() => handleShowInfoClick('tasks')}>
-                                        {showUserInfo['tasks'] ? 'Ẩn thông tin' : 'Show info'}
+                                        {showUserInfo['tasks'] ? t('Hide Info') : t('Show info')}
                                    </ShowInfoLink>
                               </CardBody>
                          </Card>
@@ -416,7 +421,7 @@ export const View = () => {
                               <CardHeader>
                                    <div>
                                         <Number>{departmentsCount}</Number>
-                                        <Label>Phòng ban</Label>
+                                        <Label>{t('Departments')}</Label>
                                    </div>
                                    <div>
                                         <Icon className="bi bi-building text-primary" />
@@ -424,7 +429,7 @@ export const View = () => {
                               </CardHeader>
                               <CardBody>
                                    <ShowInfoLink href="#" onClick={() => handleShowInfoClick('departments')}>
-                                        {showUserInfo['departments'] ? 'Ẩn thông tin' : 'Show info'}
+                                        {showUserInfo['departments'] ? t('Hide Info') : t('Show info')}
                                    </ShowInfoLink>
                               </CardBody>
                          </Card>
@@ -435,7 +440,7 @@ export const View = () => {
                               <CardHeader>
                                    <div>
                                         <Number>{activityCount}</Number>
-                                        <Label>Lịch sử hoạt động</Label>
+                                        <Label>{t('Activity Log')}</Label>
                                    </div>
                                    <div>
                                         <Icon className="bi bi-clock-history text-success" />
@@ -443,7 +448,7 @@ export const View = () => {
                               </CardHeader>
                               <CardBody>
                                    <ShowInfoLink href="#" onClick={() => handleShowInfoClick('activitys')}>
-                                        {showUserInfo['activitys'] ? 'Ẩn thông tin' : 'Show info'}
+                                        {showUserInfo['activitys'] ? t('Hide Info') : t('Show info')}
                                    </ShowInfoLink>
                               </CardBody>
                          </Card>
@@ -456,9 +461,9 @@ export const View = () => {
                               <thead className="table-light">
                                    <tr>
                                         <th>STT</th>
-                                        <th>Full Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
+                                        <th>{t('Full Name')}</th>
+                                        <th>{t('Email')}</th>
+                                        <th>{t('Role')}</th>
                                    </tr>
                               </thead>
                               <tbody>
@@ -483,9 +488,9 @@ export const View = () => {
                               <thead className="table-light">
                                    <tr>
                                         <th>STT</th>
-                                        <th>Full Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
+                                        <th>{t('Full Name')}</th>
+                                        <th>{t('Email')}</th>
+                                        <th>{t('Role')}</th>
                                    </tr>
                               </thead>
                               <tbody>
@@ -510,9 +515,9 @@ export const View = () => {
                               <thead className="table-light">
                                    <tr>
                                         <th>STT</th>
-                                        <th>Project Name</th>
-                                        <th>Status</th>
-                                        <th>User ID</th>
+                                        <th>{t('Project Name')}</th>
+                                        <th>{t('Status')}</th>
+                                        <th>{t('User ID')}</th>
                                    </tr>
                               </thead>
                               <tbody>
@@ -547,10 +552,10 @@ export const View = () => {
                               <thead className="table-light">
                                    <tr>
                                         <th>STT</th>
-                                        <th>Task Name</th>
-                                        <th>Status</th>
-                                        <th>Worktime</th>
-                                        <th>Project</th>
+                                        <th>{t('Task Name')}</th>
+                                        <th>{t('Status')}</th>
+                                        <th>{t('Worktimes')}</th>
+                                        <th>{t('Projects')}</th>
                                    </tr>
                               </thead>
                               <tbody>
@@ -586,7 +591,7 @@ export const View = () => {
                               <thead className="table-light">
                                    <tr>
                                         <th className="col-3">STT</th>
-                                        <th>Department Name</th>
+                                        <th>{t('Department Name')}</th>
                                    </tr>
                               </thead>
                               <tbody>
@@ -607,8 +612,8 @@ export const View = () => {
                               <thead className="table-light">
                                    <tr>
                                         <th className="col-1">STT</th>
-                                        <th className="col-2">User ID</th>
-                                        <th className="col-2">Action</th>
+                                        <th className="col-2">{t('User ID')}</th>
+                                        <th className="col-2">{t('Actions')}</th>
                                         <th className="col-2">Loggable ID</th>
                                    </tr>
                               </thead>
@@ -628,7 +633,7 @@ export const View = () => {
                     </div>
                )}
                <div className="mt-4">
-                    <h3 className="">Thống kê Tổng Giờ Thực Hiện</h3>
+                    <h3 className="">{t('Statistics Total Hours Executed')}</h3>
                     <Row>
                          <div className="col-md-6">
                               <BarChartComponent />

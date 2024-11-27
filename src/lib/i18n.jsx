@@ -255,6 +255,21 @@ const resources = {
                'Failed to restore assignment.': 'LỗI khôi phục vui lòng kiểm tra lại.',
                'Assignment permanently deleted!': 'Xoá vĩnh viễn phân công thành công!',
                'Failed to permanently delete assignment.': 'lỗi vui lòng kiểm tra lại',
+               'Share': 'Chia sẻ',
+               'Export': 'Xuất',
+               'Choose a time period':'Chọn khoảng thời gian',
+               'From date:':  'Từ ngày:',
+               'To date:': 'Đến ngày:',
+               'Apply': 'Áp dụng',
+               'Website administration': 'Quản trị website',
+               'Hide Info': 'Ẩn thông tin',
+               'Show info': 'Hiển thị thông tin',
+               'User': 'Người dùng',
+               'Status':'Trạng thái',
+               'User ID': 'Người dùng',
+               'Statistics Total Hours Executed': 'Thống kê Tổng Giờ Thực Hiện',
+
+
           },
      },
 };
