@@ -122,6 +122,49 @@ export const getTaskWithoutWorktime = async () => {
          throw error.response ? error.response.data : new Error('Network error');
      }
  };
+ // Cập nhật worktime_id cho một task
+export const updateWorktimeTask = async (taskId, worktimeId) => {
+     try {
+         const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/worktime`, {
+             worktime_id: worktimeId, // Giá trị worktime_id (có thể null)
+         });
+         return response.data;
+     } catch (error) {
+         console.error(`Error updating WorkTime ID for task ID ${taskId}:`, error);
+         throw error.response ? error.response.data : new Error('Network error');
+     }
+ };
+ 
+ export const forceDeleteTask = async (id) => {
+     try {
+          const response = await axiosi.delete(`${taskApiEndpoint}/${id}/force`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error force deleting task with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+export const getTrashedTasks = async () => {
+     try {
+          const response = await axiosi.get('/api/trashed-tasks');
+          return response.data;
+     } catch (error) {
+          console.error('Error fetching trashed tasks:', error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+export const restoreTask = async (id) => {
+     try {
+          const response = await axiosi.put(`${taskApiEndpoint}/${id}/restore`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error restoring task with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
  export default {
      getAllTasks,
      getTaskById,
@@ -134,4 +177,5 @@ export const getTaskWithoutWorktime = async () => {
      updateLocationTask,
      moveTasksToAnotherWorktime,
      getTasksByWorktimeId,
+     updateWorktimeTask,
  };

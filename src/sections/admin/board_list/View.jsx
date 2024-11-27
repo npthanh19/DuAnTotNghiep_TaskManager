@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './board_log.css';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getAllWorktimes } from '../../../services/worktimeService';
-import { getAllTasks, getTasksByWorktimeId, getTaskWithoutWorktime, updateLocationTask } from '../../../services/tasksService';
+import { getAllTasks, getTasksByWorktimeId, getTaskWithoutWorktime, updateLocationTask, updateWorktimeTask } from '../../../services/tasksService';
 import { v4 as uuidv4 } from 'uuid';
 
 export function View() {
@@ -10,7 +10,6 @@ export function View() {
      const [isCreatedFormVisible, setIsCreatedFormVisible] = useState(false);
      const [showDropdown, setShowDropdown] = useState(false);
      const [selectedUsers, setSelectedUsers] = useState([]);
-     /* const [initialSprints, setInitialSprints] = useState(); */
      const users = [
           { id: 1, name: 'User 1', avatar: '/assets/admin/img/avatars/1.png' },
           { id: 2, name: 'User 2', avatar: '/assets/admin/img/avatars/2.png' },
@@ -19,49 +18,60 @@ export function View() {
 
      useEffect(() => {
           const fetchWorkTimes = async () => {
-               const worktimes = await getAllWorktimes();
-               console.log(worktimes)
+               try {
+                    const worktimes = await getAllWorktimes();
+                    const formattedData = worktimes.map((worktime) => {
+                         const startDate = new Date(worktime.start_date);
+                         const endDate = new Date(worktime.end_date);
 
+                         const dateRange = `${startDate.toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                         })} – ${endDate.toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                         })}`;
 
-               const formattedData = worktimes.map((worktime) => {
-                    const startDate = new Date(worktime.start_date);
-                    const endDate = new Date(worktime.end_date);
+                         return {
+                              id: worktime.id.toString(),
+                              dateRange,
+                              tasks: [], 
+                         };
+                    });
+                    const updatedData = await Promise.all(
+                         formattedData.map(async (item) => {
+                              try {
+                                   const taskData = await getTasksByWorktimeId(item.id);
+                                   const tasks = taskData.tasks;
+                                   return { ...item, tasks }; 
+                              } catch (error) {
+                                   console.error(`Error fetching tasks for Worktime ID ${item.id}:`, error);
+                                   return item;
+                              }
+                         }),
+                    );
 
-                    const dateRange = `${startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} – ${endDate.toLocaleDateString(
-                         'en-GB',
-                         { day: '2-digit', month: 'short' },
-                    )}`;
-
-                    return {
-                         id: worktime.id.toString(),
-                         dateRange,
-                         tasks: [],
-                    };
-               });
-
-
-
-               setSprints(formattedData);
-               console.log(sprints);
+                    setSprints(updatedData);
+               } catch (error) {
+                    console.error('Error fetching worktimes:', error);
+               }
           };
 
           const fetchTask = async () => {
-               const tasks = await getTaskWithoutWorktime();
-               console.log('tasks', tasks);
-               setTaskNotWorkTime(tasks);
+               try {
+                    // Lấy tasks không có worktime_id
+                    const tasks = await getTaskWithoutWorktime();
+                    console.log('tasks without worktime', tasks);
+                    setTaskNotWorkTime(tasks);
+               } catch (error) {
+                    console.error('Error fetching tasks without worktime:', error);
+               }
           };
 
           fetchWorkTimes();
           fetchTask();
      }, []);
 
-     /* const initialSprints = [
-          { id: 'FE-0001', dateRange: '26 Aug – 2 Sep', tasks: [ 
-               { id: 'SCRUM-1', name: 'Cắt theme trang admin', status: 'REVIEW', assignee: '/assets/admin/img/avatars/2.png', priority: 5, completed: false }, 
-               { id: 'SCRUM-2', name: 'Sửa lỗi giao diện', status: 'IN PROGRESS', assignee: '/assets/admin/img/avatars/3.png', priority: 3, completed: false }, 
-               { id: 'SCRUM-3', name: 'Tối ưu hóa tốc độ tải trang', status: 'TO DO', assignee: '/assets/admin/img/avatars/1.png', priority: 4, completed: false } 
-          ]},
-     ]; */
 
      const [sprints, setSprints] = useState();
      const [taskNotWorkTime, setTaskNotWorkTime] = useState();
@@ -121,86 +131,47 @@ export function View() {
 
      const handleDragEnd = async (result) => {
           const { source, destination } = result;
-      
-          // Không có điểm đến (hủy thao tác kéo thả)
           if (!destination) return;
-      
-          const updatedSprints = [...sprints];  // sao chép trạng thái hiện tại của sprints
-          const updatedUnassignTasks = [...taskNotWorkTime];  // sao chép trạng thái hiện tại của unassignTasks
-      
-          // Kéo từ unassignTasks
+     
+          const updatedSprints = [...sprints]; 
+          const updatedUnassignTasks = [...taskNotWorkTime]; 
+
           if (source.droppableId === 'unassignTasks') {
-              const movedTask = taskNotWorkTime[source.index];
-              updatedUnassignTasks.splice(source.index, 1);
-      
-              if (destination.droppableId === 'unassignTasks') {
-                  // Kéo trong cùng unassignTasks
-                  updatedUnassignTasks.splice(destination.index, 0, movedTask);
-              } else {
-                  // Kéo vào sprint
-                  const destinationSprint = updatedSprints.find(sprint => sprint.id === destination.droppableId);
-                  if (destinationSprint) {
-                      const updatedTasks = [...destinationSprint.tasks];
-                      updatedTasks.splice(destination.index, 0, movedTask);
-                      destinationSprint.tasks = updatedTasks;
-      
-                      // Cập nhật lại state của sprints
-                      setSprints(updatedSprints);
-                  }
-                  // Cập nhật lại state của unassignTasks
-                  setTaskNotWorkTime(updatedUnassignTasks);
-      
-                  // Gọi API để cập nhật vị trí task trong cơ sở dữ liệu
-                  await updateLocationTask(movedTask.id, { locationId: destination.droppableId });
-              }
+               const movedTask = taskNotWorkTime[source.index];
+               updatedUnassignTasks.splice(source.index, 1);
+     
+               if (destination.droppableId === 'unassignTasks') {
+                    updatedUnassignTasks.splice(destination.index, 0, movedTask);
+               } else {
+                    const destinationSprint = updatedSprints.find((sprint) => sprint.id === destination.droppableId);
+                    if (destinationSprint) {
+                         destinationSprint.tasks.splice(destination.index, 0, movedTask);
+                    }
+               }
+               setTaskNotWorkTime(updatedUnassignTasks);
+               setSprints(updatedSprints);
+               await updateWorktimeTask(movedTask.id, destination.droppableId === 'unassignTasks' ? null : Number(destination.droppableId));
           } else {
-              // Kéo trong hoặc giữa các sprint
-              const sourceSprint = updatedSprints.find(sprint => sprint.id === source.droppableId);
-              const destinationSprint = updatedSprints.find(sprint => sprint.id === destination.droppableId);
-      
-              if (sourceSprint && destinationSprint) {
-                  const movedTask = sourceSprint.tasks[source.index];
-                  const updatedSourceTasks = [...sourceSprint.tasks];
-                  updatedSourceTasks.splice(source.index, 1);
-      
-                  if (source.droppableId === destination.droppableId) {
-                      // Kéo trong cùng sprint
-                      updatedSourceTasks.splice(destination.index, 0, movedTask);
-                      sourceSprint.tasks = updatedSourceTasks;
-      
-                      // Cập nhật lại state của sprints
-                      setSprints(updatedSprints);
-                  } else {
-                      // Kéo giữa các sprint
-                      const updatedDestinationTasks = [...destinationSprint.tasks];
-                      updatedDestinationTasks.splice(destination.index, 0, movedTask);
-                      destinationSprint.tasks = updatedDestinationTasks;
-      
-                      // Cập nhật lại state của sprints
-                      setSprints(updatedSprints);
-                  }
-      
-                  // Gọi API để cập nhật vị trí task trong cơ sở dữ liệu
-                  await updateLocationTask(movedTask.id, { locationId: destination.droppableId });
-              } else if (!destinationSprint) {
-                  // Kéo ra khỏi sprint vào unassignTasks
-                  const movedTask = sourceSprint.tasks[source.index];
-                  const updatedSourceTasks = [...sourceSprint.tasks];
-                  updatedSourceTasks.splice(source.index, 1);
-      
-                  const updatedUnassignTasks = [...taskNotWorkTime];
-                  updatedUnassignTasks.splice(destination.index, 0, movedTask);
-      
-                  // Cập nhật lại state của sprints và unassignTasks
-                  setSprints(updatedSprints);
-                  setTaskNotWorkTime(updatedUnassignTasks);
-      
-                  // Gọi API để cập nhật vị trí task trong cơ sở dữ liệu
-                  await updateLocationTask(movedTask.id, { locationId: 'unassignTasks' });
-              }
+               const sourceSprint = updatedSprints.find((sprint) => sprint.id === source.droppableId);
+               const destinationSprint = updatedSprints.find((sprint) => sprint.id === destination.droppableId);
+     
+               if (sourceSprint && destinationSprint) {
+                    const movedTask = sourceSprint.tasks[source.index];
+                    sourceSprint.tasks.splice(source.index, 1);
+                    destinationSprint.tasks.splice(destination.index, 0, movedTask);
+                    setSprints(updatedSprints);
+                    await updateWorktimeTask(movedTask.id, Number(destination.droppableId));
+               } else if (!destinationSprint) {
+                    const movedTask = sourceSprint.tasks[source.index];
+                    sourceSprint.tasks.splice(source.index, 1);
+                    updatedUnassignTasks.splice(destination.index, 0, movedTask);
+                    setSprints(updatedSprints);
+                    setTaskNotWorkTime(updatedUnassignTasks);
+                    await updateWorktimeTask(movedTask.id, null);
+               }
           }
-      };
-      
+     };
+     
 
      const handleToggleAllTasks = (sprintId, isChecked) => {
           const updatedSprints = sprints.map((sprint) => {
@@ -244,12 +215,8 @@ export function View() {
           <div className="container-fluid py-4">
                <h2 className="mb-4">
                     <div className="d-flex align-items-center justify-content-between">
-                         {/* Project name nằm bên trái */}
                          <small className="mb-0">Backlog</small>
-
-                         {/* Các phần còn lại nằm bên phải */}
                          <div className="d-flex align-items-center small">
-                              {/* User */}
                               <div className="users_img d-flex align-items-center position-relative me-3">
                                    <img src={users[0].avatar} alt={users[0].name} className="user-avatar" />
                                    <span className="qty ms-2">+{users.length - 1}</span>
@@ -274,11 +241,7 @@ export function View() {
                                         </div>
                                    )}
                               </div>
-
-                              {/* Search */}
                               <input type="text" className="form-control form-control-sm me-3" placeholder="Search..." style={{ width: '150px' }} />
-
-                              {/* Dropdowns */}
                               <select className="form-select form-select-sm me-3" aria-label="Epic Dropdown">
                                    <option value="">Epic</option>
                                    <option value="epic1">Topic 1</option>
@@ -311,7 +274,6 @@ export function View() {
                          </div>
                     </div>
                )}
-
                <DragDropContext onDragEnd={handleDragEnd}>
                     <Droppable droppableId="unassignTasks">
                          {(provided) => (
@@ -334,13 +296,12 @@ export function View() {
                               </div>
                          )}
                     </Droppable>
-
                     {sprints?.map((sprint) => (
                          <Droppable key={sprint.id} droppableId={sprint.id}>
                               {(provided) => (
                                    <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
                                         <h4>{sprint.dateRange}</h4>
-                                        {sprint.tasks?.map((task, index) => ( 
+                                        {sprint.tasks?.map((task, index) => (
                                              <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                                                   {(provided) => (
                                                        <div
@@ -349,9 +310,7 @@ export function View() {
                                                             ref={provided.innerRef}
                                                             className="d-flex align-items-center py-2 border-bottom">
                                                             <div className="me-auto">{task?.task_name}</div>
-                                                            {
-                                                                 console.log(task)
-                                                            }
+                                                            {console.log(task)}
                                                        </div>
                                                   )}
                                              </Draggable>
