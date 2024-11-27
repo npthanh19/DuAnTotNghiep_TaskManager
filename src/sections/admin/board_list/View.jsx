@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import './board_log.css';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getAllWorktimes } from '../../../services/worktimeService';
-import { getAllTasks } from '../../../services/tasksService';
+import { getAllTasks, getTasksByWorktimeId, getTaskWithoutWorktime, updateLocationTask } from '../../../services/tasksService';
+import { v4 as uuidv4 } from 'uuid';
 
 export function View() {
      const [newTask, setNewTask] = useState('');
@@ -19,6 +20,8 @@ export function View() {
      useEffect(() => {
           const fetchWorkTimes = async () => {
                const worktimes = await getAllWorktimes();
+               console.log(worktimes)
+
 
                const formattedData = worktimes.map((worktime) => {
                     const startDate = new Date(worktime.start_date);
@@ -30,18 +33,20 @@ export function View() {
                     )}`;
 
                     return {
-                         id: `FE-${worktime.id.toString().padStart(4, '0')}`,
+                         id: worktime.id.toString(),
                          dateRange,
                          tasks: [],
                     };
                });
+
+
 
                setSprints(formattedData);
                console.log(sprints);
           };
 
           const fetchTask = async () => {
-               const tasks = await getAllTasks();
+               const tasks = await getTaskWithoutWorktime();
                console.log('tasks', tasks);
                setTaskNotWorkTime(tasks);
           };
@@ -114,19 +119,88 @@ export function View() {
           setIsInputVisible(false);
      };
 
-     const handleDragEnd = (result, sprintId) => {
-          if (!result.destination) return;
-          const updatedSprints = sprints.map((sprint) => {
-               if (sprint.id === sprintId) {
-                    const reorderedTasks = Array.from(sprint.tasks);
-                    const [movedTask] = reorderedTasks.splice(result.source.index, 1);
-                    reorderedTasks.splice(result.destination.index, 0, movedTask);
-                    return { ...sprint, tasks: reorderedTasks };
-               }
-               return sprint;
-          });
-          setSprints(updatedSprints);
-     };
+     const handleDragEnd = async (result) => {
+          const { source, destination } = result;
+      
+          // Không có điểm đến (hủy thao tác kéo thả)
+          if (!destination) return;
+      
+          const updatedSprints = [...sprints];  // sao chép trạng thái hiện tại của sprints
+          const updatedUnassignTasks = [...taskNotWorkTime];  // sao chép trạng thái hiện tại của unassignTasks
+      
+          // Kéo từ unassignTasks
+          if (source.droppableId === 'unassignTasks') {
+              const movedTask = taskNotWorkTime[source.index];
+              updatedUnassignTasks.splice(source.index, 1);
+      
+              if (destination.droppableId === 'unassignTasks') {
+                  // Kéo trong cùng unassignTasks
+                  updatedUnassignTasks.splice(destination.index, 0, movedTask);
+              } else {
+                  // Kéo vào sprint
+                  const destinationSprint = updatedSprints.find(sprint => sprint.id === destination.droppableId);
+                  if (destinationSprint) {
+                      const updatedTasks = [...destinationSprint.tasks];
+                      updatedTasks.splice(destination.index, 0, movedTask);
+                      destinationSprint.tasks = updatedTasks;
+      
+                      // Cập nhật lại state của sprints
+                      setSprints(updatedSprints);
+                  }
+                  // Cập nhật lại state của unassignTasks
+                  setTaskNotWorkTime(updatedUnassignTasks);
+      
+                  // Gọi API để cập nhật vị trí task trong cơ sở dữ liệu
+                  await updateLocationTask(movedTask.id, { locationId: destination.droppableId });
+              }
+          } else {
+              // Kéo trong hoặc giữa các sprint
+              const sourceSprint = updatedSprints.find(sprint => sprint.id === source.droppableId);
+              const destinationSprint = updatedSprints.find(sprint => sprint.id === destination.droppableId);
+      
+              if (sourceSprint && destinationSprint) {
+                  const movedTask = sourceSprint.tasks[source.index];
+                  const updatedSourceTasks = [...sourceSprint.tasks];
+                  updatedSourceTasks.splice(source.index, 1);
+      
+                  if (source.droppableId === destination.droppableId) {
+                      // Kéo trong cùng sprint
+                      updatedSourceTasks.splice(destination.index, 0, movedTask);
+                      sourceSprint.tasks = updatedSourceTasks;
+      
+                      // Cập nhật lại state của sprints
+                      setSprints(updatedSprints);
+                  } else {
+                      // Kéo giữa các sprint
+                      const updatedDestinationTasks = [...destinationSprint.tasks];
+                      updatedDestinationTasks.splice(destination.index, 0, movedTask);
+                      destinationSprint.tasks = updatedDestinationTasks;
+      
+                      // Cập nhật lại state của sprints
+                      setSprints(updatedSprints);
+                  }
+      
+                  // Gọi API để cập nhật vị trí task trong cơ sở dữ liệu
+                  await updateLocationTask(movedTask.id, { locationId: destination.droppableId });
+              } else if (!destinationSprint) {
+                  // Kéo ra khỏi sprint vào unassignTasks
+                  const movedTask = sourceSprint.tasks[source.index];
+                  const updatedSourceTasks = [...sourceSprint.tasks];
+                  updatedSourceTasks.splice(source.index, 1);
+      
+                  const updatedUnassignTasks = [...taskNotWorkTime];
+                  updatedUnassignTasks.splice(destination.index, 0, movedTask);
+      
+                  // Cập nhật lại state của sprints và unassignTasks
+                  setSprints(updatedSprints);
+                  setTaskNotWorkTime(updatedUnassignTasks);
+      
+                  // Gọi API để cập nhật vị trí task trong cơ sở dữ liệu
+                  await updateLocationTask(movedTask.id, { locationId: 'unassignTasks' });
+              }
+          }
+      };
+      
 
      const handleToggleAllTasks = (sprintId, isChecked) => {
           const updatedSprints = sprints.map((sprint) => {
@@ -238,146 +312,20 @@ export function View() {
                     </div>
                )}
 
-               {sprints?.map((sprint) => (
-                    <div key={sprint.id} className="mb-4">
-                         <h4 className="mb-3 d-flex align-items-center">
-                              <div className="form-check me-2">
-                                   <input
-                                        type="checkbox"
-                                        className="form-check-input"
-                                        id={`sprint-${sprint.id}`}
-                                        onChange={(e) => handleToggleAllTasks(sprint.id, e.target.checked)}
-                                   />
-                              </div>
-                              <span>
-                                   {sprint.id} <small className="text-muted">({sprint.dateRange})</small>
-                              </span>
-                         </h4>
-
-                         <DragDropContext onDragEnd={(result) => handleDragEnd(result, sprint.id)}>
-                              <Droppable droppableId={sprint.id}>
-                                   {(provided) => (
-                                        <div {...provided.droppableProps} ref={provided.innerRef} className="list-group">
-                                             {sprint.tasks.map((task, index) => (
-                                                  <Draggable key={task.id} draggableId={task.id} index={index}>
-                                                       {(provided) => (
-                                                            <div
-                                                                 {...provided.draggableProps}
-                                                                 {...provided.dragHandleProps}
-                                                                 ref={provided.innerRef}
-                                                                 className="d-flex align-items-center py-2 border-bottom">
-                                                                 <div className="form-check me-3">
-                                                                      <input
-                                                                           className="form-check-input"
-                                                                           type="checkbox"
-                                                                           checked={task.completed}
-                                                                           onChange={() => handleTaskCompletionToggle(sprint.id, task.id)}
-                                                                      />
-                                                                 </div>
-                                                                 <div className="me-auto">
-                                                                      <span className="me-2">{task.id}</span>
-                                                                      <span>{task.name}</span>
-                                                                 </div>
-                                                                 <select
-                                                                      className="form-select board-list form-select-sm me-4 select-status"
-                                                                      value={task.status}
-                                                                      onChange={(e) => handleStatusChange(sprint.id, task.id, e.target.value)}>
-                                                                      <option value="TO DO">To Do</option>
-                                                                      <option value="IN PROGRESS">In Progress</option>
-                                                                      <option value="REVIEW">Review</option>
-                                                                      <option value="DONE">Done</option>
-                                                                 </select>
-                                                                 <span
-                                                                      className={`badge bg-${
-                                                                           task.status === 'DONE' ? 'success' : 'primary'
-                                                                      } me-3 status-badge`}>
-                                                                      {task.status}
-                                                                 </span>
-                                                                 <span className="me-3">
-                                                                      <span className="badge bg-secondary">{task.priority}</span>
-                                                                 </span>
-                                                                 <span className="me-3 user-id">
-                                                                      <img src={task.assignee} className="w-50 rounded-circle" alt="User Avatar" />
-                                                                 </span>
-                                                            </div>
-                                                       )}
-                                                  </Draggable>
-                                             ))}
-                                             {provided.placeholder}
-                                        </div>
-                                   )}
-                              </Droppable>
-                         </DragDropContext>
-
-                         {/* <span className="text-muted cursor-pointer" onClick={() => toggleInputVisibility(sprint.id)}>
-                              + Created
-                         </span>
- */}
-                         {isInputVisible[sprint.id] && (
-                              <div className="input-group mt-2">
-                                   <input
-                                        type="text"
-                                        className="form-control form-control-sm"
-                                        placeholder="Add new task"
-                                        value={newTask}
-                                        onChange={(e) => setNewTask(e.target.value)}
-                                   />
-                                   <button className="btn btn-primary btn-sm" onClick={() => handleAddTask(sprint.id)}>
-                                        Add Task
-                                   </button>
-                              </div>
-                         )}
-                    </div>
-               ))}
-
-               {/* Phần "Unassigned Tasks" */}
-               <DragDropContext onDragEnd={(result) => handleDragEnd(result, null)}>
-                    <Droppable droppableId="unassigned-tasks">
+               <DragDropContext onDragEnd={handleDragEnd}>
+                    <Droppable droppableId="unassignTasks">
                          {(provided) => (
-                              <div ref={provided.innerRef} {...provided.droppableProps} className="task-column">
+                              <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
                                    <h4>Unassigned Tasks</h4>
                                    {taskNotWorkTime?.map((task, index) => (
-                                        <Draggable key={task.id} draggableId={String(task.id)} index={index}>
+                                        <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                                              {(provided) => (
                                                   <div
                                                        {...provided.draggableProps}
                                                        {...provided.dragHandleProps}
                                                        ref={provided.innerRef}
                                                        className="d-flex align-items-center py-2 border-bottom">
-                                                       {/* Task Content */}
-                                                       <div className="form-check me-3">
-                                                            <input
-                                                                 className="form-check-input"
-                                                                 type="checkbox"
-                                                                 checked={task.completed}
-                                                                 onChange={() => handleTaskCompletionToggle(null, task.id)}
-                                                            />
-                                                       </div>
-                                                       <div className="me-auto">
-                                                            <span className="me-2">{task.id}</span>
-                                                            <span>{task.name}</span>
-                                                       </div>
-                                                       <select
-                                                            className="form-select board-list form-select-sm me-4 select-status"
-                                                            value={task.status}
-                                                            onChange={(e) => handleStatusChange(null, task.id, e.target.value)}>
-                                                            <option value="TO DO">To Do</option>
-                                                            <option value="IN PROGRESS">In Progress</option>
-                                                            <option value="REVIEW">Review</option>
-                                                            <option value="DONE">Done</option>
-                                                       </select>
-                                                       <span
-                                                            className={`badge bg-${
-                                                                 task.status === 'DONE' ? 'success' : 'primary'
-                                                            } me-3 status-badge`}>
-                                                            {task.status}
-                                                       </span>
-                                                       <span className="me-3">
-                                                            <span className="badge bg-secondary">{task.priority}</span>
-                                                       </span>
-                                                       <span className="me-3 user-id">
-                                                            <img src={task.assignee} className="w-50 rounded-circle" alt="User Avatar" />
-                                                       </span>
+                                                       <div className="me-auto">{task?.task_name}</div>
                                                   </div>
                                              )}
                                         </Draggable>
@@ -386,6 +334,33 @@ export function View() {
                               </div>
                          )}
                     </Droppable>
+
+                    {sprints?.map((sprint) => (
+                         <Droppable key={sprint.id} droppableId={sprint.id}>
+                              {(provided) => (
+                                   <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
+                                        <h4>{sprint.dateRange}</h4>
+                                        {sprint.tasks?.map((task, index) => ( 
+                                             <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
+                                                  {(provided) => (
+                                                       <div
+                                                            {...provided.draggableProps}
+                                                            {...provided.dragHandleProps}
+                                                            ref={provided.innerRef}
+                                                            className="d-flex align-items-center py-2 border-bottom">
+                                                            <div className="me-auto">{task?.task_name}</div>
+                                                            {
+                                                                 console.log(task)
+                                                            }
+                                                       </div>
+                                                  )}
+                                             </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                   </div>
+                              )}
+                         </Droppable>
+                    ))}
                </DragDropContext>
           </div>
      );
