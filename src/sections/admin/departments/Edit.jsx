@@ -53,7 +53,7 @@ export const Edit = () => {
                Swal.fire({
                     icon: 'error',
                     title: t('Edit Failed!'),
-                    text: error.message || t('Something went wrong'),
+                    text: t('Something went wrong'),
                });
           }
      };
@@ -62,7 +62,7 @@ export const Edit = () => {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                     <div className="spinner-border" role="status">
-                         <span className="visually-hidden">Loading...</span>
+                         <span className="visually-hidden">{t('Loading...')}</span>
                     </div>
                </div>
           );

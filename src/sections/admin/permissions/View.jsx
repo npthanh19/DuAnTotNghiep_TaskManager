@@ -101,7 +101,7 @@ export function View() {
                setPermissions((prevPermissions) => prevPermissions.map((perm) => (perm.id === updatedPermission.id ? updatedPermission : perm)));
                Swal.fire({
                     icon: 'success',
-                    text: t('Update successfully!'),
+                    text: t('Edit successfully!'),
                     position: 'top-right',
                     toast: true,
                     timer: 2000,
@@ -113,7 +113,7 @@ export function View() {
           } catch (error) {
                Swal.fire({
                     icon: 'error',
-                    title: t('Update Failed!'),
+                    title: t('Edit Failed!'),
                     text: error.message || t('Something went wrong'),
                });
           }
