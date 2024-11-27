@@ -35,6 +35,7 @@ import ViewBoardList from '../pages/admin/Board_list/List';
 import ViewProjects from '../pages/admin/Projects/List';
 import AddProjects from '../pages/admin/Projects/Add';
 import EditProjects from '../pages/admin/Projects/Edit';
+import RecentlyDeletedProjects from '../sections/admin/projects/RecentlyDeletedProjects';
 
 // Admin Tasks
 import ViewTasks from '../pages/admin/Tasks/List';
@@ -53,6 +54,7 @@ import ViewRecentlyDeleted from '../pages/admin/Recentlydelete/List';
 import ViewDepartments from '../pages/admin/Departments/List';
 import AddDepartments from '../pages/admin/Departments/Add';
 import EditDepartments from '../pages/admin/Departments/Edit';
+import RecentlyDeletedDepartments from '../sections/admin/departments/RecentlyDeletedDepartment';
 
 // Admin Worktime
 import ViewWorktime from '../pages/admin/Worktime/List';
@@ -100,6 +102,7 @@ export const AdminRoutes = () => (
           <Route path="projects" element={<PrivateRoute><AdminLayout><ViewProjects /></AdminLayout></PrivateRoute>} />
           <Route path="projects/add" element={<PrivateRoute><AdminLayout><AddProjects /></AdminLayout></PrivateRoute>} />
           <Route path="projects/edit/:id" element={<PrivateRoute><AdminLayout><EditProjects /></AdminLayout></PrivateRoute>} />
+          <Route path="/projects/trashed" element={<PrivateRoute><AdminLayout><RecentlyDeletedProjects /></AdminLayout></PrivateRoute>} />
 
           {/* Recently Deleted */}
           <Route path="recentlydelete" element={<PrivateRoute><AdminLayout><ViewRecentlyDeleted /></AdminLayout></PrivateRoute>} />
@@ -118,7 +121,7 @@ export const AdminRoutes = () => (
           <Route path="departments" element={<PrivateRoute><AdminLayout><ViewDepartments /></AdminLayout></PrivateRoute>} />
           <Route path="departments/add" element={<PrivateRoute><AdminLayout><AddDepartments /></AdminLayout></PrivateRoute>} />
           <Route path="departments/edit/:id" element={<PrivateRoute><AdminLayout><EditDepartments /></AdminLayout></PrivateRoute>} />
-
+          <Route path="/departments/trashed" element={<PrivateRoute><AdminLayout><RecentlyDeletedDepartments /></AdminLayout></PrivateRoute>} />
           {/* Worktime Management */}
           <Route path="worktimes" element={<PrivateRoute><AdminLayout><ViewWorktime /></AdminLayout></PrivateRoute>} />
           <Route path="worktimes/add" element={<PrivateRoute><AdminLayout><AddWorktime /></AdminLayout></PrivateRoute>} />

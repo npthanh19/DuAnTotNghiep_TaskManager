@@ -37,7 +37,7 @@ export function View() {
 
      const handleDeleteClick = (id) => {
           const deleteTitle = t('Delete Departments');
-     
+
           Swal.fire({
                title: deleteTitle,
                text: t('Are you sure you want to delete this departments?'),
@@ -52,7 +52,7 @@ export function View() {
                     try {
                          await deleteDepartment(id);
                          setDepartments((prevDepartments) => prevDepartments.filter((department) => department.id !== id));
-     
+
                          Swal.fire({
                               icon: 'success',
                               text: t('The departments has been moved to the trash!'),
@@ -74,7 +74,6 @@ export function View() {
                }
           });
      };
-      
 
      const handleCloseModal = () => {
           setShowDeleteModal(false);
@@ -127,9 +126,16 @@ export function View() {
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
                          <span className="marquee">{t('Departments')}</span>
                     </h3>
-                    <Link to="/taskmaneger/departments/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add')}
-                    </Link>
+                    <div className="d-flex align-items-center ms-auto">
+                         <Link to="/taskmaneger/departments/add" className="btn btn-primary">
+                              <i className="bi bi-plus me-2"></i> {t('Add')}
+                         </Link>
+                         <button
+                              className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
+                              onClick={() => navigate('/taskmaneger/departments/trashed')}>
+                              <i className="bi bi-trash me-2"></i>
+                         </button>
+                    </div>
                </div>
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
@@ -210,7 +216,7 @@ export function View() {
                     </nav>
                </div>
                <ToastContainer position="top-right" autoClose={2000} />
-               
+
                {showAddDepartmentForm && (
                     <AddUserToDepartment
                          departmentId={selectedDepartmentId}

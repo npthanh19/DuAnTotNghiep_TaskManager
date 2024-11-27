@@ -48,14 +48,13 @@ export const updateDepartment = async (id, departmentData) => {
 
 // Xóa phòng ban
 export const deleteDepartment = async (id) => {
-  try {
-    const response = await axiosi.delete(`${apiEndpoint}/${id}`);
-    return response.data;
-  } catch (error) {
-    throw new Error(`Error deleting department with ID ${id}: ${error.message}`);
-  }
+     try {
+          const response = await axiosi.delete(`${apiEndpoint}/${id}`);
+          return response.data;
+     } catch (error) {
+          throw new Error(`Error deleting department with ID ${id}: ${error.message}`);
+     }
 };
-
 
 // Thêm một người dùng vào phòng ban
 export const addUserToDepartment = async (departmentId, userId) => {
@@ -90,6 +89,39 @@ export const removeUserFromDepartment = async (departmentId, userId) => {
      }
 };
 
+// Lấy danh sách phòng ban đã bị xóa
+export const getTrashedDepartments = async () => {
+     try {
+          const response = await axiosi.get('/api/trashed-departments');
+          return response.data;
+     } catch (error) {
+          console.error('Error fetching trashed departments:', error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+// Khôi phục phòng ban
+export const restoreDepartment = async (id) => {
+     try {
+          const response = await axiosi.put(`/api/departments/${id}/restore`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error restoring department with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+// Xóa vĩnh viễn phòng ban
+export const forceDeleteDepartment = async (id) => {
+     try {
+          const response = await axiosi.delete(`/api/departments/${id}/force`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error force deleting department with ID ${id}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
 export default {
      getAllDepartments,
      getDepartmentById,
@@ -99,4 +131,7 @@ export default {
      addUserToDepartment,
      removeUserFromDepartment,
      addUsersToDepartment,
+     getTrashedDepartments,
+     restoreDepartment,
+     forceDeleteDepartment,
 };
