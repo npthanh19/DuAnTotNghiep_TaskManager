@@ -86,3 +86,20 @@
 .qtn-status h4 .status .item p {
   margin-bottom: 0;
 }
+
+.list__task-board {
+  display: grid;
+  grid-template-columns: 5fr 2fr 2fr 1fr 1fr 1fr;
+  gap: 50px;
+}
+
+.boardlist_project {
+  text-align: center;
+  font-weight: 700;
+  border-radius: 5px;
+  background: linear-gradient(270deg, #8c57ff 0%, #c3a8ff 100%);
+  text-transform: uppercase;
+}
+.boardlist_status {
+  text-transform: uppercase;
+}

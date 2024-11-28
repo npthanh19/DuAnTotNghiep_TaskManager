@@ -5,6 +5,7 @@ import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getAllTasks, getTasksByWorktimeId, getTaskWithoutWorktime, updateLocationTask, updateWorktimeTask } from '../../../services/tasksService';
 import { v4 as uuidv4 } from 'uuid';
+import { getAllDepartments } from '../../../services/deparmentsService';
 
 export function View() {
      const [newTask, setNewTask] = useState('');
@@ -12,6 +13,7 @@ export function View() {
      const [showDropdown, setShowDropdown] = useState(false);
      const [selectedUsers, setSelectedUsers] = useState([]);
      const [projects, setProjects] = useState([]);
+     const [departments, setDepartments] = useState([]);
      const users = [
           { id: 1, name: 'User 1', avatar: '/assets/admin/img/avatars/1.png' },
           { id: 2, name: 'User 2', avatar: '/assets/admin/img/avatars/2.png' },
@@ -29,6 +31,16 @@ export function View() {
           };
 
           fetchProjects();
+          const fetchDepartments = async () => {
+               try {
+                    const fetchedDepartments = await getAllDepartments();
+                    setDepartments(fetchedDepartments);
+               } catch (error) {
+                    console.error('Error fetching projects:', error);
+               }
+          };
+
+          fetchDepartments();
 
           const fetchWorkTimes = async () => {
                try {
@@ -246,11 +258,11 @@ export function View() {
                          <small className="mb-0">Backlog</small>
                          <div className="d-flex align-items-center small">
                               <div className="users_img d-flex align-items-center position-relative me-3">
-                                   <img src={users[0].avatar} alt={users[0].name} className="user-avatar" />
+                                   {/* <img src={users[0].avatar} alt={users[0].name} className="user-avatar" />
                                    <span className="qty ms-2">+{users.length - 1}</span>
                                    <button className="btn btn-link btn-sm ms-2" onClick={handleToggleDropdown}>
                                         <i className="bi bi-plus-circle" />
-                                   </button>
+                                   </button> */}
 
                                    {showDropdown && (
                                         <div className="dropdown-menu show" style={{ position: 'absolute', zIndex: 1000, top: '100%', left: '0' }}>
@@ -272,16 +284,20 @@ export function View() {
                               <input type="text" className="form-control form-control-sm me-3" placeholder="Search..." style={{ width: '150px' }} />
                               <select className="form-select form-select-sm me-3" aria-label="Epic Dropdown">
                                    <option value="">Epic</option>
-                                   <option value="epic1">Topic 1</option>
-                                   <option value="epic2">Topic 2</option>
-                                   <option value="epic3">Topic 3</option>
+                                   {projects.map((project) => (
+                                        <option key={project.id} value={project.id}>
+                                             {project.project_name}
+                                        </option>
+                                   ))}
                               </select>
-                              <select className="form-select form-select-sm me-3" aria-label="Label Dropdown">
+                              {/* <select className="form-select form-select-sm me-3" aria-label="Label Dropdown">
                                    <option value="">Label</option>
-                                   <option value="label1">Nhân Viên</option>
-                                   <option value="label2">Dev</option>
-                                   <option value="label3">Chủ tịch</option>
-                              </select>
+                                    {departments.map((department) => (
+                                        <option key={department.id} value={department.id}>
+                                             {department.department_name}
+                                        </option>
+                                   ))}
+                              </select> */}
                          </div>
                     </div>
                </h2>
@@ -303,41 +319,7 @@ export function View() {
                     </div>
                )}
                <DragDropContext onDragEnd={handleDragEnd}>
-                    <Droppable droppableId="unassignTasks">
-                         {(provided) => (
-                              <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
-                                   <h4>Unassigned Tasks</h4>
-                                   {taskNotWorkTime?.map((task, index) => {
-                                        const project = task?.project_id ? projects.find((proj) => proj.id === task.project_id) : null;
-
-                                        return (
-                                             <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
-                                                  {(provided) => (
-                                                       <div
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                            ref={provided.innerRef}
-                                                            className="d-flex align-items-center py-2 border-bottom">
-                                                            <div className="me-auto">{`${task.id} - ${task.task_name}`}</div>
-                                                            <div className="me-auto">{project ? project.project_name : 'N/A'}</div>
-                                                            <div className="me-auto">{`${task.status}`}</div>
-                                                            <div className="me-auto">{`${task.status}`}</div>
-                                                            <div className="me-auto">
-                                                                 <img
-                                                                      src="https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
-                                                                      alt=""
-                                                                      style={{ width: '50px' }}
-                                                                 />
-                                                            </div>
-                                                       </div>
-                                                  )}
-                                             </Draggable>
-                                        );
-                                   })}
-                                   {provided.placeholder}
-                              </div>
-                         )}
-                    </Droppable>
+                 
 
                     {sprints?.map((sprint) => (
                          <Droppable key={sprint.id} droppableId={sprint.id}>
@@ -366,17 +348,19 @@ export function View() {
                                                                  {...provided.draggableProps}
                                                                  {...provided.dragHandleProps}
                                                                  ref={provided.innerRef}
-                                                                 className="d-flex align-items-center py-2 border-bottom">
-                                                                 <div className="me-auto">{`${task.id} - ${task.task_name}`}</div>
-                                                                 <div className="me-auto">{project ? project.project_name : 'N/A'}</div>
-                                                                 <div className="me-auto">{`${task.status}`}</div>
-                                                                 <div className="me-auto">
+                                                                 className="list__task-board align-items-center py-2 border-bottom">
+                                                                 <div className=" boardlist_name">{`${task.id} - ${task.task_name}`}</div>
+                                                                 <div className=" boardlist_project">{project ? project.project_name : 'N/A'}</div>
+                                                                 <div className=" boardlist_status">{`${task.status}`}</div>
+                                                                 <div className=" boardlist_time">1</div>
+                                                                 <div className="">
                                                                       <img
                                                                            src="https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
                                                                            alt=""
                                                                            style={{ width: '50px' }}
                                                                       />
                                                                  </div>
+                                                                 <div className=" bi bi-trash menu-icon boardlist_trash"></div>
                                                             </div>
                                                        )}
                                                   </Draggable>
@@ -386,7 +370,45 @@ export function View() {
                                    </div>
                               )}
                          </Droppable>
+                         
                     ))}
+                       <Droppable droppableId="unassignTasks">
+                         {(provided) => (
+                              <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
+                                   <h4>Unassigned Tasks</h4>
+                                   {taskNotWorkTime?.map((task, index) => {
+                                        const project = task?.project_id ? projects.find((proj) => proj.id === task.project_id) : null;
+
+                                        return (
+                                             <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
+                                                  {(provided) => (
+                                                       <div
+                                                            {...provided.draggableProps}
+                                                            {...provided.dragHandleProps}
+                                                            ref={provided.innerRef}
+                                                            className="list__task-board align-items-center py-2 border-bottom">
+                                                            <div className=" boardlist_name">{`${task.id} - ${task.task_name}`}</div>
+                                                            <div className=" boardlist_project">{project ? project.project_name : 'N/A'}</div>
+                                                            <div className=" boardlist_status">{`${task.status}`}</div>
+                                                            <div className=" boardlist_time">1</div>
+                                                            <div className="">
+                                                                 <img
+                                                                      src="https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
+                                                                      alt=""
+                                                                      style={{ width: '50px' }}
+                                                                 />
+                                                            </div>
+
+                                                            <div className=" bi bi-trash menu-icon boardlist_trash"></div>
+                                                       </div>
+                                                  )}
+                                             </Draggable>
+                                        );
+                                   })}
+                                   {provided.placeholder}
+                              </div>
+                         )}
+                    </Droppable>
                </DragDropContext>
           </div>
      );
