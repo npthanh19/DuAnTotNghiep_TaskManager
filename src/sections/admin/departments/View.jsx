@@ -9,7 +9,7 @@ import { toast, ToastContainer } from 'react-toastify';
 
 export function View() {
      const [currentPage, setCurrentPage] = useState(1);
-     const itemsPerPage = 5;
+     const itemsPerPage = 9;
      const { t } = useTranslation();
      const navigate = useNavigate();
 

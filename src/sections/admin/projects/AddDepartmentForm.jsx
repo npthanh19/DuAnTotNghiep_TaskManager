@@ -15,6 +15,7 @@ const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }
     const [selectedDepartmentIds, setSelectedDepartmentIds] = useState([]);
     const [projectName, setProjectName] = useState('');
     const [addedDepartmentIds, setAddedDepartmentIds] = useState([]);
+    const [showModal, setShowModal] = useState(true); // State to control modal visibility
     
     const { register, handleSubmit, setValue, formState: { errors }, setError, clearErrors } = useForm();
 
@@ -128,13 +129,22 @@ const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }
 
     const availableDepartments = departments.filter((dept) => !addedDepartmentIds.includes(dept.id));
 
+    const handleCloseModal = () => {
+        setShowModal(false); // Set modal visibility to false to hide it
+        if (onClose) {
+            onClose(); // Call the onClose prop if it's passed in
+        }
+    };
+
+    if (!showModal) return null; // If the modal is closed, render nothing
+
     return (
-        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={onClose}>
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={handleCloseModal}>
             <div className="modal-dialog modal-lg" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title">{t('Add Departments to Project')}: {projectName}</h5>
-                        <button type="button" className="btn-close" onClick={onClose}></button>
+                        <button type="button" className="btn-close" onClick={handleCloseModal}></button>
                     </div>
                     <div className="modal-body">
                         <form onSubmit={handleSubmit(handleAddSubmit)}>
