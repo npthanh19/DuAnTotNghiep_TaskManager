@@ -193,7 +193,7 @@ const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }
                         </ul>
                     </div>
                 </div>
-            </div>
+            </div>  
         </div>
     );
 };
