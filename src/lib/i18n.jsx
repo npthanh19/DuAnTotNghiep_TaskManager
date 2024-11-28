@@ -329,7 +329,12 @@ const resources = {
                'Error adding departments! Please try again.': 'Lỗi khi thêm phòng ban! Vui lòng thử lại.',
                'Error removing department! Please try again.': 'Lỗi xóa phòng ban! Vui lòng thử lại.',
                'Added Departments': 'Thêm phòng ban',
+               'File Name': 'Tên tập tin',
+               'Hide comments': 'Ẩn bình luận',
+               'See more': 'Xem thêm',
+               'Search by comments or username...': 'Tìm kiếm theo bình luận hoặc tên người dùng...',
                
+
 
 
           },
