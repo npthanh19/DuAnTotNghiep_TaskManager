@@ -319,8 +319,6 @@ export function View() {
                     </div>
                )}
                <DragDropContext onDragEnd={handleDragEnd}>
-                 
-
                     {sprints?.map((sprint) => (
                          <Droppable key={sprint.id} droppableId={sprint.id}>
                               {(provided) => (
@@ -352,7 +350,7 @@ export function View() {
                                                                  <div className=" boardlist_name">{`${task.id} - ${task.task_name}`}</div>
                                                                  <div className=" boardlist_project">{project ? project.project_name : 'N/A'}</div>
                                                                  <div className=" boardlist_status">{`${task.status}`}</div>
-                                                                 <div className=" boardlist_time">1</div>
+                                                                 <div className="boardlist_time">{task?.task_time || '-'}</div>
                                                                  <div className="">
                                                                       <img
                                                                            src="https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
@@ -370,9 +368,8 @@ export function View() {
                                    </div>
                               )}
                          </Droppable>
-                         
                     ))}
-                       <Droppable droppableId="unassignTasks">
+                    <Droppable droppableId="unassignTasks">
                          {(provided) => (
                               <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
                                    <h4>Unassigned Tasks</h4>
