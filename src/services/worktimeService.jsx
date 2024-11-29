@@ -53,3 +53,16 @@ export const deleteWorktime = async (id) => {
           throw error.response ? error.response.data : new Error('Network error');
      }
 };
+
+export const updateWorktimeStatus = async (id, status) => {
+     try {
+         const response = await axiosi.put(`${apiEndpoint}/${id}/status`, { status });
+         return response.data;
+     } catch (error) {
+         console.error(`Error updating status for worktime with ID ${id}:`, error);
+         throw error.response ? error.response.data : new Error('Network error');
+     }
+ };
+
+
+ //dời các task CHƯA HOÀN THÀNH sang wortime khác || unassign nếu worktime này bấm hoàn thành

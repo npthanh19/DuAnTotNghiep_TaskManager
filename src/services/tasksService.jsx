@@ -167,7 +167,7 @@ export const restoreTask = async (id) => {
 // Cập nhật trạng thái task
 export const updateTaskStatus = async (taskId, status) => {
      try {
-         const response = await axiosi.patch(`${taskApiEndpoint}/${taskId}/status`, { status });
+         const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/status`, { status });
          return response.data;
      } catch (error) {
          console.error(`Error updating status for task ID ${taskId}:`, error);
@@ -192,6 +192,19 @@ export const getProjectIdFromTask = async (taskId) => {
          return null;
      }
  };
+ // Cập nhật thời gian của một task
+export const updateTaskTime = async (taskId, taskTime) => {
+     try {
+         const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/tasktime`, {
+             task_time: taskTime, // Dữ liệu thời gian công việc cần cập nhật
+         });
+         return response.data;
+     } catch (error) {
+         console.error(`Error updating task time for task ID ${taskId}:`, error);
+         throw error.response ? error.response.data : new Error('Network error');
+     }
+ };
+ 
  
  export default {
      getAllTasks,
