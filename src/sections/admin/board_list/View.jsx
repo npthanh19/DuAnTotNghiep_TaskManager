@@ -3,7 +3,14 @@ import './board_log.css';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllProjects } from '../../../services/projectsService';
-import { getAllTasks, getTasksByWorktimeId, getTaskWithoutWorktime, updateLocationTask, updateWorktimeTask } from '../../../services/tasksService';
+import {
+     getAllTasks,
+     getTasksByWorktimeId,
+     getTaskWithoutWorktime,
+     updateLocationTask,
+     updateTaskStatus,
+     updateWorktimeTask,
+} from '../../../services/tasksService';
 import { v4 as uuidv4 } from 'uuid';
 import { getAllDepartments } from '../../../services/deparmentsService';
 
@@ -131,17 +138,30 @@ export function View() {
           });
      };
 
-     const handleStatusChange = (sprintId, taskId, newStatus) => {
-          const updatedSprints = sprints.map((sprint) => {
-               if (sprint.id === sprintId) {
-                    return {
+     const handleStatusChange = async (taskId, status) => {
+          let dataMapping;
+          if (status === 'to do') dataMapping = 1;
+          if (status === 'in progress') dataMapping = 2;
+          if (status === 'preview') dataMapping = 3;
+          if (status === 'done') dataMapping = 4;
+
+          try {
+               const updatedTask = await updateTaskStatus(taskId, dataMapping);
+               console.log(`Task updated successfully:`, updatedTask);
+
+               // Cập nhật lại danh sách sprints
+               setSprints((prevSprints) =>
+                    prevSprints.map((sprint) => ({
                          ...sprint,
-                         tasks: sprint.tasks.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task)),
-                    };
-               }
-               return sprint;
-          });
-          setSprints(updatedSprints);
+                         tasks: sprint.tasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
+                    })),
+               );
+
+               // Nếu task nằm trong `taskNotWorkTime`, cập nhật nó
+               setTaskNotWorkTime((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, status } : task)));
+          } catch (error) {
+               console.error(`Failed to update task status:`, error);
+          }
      };
 
      const handleAddTask = (sprintId) => {
@@ -290,18 +310,9 @@ export function View() {
                                         </option>
                                    ))}
                               </select>
-                              {/* <select className="form-select form-select-sm me-3" aria-label="Label Dropdown">
-                                   <option value="">Label</option>
-                                    {departments.map((department) => (
-                                        <option key={department.id} value={department.id}>
-                                             {department.department_name}
-                                        </option>
-                                   ))}
-                              </select> */}
                          </div>
                     </div>
                </h2>
-
                {isCreatedFormVisible && (
                     <div className="created-form mb-3">
                          <div className="input-group">
@@ -319,8 +330,6 @@ export function View() {
                     </div>
                )}
                <DragDropContext onDragEnd={handleDragEnd}>
-                 
-
                     {sprints?.map((sprint) => (
                          <Droppable key={sprint.id} droppableId={sprint.id}>
                               {(provided) => (
@@ -329,10 +338,19 @@ export function View() {
                                              {sprint.dateRange}
                                              <div className="status">
                                                   <div className="item">
-                                                       <p>1</p>
-                                                       <p>2</p>
-                                                       <p>3</p>
-                                                       <p>4</p>
+                                                       <p style={{ color: 'gray' }}>
+                                                            {sprint.tasks.filter((task) => task.status === 'to do').length}
+                                                       </p>
+                                                       <p className="text-primary">
+                                                            {sprint.tasks.filter((task) => task.status === 'in progress').length}
+                                                       </p>
+
+                                                       <p style={{ color: 'gold' }}>
+                                                            {sprint.tasks.filter((task) => task.status === 'preview').length}
+                                                       </p>
+                                                       <p style={{ color: 'green' }}>
+                                                            {sprint.tasks.filter((task) => task.status === 'done').length}
+                                                       </p>
                                                   </div>
                                                   <div className="status__worktime">Bắt đầu</div>
                                              </div>
@@ -351,7 +369,17 @@ export function View() {
                                                                  className="list__task-board align-items-center py-2 border-bottom">
                                                                  <div className=" boardlist_name">{`${task.id} - ${task.task_name}`}</div>
                                                                  <div className=" boardlist_project">{project ? project.project_name : 'N/A'}</div>
-                                                                 <div className=" boardlist_status">{`${task.status}`}</div>
+                                                                 <div className="boardlist_status">
+                                                                      <select
+                                                                           className="form-select"
+                                                                           value={task?.status}
+                                                                           onChange={(e) => handleStatusChange(task.id, e.target.value)}>
+                                                                           <option value="to do">To do</option>
+                                                                           <option value="in progress">In progress</option>
+                                                                           <option value="preview">Preview</option>
+                                                                           <option value="done">Done</option>
+                                                                      </select>
+                                                                 </div>
                                                                  <div className=" boardlist_time">1</div>
                                                                  <div className="">
                                                                       <img
@@ -370,9 +398,8 @@ export function View() {
                                    </div>
                               )}
                          </Droppable>
-                         
                     ))}
-                       <Droppable droppableId="unassignTasks">
+                    <Droppable droppableId="unassignTasks">
                          {(provided) => (
                               <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
                                    <h4>Unassigned Tasks</h4>
@@ -389,7 +416,17 @@ export function View() {
                                                             className="list__task-board align-items-center py-2 border-bottom">
                                                             <div className=" boardlist_name">{`${task.id} - ${task.task_name}`}</div>
                                                             <div className=" boardlist_project">{project ? project.project_name : 'N/A'}</div>
-                                                            <div className=" boardlist_status">{`${task.status}`}</div>
+                                                            <div className="boardlist_status">
+                                                                 <select
+                                                                      className="form-select"
+                                                                      value={task?.status}
+                                                                      onChange={(e) => handleStatusChange(task.id, e.target.value)}>
+                                                                      <option value="to do">To do</option>
+                                                                      <option value="in progress">In progress</option>
+                                                                      <option value="preview">Preview</option>
+                                                                      <option value="done">Done</option>
+                                                                 </select>
+                                                            </div>
                                                             <div className=" boardlist_time">1</div>
                                                             <div className="">
                                                                  <img

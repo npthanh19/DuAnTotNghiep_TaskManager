@@ -9,7 +9,6 @@ import { getAllProjects } from '../../../services/projectsService';
 import { getDepartmentsByProjectId } from '../../../services/tasksService';
 import Swal from 'sweetalert2';
 
-
 export const Add = () => {
      const { t } = useTranslation();
      const navigate = useNavigate();
@@ -68,6 +67,7 @@ export const Add = () => {
                const payload = {
                     task_name: data.task_name,
                     description: data.description,
+                    task_time: data.task_time ? parseFloat(data.task_time) : null,
                     status: Number(data.status),
                     project_id: data.project_id,
                     department_id: data.department_id,
@@ -121,6 +121,22 @@ export const Add = () => {
                                    />
                                    {errors.task_name && <div className="invalid-feedback">{errors.task_name.message}</div>}
                               </div>
+                              <div className="row mb-3">
+                                   <div className="col">
+                                        <label htmlFor="task_time" className="form-label">
+                                             {t('Task Time')}
+                                        </label>
+                                        <input
+                                             type="number"
+                                             step="0.1"
+                                             id="task_time"
+                                             className="form-control form-control-sm"
+                                             {...register('task_time')}
+                                             placeholder={t('Enter task time in hours')}
+                                        />
+                                   </div>
+                              </div>
+
                               <div className="col">
                                    <label htmlFor="status" className="form-label">
                                         {t('Status')}
@@ -138,18 +154,6 @@ export const Add = () => {
 
                                    {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
-                         </div>
-
-                         <div className="mb-3">
-                              <label htmlFor="description" className="form-label">
-                                   {t('Description')}
-                              </label>
-                              <textarea
-                                   id="description"
-                                   className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
-                                   {...register('description', { required: t('Description cannot be empty!') })}
-                                   rows="3"></textarea>
-                              {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
                          </div>
 
                          {/* Select Project */}
@@ -172,7 +176,17 @@ export const Add = () => {
                                    </select>
                                    {errors.project_id && <div className="invalid-feedback">{errors.project_id.message}</div>}
                               </div>
-
+                              <div className="mb-3">
+                                   <label htmlFor="description" className="form-label">
+                                        {t('Description')}
+                                   </label>
+                                   <textarea
+                                        id="description"
+                                        className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
+                                        {...register('description', { required: t('Description cannot be empty!') })}
+                                        rows="3"></textarea>
+                                   {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+                              </div>
                               <div className="col">
                                    <label htmlFor="department_id" className="form-label">
                                         {t('Departments')}

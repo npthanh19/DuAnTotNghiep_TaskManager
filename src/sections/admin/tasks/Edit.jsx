@@ -143,6 +143,18 @@ export const Edit = () => {
                                    {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
                          </div>
+                         <div className="col">
+                                   <label htmlFor="task_time" className="form-label">
+                                        {t('Task Time')}
+                                   </label>
+                                   <input
+                                        type="text"
+                                        id="task_time"
+                                        className={`form-control form-control-sm ${errors.task_time ? 'is-invalid' : ''}`}
+                                        {...register('task_time')}
+                                   />
+                                   {errors.task_time && <div className="invalid-feedback">{errors.task_time.message}</div>}
+                              </div>
 
                          <div className="mb-3">
                               <label htmlFor="description" className="form-label">

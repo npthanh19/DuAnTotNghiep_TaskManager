@@ -18,9 +18,9 @@ const initialData = {
           'card-3': { id: 'card-3', task_name: 'Sample Task 3', project_name: 'Project C', user_id: 'user-3', status: 'Completed' },
      },
      users: {
-          'user-1': { id: 'user-1', avatarUrl: 'url_to_avatar_1' },
-          'user-2': { id: 'user-2', avatarUrl: 'url_to_avatar_2' },
-          'user-3': { id: 'user-3', avatarUrl: 'url_to_avatar_3' },
+          'user-1': { id: 'user-1', avatarUrl: 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg' },
+          'user-2': { id: 'user-2', avatarUrl: 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg' },
+          'user-3': { id: 'user-3', avatarUrl: 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg' },
      },
 };
 

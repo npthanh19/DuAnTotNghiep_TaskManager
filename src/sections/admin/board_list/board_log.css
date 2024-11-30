@@ -9,7 +9,6 @@
 
 .user-id {
   width: 80px;
-
 }
 
 .users_img {
@@ -35,17 +34,17 @@
   box-shadow: none !important;
   border: none;
   background: none;
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+.btn-link:hover {
+  color: #0056b3;
 }
 
 .status-info {
   display: flex;
   align-items: center;
-}
-
-.user-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
 }
 
 .dropdown-menu {
@@ -57,23 +56,26 @@
 .dropdown-item {
   padding: 8px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .dropdown-item:hover {
   background-color: #f8f9fa;
 }
 
-
 .qtn-status h4 {
   display: flex;
   justify-content: space-between;
-
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1rem;
 }
 
 .qtn-status h4 .status {
   display: flex;
   gap: 20px;
-
 }
 
 .qtn-status h4 .status .item {
@@ -81,16 +83,37 @@
   gap: 10px;
   font-size: 14px;
   align-items: center;
+  color: #666;
 }
 
 .qtn-status h4 .status .item p {
   margin-bottom: 0;
 }
 
+.qtn-status h4 .status .status__worktime {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #007bff;
+}
+
 .list__task-board {
   display: grid;
   grid-template-columns: 5fr 2fr 2fr 1fr 1fr 1fr;
-  gap: 50px;
+  gap: 30px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.list__task-board:hover {
+  background-color: #f1f1f1;
+}
+
+.boardlist_name {
+  font-weight: bold;
+  color: #333;
 }
 
 .boardlist_project {
@@ -99,7 +122,57 @@
   border-radius: 5px;
   background: linear-gradient(270deg, #8c57ff 0%, #c3a8ff 100%);
   text-transform: uppercase;
+  color: white;
+  padding: 5px 10px;
 }
-.boardlist_status {
+
+.boardlist_status select {
   text-transform: uppercase;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 14px;
 }
+
+.boardlist_time {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: bold;
+  text-align: center;
+}
+
+.boardlist_trash {
+  font-size: 1.2rem;
+  color: #ff5a5a;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.boardlist_trash:hover {
+  color: #e63939;
+}
+
+img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.list-group {
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.list-group h4 {
+  margin-bottom: 15px;
+  color: #007bff;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 10px;
+}
+
+
