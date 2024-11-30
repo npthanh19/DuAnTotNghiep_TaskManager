@@ -333,6 +333,11 @@ const resources = {
                'Hide comments': 'Ẩn bình luận',
                'See more': 'Xem thêm',
                'Search by comments or username...': 'Tìm kiếm theo bình luận hoặc tên người dùng...',
+               'List of files': 'Danh sách tập tin',
+               'The comment has been moved to the trash!': 'Bình luận đã được chuyển vào thùng rác!',
+               'An error occurred while deleting the comment.': 'Đã xảy ra lỗi khi xóa bình luận.',
+               'Are you sure you want to delete this comment?': 'Bạn có chắc chắn muốn xóa bình luận này không?',
+               'Delete Comments': 'Xóa bình luận',
                
 
 

@@ -5,7 +5,7 @@ import { Delete } from './Delete';
 import { CommentForm } from '../comment/View';
 import { getAllTasks, deleteTask as deleteTaskService } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
-import { getFilesByTaskId } from '../../../services/fileService';
+import { getFilesByTaskId, downloadFile } from '../../../services/fileService';
 import Swal from 'sweetalert2';
 
 export const View = () => {
@@ -168,6 +168,28 @@ export const View = () => {
           setCurrentPage(1);
      };
 
+
+
+     const handleDownloadFile = async (fileUrl, fileName) => {
+          try {
+              const response = await fetch(fileUrl);
+              if (!response.ok) {
+                  throw new Error('Error downloading file');
+              }
+      
+              const fileBlob = await response.blob();
+              const fileUrlBlob = URL.createObjectURL(fileBlob);
+              const link = document.createElement('a');
+              link.href = fileUrlBlob;
+              link.download = fileName;
+              link.click();
+              URL.revokeObjectURL(fileUrlBlob);
+          } catch (error) {
+              console.error('Error downloading file:', error);
+          }
+      };
+      
+
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
@@ -211,77 +233,75 @@ export const View = () => {
                          </thead>
                          <tbody>
                               {currentTasks.map((task, index) => (
-                                        <tr key={task.id}>
-                                             <td>{index + 1}</td> {/* Hiển thị STT tự động tăng */}
-                                             <td>{task.id}</td>
-                                             <td>{getProjectNameById(task.project_id)}</td>
-                                             <td>{task.task_name}</td>
-                                             <td>{task.start_date}</td>
-                                             <td>{task.end_date}</td>
-                                             <td>
-                                                  {task.status === 'to do' && (
-                                                       <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('To Do')}
-                                                       </span>
-                                                  )}
-                                                  {task.status === 'in progress' && (
-                                                       <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('In Progress')}
-                                                       </span>
-                                                  )}
-                                                  {task.status === 'preview' && (
-                                                       <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Preview')}
-                                                       </span>
-                                                  )}
-                                                  {task.status === 'done' && (
-                                                       <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Done')}
-                                                       </span>
-                                                  )}
-                                             </td>
-                                             <td>
-                                                  <div className="dropdown">
-                                                       <button
-                                                            className="btn btn-sm"
-                                                            type="button"
-                                                            id={`dropdownMenuButton${task.id}`}
-                                                            data-bs-toggle="dropdown"
-                                                            aria-expanded="false">
-                                                            <i className="bi bi-three-dots-vertical"></i>
-                                                       </button>
-                                                       <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${task.id}`}>
-                                                            <li>
-                                                                 <button
-                                                                      className="dropdown-item text-primary"
-                                                                      onClick={() => handleCommentClick(task.id)}>
-                                                                      <i className="bi bi-chat me-2"></i> {t('Comment')}
-                                                                 </button>
-                                                            </li>
-                                                            <li>
-                                                                 <button
-                                                                      className="dropdown-item text-primary"
-                                                                      onClick={() => handleFileViewClick(task.id)}>
-                                                                      <i className="bi bi-file-earmark-text me-2"></i> {t('See File')}
-                                                                 </button>
-                                                            </li>
-                                                            <li>
-                                                                 <button className="dropdown-item text-warning" onClick={() => handleEdit(task.id)}>
-                                                                      <i className="bi bi-pencil me-2"></i> {t('Edit')}
-                                                                 </button>
-                                                            </li>
-                                                            <li>
-                                                                 <button
-                                                                      className="dropdown-item text-danger"
-                                                                      onClick={() => handleDeleteClick(task.id)}>
-                                                                      <i className="bi bi-trash me-2"></i> {t('Delete')}
-                                                                 </button>
-                                                            </li>
-                                                       </ul>
-                                                  </div>
-                                             </td>
-                                        </tr>
-                                   ))}
+                                   <tr key={task.id}>
+                                        <td>{index + 1}</td> {/* Hiển thị STT tự động tăng */}
+                                        <td>{task.id}</td>
+                                        <td>{getProjectNameById(task.project_id)}</td>
+                                        <td>{task.task_name}</td>
+                                        <td>{task.start_date}</td>
+                                        <td>{task.end_date}</td>
+                                        <td>
+                                             {task.status === 'to do' && (
+                                                  <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('To Do')}
+                                                  </span>
+                                             )}
+                                             {task.status === 'in progress' && (
+                                                  <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('In Progress')}
+                                                  </span>
+                                             )}
+                                             {task.status === 'preview' && (
+                                                  <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('Preview')}
+                                                  </span>
+                                             )}
+                                             {task.status === 'done' && (
+                                                  <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                       {t('Done')}
+                                                  </span>
+                                             )}
+                                        </td>
+                                        <td>
+                                             <div className="dropdown">
+                                                  <button
+                                                       className="btn btn-sm"
+                                                       type="button"
+                                                       id={`dropdownMenuButton${task.id}`}
+                                                       data-bs-toggle="dropdown"
+                                                       aria-expanded="false">
+                                                       <i className="bi bi-three-dots-vertical"></i>
+                                                  </button>
+                                                  <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${task.id}`}>
+                                                       <li>
+                                                            <button
+                                                                 className="dropdown-item text-primary"
+                                                                 onClick={() => handleCommentClick(task.id)}>
+                                                                 <i className="bi bi-chat me-2"></i> {t('Comment')}
+                                                            </button>
+                                                       </li>
+                                                       <li>
+                                                            <button
+                                                                 className="dropdown-item text-primary"
+                                                                 onClick={() => handleFileViewClick(task.id)}>
+                                                                 <i className="bi bi-file-earmark-text me-2"></i> {t('See File')}
+                                                            </button>
+                                                       </li>
+                                                       <li>
+                                                            <button className="dropdown-item text-warning" onClick={() => handleEdit(task.id)}>
+                                                                 <i className="bi bi-pencil me-2"></i> {t('Edit')}
+                                                            </button>
+                                                       </li>
+                                                       <li>
+                                                            <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(task.id)}>
+                                                                 <i className="bi bi-trash me-2"></i> {t('Delete')}
+                                                            </button>
+                                                       </li>
+                                                  </ul>
+                                             </div>
+                                        </td>
+                                   </tr>
+                              ))}
                          </tbody>
                     </table>
                     <nav aria-label="Page navigation">
@@ -318,17 +338,24 @@ export const View = () => {
                          <div className="modal-dialog">
                               <div className="modal-content">
                                    <div className="modal-header">
-                                        <h5 className="modal-title">Danh sách file</h5>
+                                        <h5 className="modal-title">{t('List of files')}</h5>
                                         <button type="button" className="btn-close" onClick={() => setShowFilePopup(false)}></button>
                                    </div>
                                    <div className="modal-body">
                                         {taskFiles.length > 0 ? (
                                              <ul className="list-group">
                                                   {taskFiles.map((file) => (
-                                                       <li key={file.id} className="list-group-item">
+                                                       <li
+                                                            key={file.id}
+                                                            className="list-group-item d-flex justify-content-between align-items-center">
                                                             <a href={file.url} target="_blank" rel="noopener noreferrer">
                                                                  {file.file_name}
                                                             </a>
+                                                            <button
+                                                                 className="btn btn-link"
+                                                                 onClick={() => handleDownloadFile(file.url, file.file_name)}>
+                                                                 <i className="bi bi-file-earmark-arrow-down"></i>
+                                                            </button>
                                                        </li>
                                                   ))}
                                              </ul>

@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61f0128f-9905-43b7-9f18-3d69e0160f17" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/i18n.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/i18n.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/sections/admin/comment/View.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/sections/admin/comment/View.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/sections/admin/projects/AddDepartmentForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/sections/admin/projects/AddDepartmentForm.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/sections/admin/tasks/View.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/sections/admin/tasks/View.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,8 +39,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "WE-62",
-    "last_opened_file_path": "D:/Du An Ton Nghiep - NHDT/DuAnTotNghiep_TaskManager",
+    "git-widget-placeholder": "WE-64",
+    "last_opened_file_path": "D:/Du An Ton Nghiep - NHDT/Backend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -59,7 +59,9 @@
       <updated>1732626131307</updated>
       <workItem from="1732626133795" duration="670000" />
       <workItem from="1732686623405" duration="3286000" />
-      <workItem from="1732779699507" duration="1238000" />
+      <workItem from="1732779699507" duration="1749000" />
+      <workItem from="1732856601061" duration="610000" />
+      <workItem from="1732953774252" duration="71000" />
     </task>
     <servers />
   </component>
