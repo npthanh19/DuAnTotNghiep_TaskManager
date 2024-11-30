@@ -166,11 +166,7 @@ export function View() {
                                         <td>
                                              <div className="d-flex justify-content-center">
                                                   <img
-                                                       src={
-                                                            user.avatar
-                                                                 ? `${process.env.REACT_APP_BASE_URL}/storage/${user.avatar}`
-                                                                 : 'https://i.pinimg.com/474x/c5/21/64/c52164749f7460c1ededf8992cd9a6ec--page-design-design-web.jpg'
-                                                       }
+                                                       src={`${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`}
                                                        alt={user.fullname}
                                                        className="img-thumbnail"
                                                        style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '50%' }}
@@ -235,16 +231,6 @@ export function View() {
                          </ul>
                     </nav>
                </div>
-               <ToastContainer
-                    autoClose={1500}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-               />
           </div>
      );
 }

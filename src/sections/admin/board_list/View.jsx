@@ -380,7 +380,7 @@ export function View() {
                                                                            <option value="done">Done</option>
                                                                       </select>
                                                                  </div>
-                                                                 <div className=" boardlist_time">1</div>
+                                                                 <div className=" boardlist_time">{task ? task.task_time : '-'}</div>
                                                                  <div className="">
                                                                       <img
                                                                            src="https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
@@ -427,7 +427,7 @@ export function View() {
                                                                       <option value="done">Done</option>
                                                                  </select>
                                                             </div>
-                                                            <div className=" boardlist_time">1</div>
+                                                            <div className=" boardlist_time">{task ? task.task_time : '-'}</div>
                                                             <div className="">
                                                                  <img
                                                                       src="https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"

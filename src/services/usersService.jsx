@@ -96,7 +96,7 @@ export const updateAvatar = async (id, avatarData) => {
 };
 
 export const getAvatarUrl = (avatar) => {
-     return avatar ? `${process.env.REACT_APP_BASE_URL}/storage/${avatar}` : null;
+     return avatar ? `${process.env.REACT_APP_BASE_URL}/avatar/${avatar}` : null;
 };
 
 export default {
