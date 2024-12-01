@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getCommentsByTask, createComment } from '../../../services/commentService';
+import { getCommentsByTask, createComment, deleteComment } from '../../../services/commentService';
 import { getTaskById } from '../../../services/tasksService';
 import { getUserById } from '../../../services/usersService';
 import { getTaskFiles } from '../../../services/fileService';
 import { DeleteComment } from './Delete';
 import { useTranslation } from 'react-i18next';
+import Swal from 'sweetalert2';
 
 export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
      const [comments, setComments] = useState([]);
@@ -80,15 +81,45 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
           }
      }, [taskId]);
 
-     const handleDeleteCommentSuccess = (commentId, errorMsg) => {
-          if (errorMsg) {
-               toast.error(`Xóa bình luận thất bại: ${errorMsg}`);
-          } else {
-               toast.success('Xóa bình luận thành công!');
-               setComments((prev) => prev.filter((comment) => comment.id !== commentId));
-               setFilteredComments((prev) => prev.filter((comment) => comment.id !== commentId));
+     const handleDeleteCommentSuccess = async (id) => {
+          try {
+               await deleteComment(id);
+               setComments((prevComment) => prevComment.filter((comment) => comment.id !== id));
+               Swal.fire({
+                    icon: 'success',
+                    text: t('The comment has been moved to the trash!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
+          } catch (error) {
+               Swal.fire({
+                    icon: 'error',
+                    text: t('An error occurred while deleting the comment.'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
           }
-          setShowDeleteModal(false);
+     };
+
+     const handleDeleteClick = (id) => {
+          Swal.fire({
+               title: t('Delete Comments'),
+               text: t('Are you sure you want to delete this comment?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#d33',
+               cancelButtonColor: '#3085d6',
+               confirmButtonText: t('Delete'),
+               cancelButtonText: t('Cancel'),
+          }).then(async (result) => {
+               if (result.isConfirmed) {
+                    await handleDeleteCommentSuccess(id);
+               }
+          });
      };
 
      useEffect(() => {
@@ -119,8 +150,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                hour: '2-digit',
                minute: '2-digit',
           });
-          
-
+     
           return (
                <li key={comment.id} className="list-group-item" style={{ marginLeft: indent, backgroundColor: indent ? '#f8f9fa' : 'white' }}>
                     <div className="d-flex justify-content-between align-items-center">
@@ -156,13 +186,11 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                               href="#"
                               className="text-danger ms-2"
                               onClick={(e) => {
-                                   e.preventDefault();
-                                   setSelectedCommentId(comment.id);
-                                   setShowDeleteModal(true);
+                                   handleDeleteClick(comment.id);
                               }}>
                               {t('Delete')}
                          </a>
-
+     
                          {!comment.parent_id && (
                               <a className="ms-3" onClick={() => toggleRepliesVisibility(comment.id)}>
                                    {repliesVisibility[comment.id] ? t('Hide comments') : t('See more')}
@@ -179,39 +207,60 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                userName: userFullName,
                comment: commentContent,
                created_at: new Date().toISOString(),
-               task_id: taskId, // Gửi task_id để liên kết với công việc
+               task_id: taskId,
           };
-
-          // Create a FormData object to send the comment data along with the image file
+     
           const formData = new FormData();
           formData.append('comment', newComment.comment);
           formData.append('task_id', newComment.task_id);
           formData.append('user_name', newComment.userName);
           formData.append('created_at', newComment.created_at);
-
-          // If an image is selected, append it to the form data
+     
           if (selectedImage) {
                formData.append('image', selectedImage);
           }
-
+     
           try {
-               // Gọi API để thêm bình luận vào cơ sở dữ liệu (Ensure your API can handle FormData)
-               const savedComment = await createComment(formData); // Update this to send formData
-
-               // Cập nhật danh sách bình luận sau khi lưu thành công
-               setComments([savedComment, ...comments]);
-               setFilteredComments([savedComment, ...comments]);
-
-               // Xóa dữ liệu đầu vào và ẩn khu vực nhập
+               // Create the comment
+               await createComment(formData);
+     
+               // Fetch the task files again after creating the comment
+               await fetchTaskFiles();
+     
+               // Process the newly added comment and include any associated files
+               const processedComment = {
+                    id: Date.now(), // Temporary use of timestamp as the id (if needed)
+                    ...newComment,
+                    replies: [], // Ensure no error occurs while rendering
+               };
+     
+               setComments([processedComment, ...comments]);
+               setFilteredComments([processedComment, ...filteredComments]);
+     
+               // Clear the input fields
                setCommentContent('');
                setShowAddCommentInput(false);
-               setSelectedImage(null); // Xóa ảnh đã chọn sau khi lưu
-
-               toast.success('Bình luận đã được thêm!');
+               setSelectedImage(null);
+     
+               // Success notification
+               Swal.fire({
+                    icon: 'success',
+                    text: t('Added successfully!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
           } catch (error) {
-               toast.error('Có lỗi xảy ra khi thêm bình luận.');
+               console.error('Error adding comment:', error);
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Added Failed!'),
+                    text: t('Something went wrong'),
+               });
           }
      };
+     
 
      const CommentItem = ({ comment }) => {
           return (
@@ -267,7 +316,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                                    <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={(e) => setSelectedImage(e.target.file_name[0])}
+                                        onChange={(e) => setSelectedImage(e.target.files[0])}
                                         className="form-control"
                                    />
                               </div>
