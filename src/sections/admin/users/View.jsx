@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { getAllUsers, deleteUser } from '../../../services/usersService';
 import { getAllRoles } from '../../../services/rolesService';
 import Swal from 'sweetalert2';
-import { toast, ToastContainer } from 'react-toastify';
 
 export function View() {
      const [currentPage, setCurrentPage] = useState(1);
@@ -149,6 +148,7 @@ export function View() {
                     <table className="table">
                          <thead>
                               <tr className="text-center">
+                                   <th>{t('STT')}</th>
                                    <th>{t('ID')}</th>
                                    <th>{t('Full Name')}</th>
                                    <th>{t('Avatar')}</th>
@@ -159,8 +159,9 @@ export function View() {
                               </tr>
                          </thead>
                          <tbody>
-                              {currentUsers.map((user) => (
+                              {currentUsers.map((user, index) => (
                                    <tr key={user.id} className="text-center">
+                                        <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{user.id}</td>
                                         <td>{user.fullname}</td>
                                         <td>

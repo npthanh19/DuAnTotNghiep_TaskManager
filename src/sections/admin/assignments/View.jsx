@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { getAllAssignments, deleteAssignment } from '../../../services/assignmentService';
+import { getAllProjects } from '../../../services/projectsService';
 import Swal from 'sweetalert2';
-import RecentlyDeletedAssignment from './RecentlyDeletedAssignment';
 
 export const View = () => {
      const [currentPage, setCurrentPage] = useState(1);
-     const itemsPerPage = 9;
+     const itemsPerPage = 5;
 
      const { t } = useTranslation();
      const navigate = useNavigate();
@@ -16,20 +16,23 @@ export const View = () => {
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
      const [loading, setLoading] = useState(true);
+     const [projects, setProjects] = useState([]);
 
      useEffect(() => {
           const fetchAssignments = async () => {
                setLoading(true);
                try {
                     const allAssignments = await getAllAssignments();
+                    const allProjects = await getAllProjects();
                     setAssignments(allAssignments);
+                    setProjects(allProjects);
+                    const sortedAssignments = allAssignments.sort((a, b) => b.id - a.id);
                } catch (error) {
                     console.error(t('Failed:'), error);
                } finally {
                     setLoading(false);
                }
           };
-
           fetchAssignments();
      }, []);
 
@@ -97,6 +100,11 @@ export const View = () => {
           );
      }
 
+     const getProjectName = (projectId) => {
+          const project = projects.find((p) => p.id === projectId);
+          return project ? project.project_name : '';
+     };
+
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
@@ -118,23 +126,59 @@ export const View = () => {
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th className="">ID</th>
-                                   <th className="">{t('User Name')}</th>
+                                   <th className="">{t('STT')}</th>
+                                   <th className="">{t('ID')}</th>
+                                   <th className="">{t('Project Name')}</th>
                                    <th className="">{t('Task Name')}</th>
                                    <th className="">{t('Department Name')}</th>
+                                   <th className="">{t('User Name')}</th>
                                    <th className="">{t('Note')}</th>
                                    <th className="">{t('Status')}</th>
                                    <th className="col-1">{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
-                              {currentAssignments.map((assignment) => (
+                              {currentAssignments.map((assignment, index) => (
                                    <tr key={assignment.id}>
+                                        <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                                         <td>{assignment.id}</td>
-                                        <td>{assignment.user_name}</td>
-                                        <td>{assignment.task_name}</td>
-                                        <td>{assignment.department_name}</td>
-                                        <td>{assignment.note}</td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '150px' }}
+                                                  title={getProjectName(assignment.project_id)}>
+                                                  {getProjectName(assignment.project_id).slice(0, 20)}...
+                                             </span>
+                                        </td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '150px' }}
+                                                  title={assignment.task_name}>
+                                                  {assignment.task_name.slice(0, 20)}...
+                                             </span>
+                                        </td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '150px' }}
+                                                  title={assignment.department_name}>
+                                                  {assignment.department_name.slice(0, 20)}...
+                                             </span>
+                                        </td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '150px' }}
+                                                  title={assignment.user_name}>
+                                                  {assignment.user_name.slice(0, 20)}...
+                                             </span>
+                                        </td>
+                                        <td>
+                                             <span className="d-inline-block text-truncate" style={{ maxWidth: '150px' }} title={assignment.note}>
+                                                  {assignment.note.slice(0, 20)}...
+                                             </span>
+                                        </td>
                                         <td>
                                              {assignment.status === 'to do' && (
                                                   <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
@@ -157,7 +201,6 @@ export const View = () => {
                                                   </span>
                                              )}
                                         </td>
-
                                         <td>
                                              <div className="dropdown">
                                                   <button

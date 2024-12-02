@@ -29,7 +29,6 @@ export const Add = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
-               reset();
                setTimeout(() => {
                     navigate('/taskmaneger/departments');
                }, 1000);

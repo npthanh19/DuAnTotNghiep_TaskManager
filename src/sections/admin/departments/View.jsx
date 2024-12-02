@@ -3,9 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getAllDepartments, deleteDepartment } from '../../../services/deparmentsService';
 import AddUserToDepartment from './AddUserToDepartment';
-import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
-import { toast, ToastContainer } from 'react-toastify';
 
 export function View() {
      const [currentPage, setCurrentPage] = useState(1);
@@ -24,7 +22,8 @@ export function View() {
           const fetchDepartments = async () => {
                try {
                     const fetchedDepartments = await getAllDepartments();
-                    setDepartments(fetchedDepartments);
+                    const sortedDepartments = fetchedDepartments.sort((a, b) => b.id - a.id);
+                    setDepartments(sortedDepartments);
                } catch (err) {
                     setError(err.message || 'Cannot retrieve the list of departments');
                } finally {
@@ -141,18 +140,34 @@ export function View() {
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th>ID</th>
+                                   <th>STT</th>
+                                   <th>{t('ID')}</th>
                                    <th>{t('Name')}</th>
                                    <th>{t('Description')}</th>
                                    <th>{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
-                              {currentDepartments.map((department) => (
+                              {currentDepartments.map((department, index) => (
                                    <tr key={department.id}>
+                                        <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{department.id}</td>
-                                        <td>{department.department_name}</td>
-                                        <td>{department.description}</td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '500px' }}
+                                                  title={department.department_name}>
+                                                  {department.department_name.slice(0, 100)}...
+                                             </span>
+                                        </td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '500px' }}
+                                                  title={department.description}>
+                                                  {department.description.slice(0, 100)}...
+                                             </span>
+                                        </td>
                                         <td>
                                              <div className="dropdown">
                                                   <button
@@ -215,7 +230,6 @@ export function View() {
                          </ul>
                     </nav>
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
 
                {showAddDepartmentForm && (
                     <AddUserToDepartment

@@ -5,12 +5,14 @@ import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { getAssignmentById, updateAssignment, getDepartmentsByTask, getUsersByDepartment } from '../../../services/assignmentService';
 import { getAllTasks } from '../../../services/tasksService';
+import { getAllProjects } from '../../../services/projectsService';
 
 export const Edit = () => {
      const { id } = useParams();
      const { t } = useTranslation();
      const navigate = useNavigate();
 
+     const [projects, setProjects] = useState([]);
      const [tasks, setTasks] = useState([]);
      const [departments, setDepartments] = useState([]);
      const [users, setUsers] = useState([]);
@@ -29,19 +31,24 @@ export const Edit = () => {
      useEffect(() => {
           const initData = async () => {
                try {
-                    const [assignment, tasks] = await Promise.all([getAssignmentById(id), getAllTasks()]);
+                    const [assignment, projects, tasks] = await Promise.all([getAssignmentById(id), getAllProjects(), getAllTasks()]);
+                    setProjects(projects);
                     setTasks(tasks);
+
                     reset({
+                         projectId: assignment.project_id || '',
                          taskId: assignment.task_id || '',
                          departmentId: assignment.department?.id || '',
                          userId: assignment.user?.id || '',
                          status: assignment.status || '1',
                          note: assignment.note || '',
                     });
+
                     if (assignment.task_id) {
                          const departments = await getDepartmentsByTask(assignment.task_id);
                          setDepartments(departments.departments || []);
                     }
+
                     if (assignment.department?.id) {
                          const users = await getUsersByDepartment(assignment.department.id);
                          setUsers(users.users || []);
@@ -81,6 +88,7 @@ export const Edit = () => {
                task_id: data.taskId,
                department_id: data.departmentId,
                user_ids: [data.userId],
+               project_id: data.projectId,
                status: data.status,
                note: data.note,
           };
@@ -116,6 +124,24 @@ export const Edit = () => {
                </div>
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
+                         {/* Project Selection */}
+                         <div className="row mb-3">
+                              <div className="col">
+                                   <label className="form-label">{t('Project')}</label>
+                                   <select
+                                        {...register('projectId', { required: t('Project is required') })}
+                                        className={`form-select form-select-sm ${errors.projectId ? 'is-invalid' : ''}`}>
+                                        <option value="">{t('Select Project')}</option>
+                                        {projects.map((project) => (
+                                             <option key={project.id} value={project.id}>
+                                                  {project.project_name}
+                                             </option>
+                                        ))}
+                                   </select>
+                                   {errors.projectId && <div className="invalid-feedback">{errors.projectId.message}</div>}
+                              </div>
+                         </div>
+
                          {/* Task Selection */}
                          <div className="row mb-3">
                               <div className="col">
@@ -165,23 +191,35 @@ export const Edit = () => {
                                    </select>
                                    {errors.userId && <div className="invalid-feedback">{errors.userId.message}</div>}
                               </div>
-                              {/* Status and Note */}
+                         </div>
+
+                         {/* Status Selection */}
+                         <div className="row mb-3">
                               <div className="col">
                                    <label className="form-label">{t('Status')}</label>
-                                   <select {...register('status')} className="form-select form-select-sm">
+                                   <select
+                                        {...register('status', { required: t('Status is required') })}
+                                        className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}>
+                                        <option value="">{t('Select Status')}</option>
                                         <option value="1">{t('To Do')}</option>
                                         <option value="2">{t('In Progress')}</option>
                                         <option value="3">{t('Preview')}</option>
                                         <option value="4">{t('Done')}</option>
                                    </select>
+                                   {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
                          </div>
-                         <div className="col">
-                              <label className="form-label">{t('Note')}</label>
-                              <textarea {...register('note')} className="form-control" rows="3" />
+
+                         {/* Note */}
+                         <div className="row mb-3">
+                              <div className="col">
+                                   <label className="form-label">{t('Note')}</label>
+                                   <textarea id="note" className="form-control" rows="4" {...register('note')} />
+                              </div>
                          </div>
-                         <button type="submit" className="btn btn-success mt-3">
-                              {t('Confirm')}
+
+                         <button type="submit" className="btn btn-success">
+                              <i className="bi bi-check-circle me-3"></i> {t('Confirm')}
                          </button>
                     </form>
                </div>

@@ -56,7 +56,7 @@ import ViewDepartments from '../pages/admin/Departments/List';
 import AddDepartments from '../pages/admin/Departments/Add';
 import EditDepartments from '../pages/admin/Departments/Edit';
 import RecentlyDeletedDepartments from '../sections/admin/departments/RecentlyDeletedDepartment';
-
+import ConfirmDepartment from '../sections/admin/departments/ConfirmDepartment';
 // Admin Worktime
 import ViewWorktime from '../pages/admin/Worktime/List';
 import AddWorktime from '../pages/admin/Worktime/Add';
@@ -124,12 +124,14 @@ export const AdminRoutes = () => (
           <Route path="departments/add" element={<PrivateRoute><AdminLayout><AddDepartments /></AdminLayout></PrivateRoute>} />
           <Route path="departments/edit/:id" element={<PrivateRoute><AdminLayout><EditDepartments /></AdminLayout></PrivateRoute>} />
           <Route path="/departments/trashed" element={<PrivateRoute><AdminLayout><RecentlyDeletedDepartments /></AdminLayout></PrivateRoute>} />
+          <Route path="/departments/confirm/:departmentId/:token" element={<PrivateRoute><AdminLayout><ConfirmDepartment  /></AdminLayout></PrivateRoute>} />
+
           {/* Worktime Management */}
           <Route path="worktimes" element={<PrivateRoute><AdminLayout><ViewWorktime /></AdminLayout></PrivateRoute>} />
           <Route path="worktimes/add" element={<PrivateRoute><AdminLayout><AddWorktime /></AdminLayout></PrivateRoute>} />
 
           {/* Permission Management */}
-          <Route path="permissions" element={<PrivateRoute><AdminLayout><ViewPer /></AdminLayout></PrivateRoute>} />
-          <Route path="permissions/trash" element={<PrivateRoute><AdminLayout><TrashPer /></AdminLayout></PrivateRoute>} />
+          {/* <Route path="permissions" element={<PrivateRoute><AdminLayout><ViewPer /></AdminLayout></PrivateRoute>} />
+          <Route path="permissions/trash" element={<PrivateRoute><AdminLayout><TrashPer /></AdminLayout></PrivateRoute>} /> */}
      </Routes>
 );
