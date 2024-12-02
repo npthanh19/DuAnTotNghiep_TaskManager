@@ -8,7 +8,7 @@ import { getAllProjects } from '../../../services/projectsService';
 import { getAllTasks } from '../../../services/tasksService';
 import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllDepartments } from '../../../services/deparmentsService';
-import { getAllActivityLogs } from '../../../services/activityService';
+// import { getAllActivityLogs } from '../../../services/activityService';
 import { useTranslation } from 'react-i18next';
 
 
@@ -255,7 +255,7 @@ export const View = () => {
                     const tasksData = await getAllTasks();
                     const worktimesData = await getAllWorktimes();
                     const departmentsData = await getAllDepartments();
-                    const activityData = await getAllActivityLogs();
+                    // const activityData = await getAllActivityLogs();
 
                     setUsers(usersData);
                     setRoles(rolesData);
@@ -263,7 +263,7 @@ export const View = () => {
                     setTasks(tasksData);
                     setWorktimes(worktimesData);
                     setDepartments(departmentsData);
-                    setActivitys(activityData);
+                    // setActivitys(activityData);
                } catch (error) {
                     console.error('Failed to fetch data:', error);
                }

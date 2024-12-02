@@ -122,11 +122,11 @@ const Navbar = ({ onToggleSidebar }) => {
                                    <span className={`language-slider ${language === 'vi' ? 'slider-vie' : 'slider-eng'}`}></span>
                               </div>
                          </li>
-                         <li className="nav-item me-3">
+                         {/* <li className="nav-item me-3">
                               <button className="nav-link px-0 dark-mode-toggle" aria-label="Toggle Dark Mode" onClick={handleDarkModeToggle}>
                                    <i className={`bi ${isDarkMode ? 'bi-moon-fill' : 'bi-sun-fill'} ri-24px`}></i>
                               </button>
-                         </li>
+                         </li> */}
                          <li className="nav-item dropdown">
                               <a
                                    className="nav-link dropdown-toggle hide-arrow p-0"

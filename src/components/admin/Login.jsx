@@ -23,6 +23,7 @@ const Login = () => {
                if (response && response.access_token) {
                     localStorage.setItem('isAuthenticated', 'true');
                     localStorage.setItem('token', response.access_token);
+                    localStorage.setItem('role', response.role);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
 
                     Swal.fire({
@@ -35,7 +36,11 @@ const Login = () => {
                     });
 
                     setTimeout(() => {
-                         navigate('/taskmaneger');
+                         if (response.role === 'Admin' || response.role === 'Manager') {
+                              navigate('/taskmaneger');
+                         } else {
+                              navigate('/taskmaneger/departments');
+                         }
                     }, 1000);
                }
           } catch (error) {
@@ -79,6 +84,7 @@ const Login = () => {
                } else if (response.data.status === 'verified') {
                     localStorage.setItem('isAuthenticated', 'true');
                     localStorage.setItem('token', response.data.access_token);
+                    localStorage.setItem('role', response.data.role);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
                     Swal.fire({
@@ -89,7 +95,11 @@ const Login = () => {
                          timer: 3000,
                          showConfirmButton: false,
                     }).then(() => {
-                         navigate('/taskmaneger');
+                         if (response.data.role === 'Admin' || response.data.role === 'Manager') {
+                              navigate('/taskmaneger');
+                         } else {
+                              navigate('/taskmaneger/departments');
+                         }
                     });
                }
           } catch (error) {

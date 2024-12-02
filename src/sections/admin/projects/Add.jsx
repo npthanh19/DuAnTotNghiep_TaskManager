@@ -147,10 +147,10 @@ export const Add = () => {
                                    className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                                    {...register('status', { required: t('Status is required!') })}>
                                    <option value="">{t('Select Status')}</option>
-                                   <option value="To Do">{t('To Do')}</option>
-                                   <option value="In Progress">{t('In Progress')}</option>
-                                   <option value="Preview">{t('Preview')}</option>
-                                   <option value="Done">{t('Done')}</option>
+                                   <option value="To Do">{t('Not yet implemented')}</option>
+                                   <option value="In Progress">{t('Ongoing')}</option>
+                                   <option value="Preview">{t('Complete')}</option>
+                                   <option value="Done">{t('Destroy')}</option>
                               </select>
                               {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                          </div>
