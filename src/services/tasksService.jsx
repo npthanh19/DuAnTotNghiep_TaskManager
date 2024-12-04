@@ -213,7 +213,18 @@ export const getTasksByProject = async (projectId) => {
           return [];
      }
 };
-
+export const getRunningTasks = async (id) => {
+     try {
+         const response = await axiosi.get(`/api/tasks/by-running/${id}`);
+         return response.data;
+     } catch (error) {
+         console.error('Error fetching tasks from running worktimes:', error);
+         throw error.response ? error.response.data : new Error('Network error');
+     }
+ };
+ 
+ 
+ 
 export default {
      getAllTasks,
      getTaskById,
@@ -228,4 +239,5 @@ export default {
      getTasksByWorktimeId,
      updateWorktimeTask,
      restoreTask,
+     getRunningTasks,
 };
