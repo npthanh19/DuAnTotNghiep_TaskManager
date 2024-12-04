@@ -201,7 +201,7 @@ export const Edit = () => {
                                         {...register('status', { required: t('Status is required') })}
                                         className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}>
                                         <option value="">{t('Select Status')}</option>
-                                        <option value="1">{t('To Do')}</option>
+                                        <option value="1">{t('Pending')}</option>
                                         <option value="2">{t('In Progress')}</option>
                                         <option value="3">{t('Preview')}</option>
                                         <option value="4">{t('Done')}</option>

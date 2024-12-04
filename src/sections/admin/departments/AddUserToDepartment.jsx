@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Select from 'react-select';
 import { addUsersToDepartment, removeUserFromDepartment, getDepartmentById, getUsersWithStatus } from '../../../services/deparmentsService';
 import { getAllUsers } from '../../../services/usersService';
@@ -10,20 +8,21 @@ import Swal from 'sweetalert2';
 
 const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}, onAddSuccess }) => {
      const { t } = useTranslation();
-     const [users, setUsers] = useState([]); // All users
-     const [selectedUserIds, setSelectedUserIds] = useState([]); // Selected users to add
-     const [departmentName, setDepartmentName] = useState(''); // Department name
-     const [addedUserIds, setAddedUserIds] = useState([]); // Already added users
-     const [roles, setRoles] = useState([]); // User roles
-     const [usersWithStatus, setUsersWithStatus] = useState([]); // Users with status (confirmation status)
+     const [users, setUsers] = useState([]);
+     const [selectedUserIds, setSelectedUserIds] = useState([]);
+     const [departmentName, setDepartmentName] = useState('');
+     const [addedUserIds, setAddedUserIds] = useState([]);
+     const [roles, setRoles] = useState([]);
+     const [usersWithStatus, setUsersWithStatus] = useState([]);
+     const [currentUserRole, setCurrentUserRole] = useState(null);
+     const [isLoading, setIsLoading] = useState(false);
 
      useEffect(() => {
-          // Fetch department info
           const fetchDepartment = async () => {
                try {
                     const departmentData = await getDepartmentById(departmentId);
                     setDepartmentName(departmentData.department_name);
-                    setAddedUserIds(departmentData.users.map((user) => user.id)); // Store user IDs already added
+                    setAddedUserIds(departmentData.users.map((user) => user.id));
                } catch (error) {
                     console.error('Error fetching department:', error);
                }
@@ -33,45 +32,49 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
           const fetchUsers = async () => {
                try {
                     const data = await getAllUsers();
-                    setUsers(data); // Update users list
+                    setUsers(data);
                } catch (error) {
                     console.error('Error fetching users:', error);
                }
           };
 
-          // Fetch roles
           const fetchRoles = async () => {
-               try {
-                    const allRoles = await getAllRoles();
-                    setRoles(allRoles); // Update roles list
-               } catch (error) {
-                    console.error('Error fetching roles:', error);
+               if (currentUserRole !== 3) {
+                    try {
+                         const allRoles = await getAllRoles();
+                         setRoles(allRoles);
+                    } catch (error) {
+                         console.error('Error fetching roles:', error);
+                    }
                }
           };
 
-          // Fetch users with status (confirmation status)
           const fetchUsersWithStatus = async () => {
                try {
                     const data = await getUsersWithStatus(departmentId);
-                    setUsersWithStatus(data); // Store users with status
+                    setUsersWithStatus(data);
                } catch (error) {
                     console.error('Error fetching users with status:', error);
                }
           };
 
+          const fetchCurrentUserRole = () => {
+               const storedRole = localStorage.getItem('role');
+               setCurrentUserRole(Number(storedRole));
+          };
+
           fetchDepartment();
           fetchUsers();
+          fetchCurrentUserRole();
+          fetchUsersWithStatus();
           fetchRoles();
-          fetchUsersWithStatus(); // Fetch users with status
-     }, [departmentId]);
+     }, [departmentId, currentUserRole]);
 
-     // Handle user selection
      const handleUserChange = (selectedOptions) => {
           const values = selectedOptions ? selectedOptions.map((option) => option.value) : [];
           setSelectedUserIds(values);
      };
 
-     // Handle add user form submission
      const handleAddSubmit = async (e) => {
           e.preventDefault();
           if (!selectedUserIds || selectedUserIds.length === 0) {
@@ -83,11 +86,13 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
                return;
           }
 
+          setIsLoading(true);
+
           try {
                const response = await addUsersToDepartment(departmentId, selectedUserIds);
                await Swal.fire({
                     icon: 'success',
-                    text: t('Invitations have been sent successfully! Please wait for users to confirm.'),
+                    text: t('Invitations have been sent successfully!'),
                     position: 'top-right',
                     toast: true,
                     timer: 3000,
@@ -101,10 +106,11 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
                     text: t('Failed to send invitations.'),
                     confirmButtonText: t('OK'),
                });
+          } finally {
+               setIsLoading(false);
           }
      };
 
-     // Handle removing a user from the department
      const handleRemoveUser = async (userId) => {
           const result = await Swal.fire({
                title: t('Delete'),
@@ -148,6 +154,31 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
           }
      };
 
+     const handleCreateOption = (inputValue) => {
+          if (!/\S+@\S+\.\S+/.test(inputValue)) {
+               Swal.fire({
+                    icon: 'error',
+                    text: t('Invalid email address!'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
+               return;
+          }
+
+          const newUser = {
+               id: `custom-${inputValue}`,
+               fullname: inputValue,
+               email: inputValue,
+               role_id: null,
+          };
+
+          setUsers((prevUsers) => [...prevUsers, newUser]);
+
+          setSelectedUserIds((prev) => [...prev, newUser.id]);
+     };
+
      const availableUsers = users.filter((user) => !addedUserIds.includes(user.id));
 
      const getRoleName = (roleId) => {
@@ -183,27 +214,33 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
                                                   label: `${user.fullname} - (${getRoleName(user.role_id)}) - ${user.email}`,
                                              }))}
                                              onChange={handleUserChange}
+                                             onCreateOption={handleCreateOption}
                                              className="basic-multi-select"
                                              classNamePrefix="select"
                                              isMulti
                                         />
                                    </div>
-                                   <button type="submit" className="btn btn-primary">
-                                        {t('Add')}
+                                   <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                                        {isLoading ? t('Adding...') : t('Add')}
+                                        {isLoading && (
+                                             <span className="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                                        )}{' '}
                                    </button>
                               </form>
 
                               <h6 className="mt-3">{t('Invited Users')}:</h6>
                               <ul className="list-group">
                                    {addedUserIds.map((id) => {
-                                        const user = usersWithStatus.find((usr) => usr.id === id); // Use usersWithStatus here
-                                        const status = user?.confirmation_status || t('Pending');
+                                        const user = usersWithStatus.find((usr) => usr.id === id);
+                                        const status = user?.confirmation_status ? t(user.confirmation_status) : t('Pending');
                                         return (
                                              <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
-                                                  {user ? `${user.fullname} - (${status})` : t('Người tạo phòng ban')}
-                                                  <button className="btn btn-danger btn-sm" onClick={() => handleRemoveUser(id)}>
-                                                       {t('Remove')}
-                                                  </button>
+                                                  {user?.fullname} ({status})
+                                                  {currentUserRole !== 3 && (
+                                                       <button className="btn btn-danger btn-sm" onClick={() => handleRemoveUser(id)}>
+                                                            {t('Remove')}
+                                                       </button>
+                                                  )}
                                              </li>
                                         );
                                    })}

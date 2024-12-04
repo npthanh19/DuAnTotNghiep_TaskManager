@@ -78,17 +78,6 @@ export const addUsersToDepartment = async (departmentId, userIds) => {
      }
 };
 
-// Xóa người dùng khỏi phòng ban
-// export const removeUserFromDepartment = async (departmentId, userId) => {
-//      try {
-//           const response = await axiosi.post(`${apiEndpoint}/${departmentId}/remove-users`, { user_id: userId });
-//           return response.data;
-//      } catch (error) {
-//           console.error(`Error removing user from department with ID ${departmentId}:`, error);
-//           throw error.response ? error.response.data : new Error('Network error');
-//      }
-// };
-
 // Lấy danh sách phòng ban đã bị xóa
 export const getTrashedDepartments = async () => {
      try {
@@ -133,8 +122,12 @@ export const getUsersWithStatus = async (departmentId) => {
 };
 
 export const removeUserFromDepartment = async (departmentId, userId) => {
-     const response = await axiosi.delete(`/api/departments/${departmentId}/users/${userId}`);
-     return response.data;
+     try {
+          const response = await axiosi.delete(`/api/departments/${departmentId}/users/${userId}`);
+          return response.data;
+     } catch (error) {
+          throw new Error('Failed to remove user');
+     }
 };
 
 export default {

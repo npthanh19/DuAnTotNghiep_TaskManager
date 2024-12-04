@@ -3,18 +3,21 @@ import { useTranslation } from 'react-i18next';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
-import { getUserById, updateUser } from '../../services/usersService';
+import { getUserById, updateUser, updateAvatar, requestDeleteAccount } from '../../services/usersService';
 import { useForm } from 'react-hook-form';
-import Swal from 'sweetalert2'; // Import Swal
-import { getAllRoles } from '../../services/rolesService';
+import Swal from 'sweetalert2';
 import '../../index.css';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Update_profile() {
      const [isSidebarOpen, setIsSidebarOpen] = useState(true);
      const [user, setUser] = useState({});
-     const [roles, setRoles] = useState([]);
-     const userId = 1;
      const { t } = useTranslation();
+     const [avatar, setAvatar] = useState(null);
+     const navigate = useNavigate();
+     const userInfo = JSON.parse(localStorage.getItem('user'));
+     const userId = userInfo?.user_id;
+     const token = localStorage.getItem('token');
 
      const toggleSidebar = () => {
           setIsSidebarOpen(!isSidebarOpen);
@@ -37,14 +40,25 @@ export default function Update_profile() {
      useEffect(() => {
           const fetchUserData = async () => {
                try {
-                    const userData = await getUserById(userId);
+                    if (!userInfo || !userInfo.access_token) {
+                         Swal.fire({
+                              icon: 'error',
+                              text: t('User not found! Please login again.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
+                         return;
+                    }
+
+                    const userData = await getUserById(userId, token);
                     if (userData) {
                          setUser(userData);
-
+                         setAvatar(userData.avatar);
                          setValue('fullname', userData.fullname || '');
                          setValue('email', userData.email || '');
                          setValue('phoneNumber', formatPhoneNumber(userData.phone_number) || '');
-                         setValue('role_id', userData.role_id || '');
                     }
                } catch (error) {
                     Swal.fire({
@@ -58,32 +72,57 @@ export default function Update_profile() {
                }
           };
 
-          const fetchRoles = async () => {
-               try {
-                    const rolesData = await getAllRoles();
-                    setRoles(rolesData);
-               } catch (error) {
-                    console.error('Error fetching roles:', error);
-                    Swal.fire({
-                         icon: 'error',
-                         text: t('Failed to fetch roles.'),
-                         position: 'top-right',
-                         toast: true,
-                         timer: 3000,
-                         showConfirmButton: false,
-                    });
-               }
-          };
-
           fetchUserData();
-          fetchRoles();
-     }, [userId, setValue, t]);
+     }, [userId, token, setValue, t]);
 
-     const handleRoleChange = (selectedRoleId) => {
-          setUser((prevUser) => ({
-               ...prevUser,
-               role_id: selectedRoleId,
-          }));
+     const handleAvatarChange = (event) => {
+          const file = event.target.files[0];
+          if (file) {
+               const formData = new FormData();
+               formData.append('avatar', file);
+
+               updateAvatar(userId, formData, token)
+                    .then((response) => {
+                         if (response && response.data && response.data.avatar) {
+                              const avatarUrl = `${process.env.REACT_APP_BASE_URL}/avatar/${response.data.avatar}`;
+
+                              setAvatar(response.data.avatar);
+
+                              const imgElement = document.getElementById('uploadedAvatar');
+                              if (imgElement) {
+                                   imgElement.src = avatarUrl;
+                              }
+
+                              Swal.fire({
+                                   icon: 'success',
+                                   text: t('Avatar updated successfully!'),
+                                   position: 'top-right',
+                                   toast: true,
+                                   timer: 3000,
+                                   showConfirmButton: false,
+                              });
+                         } else {
+                              Swal.fire({
+                                   icon: 'success',
+                                   text: t('Avatar updated successfully!'),
+                                   position: 'top-right',
+                                   toast: true,
+                                   timer: 3000,
+                                   showConfirmButton: false,
+                              });
+                         }
+                    })
+                    .catch((error) => {
+                         Swal.fire({
+                              icon: 'error',
+                              text: t('Failed to update avatar.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
+                    });
+          }
      };
 
      const onSubmit = async (data) => {
@@ -92,10 +131,9 @@ export default function Update_profile() {
                     fullname: data.fullname,
                     email: data.email,
                     phone_number: data.phoneNumber,
-                    role_id: user.role_id,
                };
 
-               await updateUser(userId, updatedData);
+               await updateUser(userId, updatedData, token);
                Swal.fire({
                     icon: 'success',
                     text: t('User updated successfully!'),
@@ -143,10 +181,10 @@ export default function Update_profile() {
                                              <div className="nav-align-top">
                                                   <ul className="nav nav-pills flex-column flex-md-row mb-6 gap-2 gap-lg-0">
                                                        <li className="nav-item">
-                                                            <button className="nav-link active" type="button">
+                                                            <Link to="/taskmaneger/update_profile" className="nav-link active">
                                                                  <i className="ri-group-line me-1_5" />
-                                                                 Account
-                                                            </button>
+                                                                 {t('Account')}
+                                                            </Link>
                                                        </li>
                                                   </ul>
                                              </div>
@@ -154,11 +192,16 @@ export default function Update_profile() {
                                                   <div className="card-body">
                                                        <div className="d-flex align-items-start align-items-sm-center gap-6">
                                                             <img
-                                                                 src={`${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`}
+                                                                 src={
+                                                                      avatar
+                                                                           ? `${process.env.REACT_APP_BASE_URL}/avatar/${avatar}`
+                                                                           : '/default-avatar.png'
+                                                                 }
                                                                  alt={user.fullname || 'User Avatar'}
-                                                                 className="d-block w-px-100 h-px-100 rounded"
+                                                                 className="d-block w-px-200 h-px-200 rounded"
                                                                  id="uploadedAvatar"
                                                             />
+
                                                             <div className="button-wrapper">
                                                                  <label htmlFor="upload" className="btn btn-sm btn-primary me-3 mb-4" tabIndex={0}>
                                                                       <span className="d-none d-sm-block">Upload new photo</span>
@@ -169,80 +212,58 @@ export default function Update_profile() {
                                                                            className="account-file-input"
                                                                            hidden
                                                                            accept="image/png, image/jpeg"
+                                                                           onChange={handleAvatarChange}
                                                                       />
                                                                  </label>
-                                                                 <button
-                                                                      type="button"
-                                                                      className="btn btn-sm btn-outline-danger account-image-reset mb-1">
-                                                                      <i className="ri-refresh-line d-block d-sm-none" />
-                                                                      <span className="d-none d-sm-block">Reset</span>
-                                                                 </button>
                                                                  <div>Allowed JPG, GIF or PNG. Max size of 800K</div>
                                                             </div>
                                                        </div>
                                                   </div>
                                                   <div className="card-body pt-0">
                                                        <form id="formAccountSettings" method="POST" onSubmit={handleSubmit(onSubmit)}>
-                                                            <div className="row mt-1 g-5">
+                                                            <div className="row mt-4">
                                                                  <div className="col-md-6">
-                                                                      <div className="form-floating form-floating-outline">
+                                                                      <div className="mb-3">
+                                                                           <label className="form-label">{t('Fullname')}</label>
                                                                            <input
-                                                                                className="form-control"
+                                                                                {...register('fullname', { required: t('Fullname is required') })}
                                                                                 type="text"
-                                                                                name="fullname"
-                                                                                id="fullname"
-                                                                                {...register('fullname')}
+                                                                                className="form-control"
+                                                                                defaultValue={user.fullname}
                                                                            />
-                                                                           <label htmlFor="fullname">Full Name</label>
+                                                                           {errors.fullname && (
+                                                                                <div className="text-danger">{errors.fullname.message}</div>
+                                                                           )}
                                                                       </div>
                                                                  </div>
                                                                  <div className="col-md-6">
-                                                                      <div className="form-floating form-floating-outline">
+                                                                      <div className="mb-3">
+                                                                           <label className="form-label">{t('Email')}</label>
                                                                            <input
+                                                                                {...register('email', { required: t('Email is required') })}
+                                                                                type="email"
                                                                                 className="form-control"
-                                                                                type="text"
-                                                                                id="email"
-                                                                                name="email"
-                                                                                {...register('email')}
+                                                                                defaultValue={user.email}
+                                                                                disabled
                                                                            />
-                                                                           <label htmlFor="email">E-mail</label>
-                                                                      </div>
-                                                                 </div>
-                                                                 <div className="col-md-6">
-                                                                      <div className="form-floating form-floating-outline">
-                                                                           <input
-                                                                                type="text"
-                                                                                id="phoneNumber"
-                                                                                name="phoneNumber"
-                                                                                className="form-control"
-                                                                                {...register('phoneNumber')}
-                                                                           />
-                                                                           <label htmlFor="phoneNumber">Phone Number</label>
-                                                                      </div>
-                                                                 </div>
-                                                                 <div className="col-md-6">
-                                                                      <div className="form-floating form-floating-outline">
-                                                                           <select
-                                                                                className="form-control"
-                                                                                id="role_id"
-                                                                                name="role_id"
-                                                                                {...register('role_id', { required: true })}
-                                                                                value={user.role_id || ''}>
-                                                                                <option value="" disabled>
-                                                                                     Select role
-                                                                                </option>
-                                                                                {roles.map((role) => (
-                                                                                     <option key={role.id} value={role.id}>
-                                                                                          {role.name}
-                                                                                     </option>
-                                                                                ))}
-                                                                           </select>
-                                                                           <label htmlFor="role_id">Role</label>
+                                                                           {errors.email && <div className="text-danger">{errors.email.message}</div>}
                                                                       </div>
                                                                  </div>
                                                             </div>
-                                                            <button type="submit" className="btn btn-primary mt-4">
-                                                                 Save Changes
+                                                            <div className="mb-3">
+                                                                 <label className="form-label">{t('Phone number')}</label>
+                                                                 <input
+                                                                      {...register('phoneNumber', { required: t('Phone number is required') })}
+                                                                      type="text"
+                                                                      className="form-control"
+                                                                      defaultValue={user.phone_number}
+                                                                 />
+                                                                 {errors.phoneNumber && (
+                                                                      <div className="text-danger">{errors.phoneNumber.message}</div>
+                                                                 )}
+                                                            </div>
+                                                            <button type="submit" className="btn btn-primary">
+                                                                 {t('Save changes')}
                                                             </button>
                                                        </form>
                                                   </div>

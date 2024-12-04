@@ -11,6 +11,7 @@ const OtpPage = () => {
      const [resetMethod, setResetMethod] = useState('');
      const [contact, setContact] = useState('');
      const [otp, setOtp] = useState('');
+     const [loading, setLoading] = useState(false);
 
      const handleOtpChange = (e) => {
           const value = e.target.value;
@@ -29,6 +30,20 @@ const OtpPage = () => {
 
      const handleVerifyOtp = async (e) => {
           e.preventDefault();
+
+          if (otp.length !== 6) {
+               Swal.fire({
+                    icon: 'error',
+                    title: 'Mã OTP phải có 6 chữ số!',
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+               return;
+          }
+
+          setLoading(true);
 
           try {
                const response = await verifyResetCode(otp, contact, resetMethod);
@@ -67,6 +82,8 @@ const OtpPage = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
+          } finally {
+               setLoading(false);
           }
      };
 
@@ -103,8 +120,14 @@ const OtpPage = () => {
                                         <button
                                              type="submit"
                                              className="btn btn-primary btn-sm"
-                                             style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}>
-                                             Xác thực OTP
+                                             style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
+                                             disabled={loading}>
+                                             {' '}
+                                             {loading ? (
+                                                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                             ) : (
+                                                  'Xác thực OTP'
+                                             )}
                                         </button>
                                    </div>
                               </form>

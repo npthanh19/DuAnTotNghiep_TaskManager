@@ -200,7 +200,7 @@ const AddDepartmentForm = ({ projectId, onClose, onAddSuccess, onRemoveSuccess }
                                    </button>
                               </form>
 
-                              <h6 className="mt-3">{t('Added Departments')} :</h6>
+                              <h6 className="mt-3">{t('Departments Added')} :</h6>
                               <ul className="list-group">
                                    {addedDepartmentIds.map((id) => {
                                         const department = departments.find((dept) => dept.id === id);

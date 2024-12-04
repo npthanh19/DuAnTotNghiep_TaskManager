@@ -9,7 +9,6 @@ import { getAllUsers } from '../../../services/usersService';
 import { getAllDepartments } from '../../../services/deparmentsService';
 import Swal from 'sweetalert2';
 
-
 export const Add = () => {
      const { t } = useTranslation();
      const navigate = useNavigate();
@@ -70,13 +69,12 @@ export const Add = () => {
                await createProject(mappedData);
                Swal.fire({
                     icon: 'success',
-                    text: t('Project and department added successfully!'),
+                    text: t('Project added successfully!'),
                     position: 'top-right',
                     toast: true,
                     timer: 2000,
                     showConfirmButton: false,
                });
-               reset();
                setTimeout(() => {
                     navigate('/taskmaneger/projects');
                }, 1000);
@@ -167,18 +165,6 @@ export const Add = () => {
                                         className={`form-control form-control-sm ${errors.startDate ? 'is-invalid' : ''}`}
                                         {...register('startDate', {
                                              required: t('Start date is required!'),
-                                             validate: (value) => {
-                                                  const today = new Date();
-                                                  today.setHours(0, 0, 0, 0); // Xóa phần giờ, phút, giây
-                                                  const selectedDate = new Date(value);
-                                                  selectedDate.setHours(0, 0, 0, 0); // Xóa phần giờ, phút, giây của ngày được chọn
-                                              
-                                                  if (selectedDate < today) {
-                                                      return t('Start date must be today or later');
-                                                  }
-                                                  return true;
-                                              },
-                                              
                                         })}
                                    />
                                    {errors.startDate && <div className="invalid-feedback">{errors.startDate.message}</div>}
@@ -207,7 +193,7 @@ export const Add = () => {
                                    {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
                               </div>
                          </div>
-{/* 
+                         {/* 
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="projectManager" className="form-label">

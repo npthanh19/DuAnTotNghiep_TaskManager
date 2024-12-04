@@ -9,7 +9,6 @@ import { getDepartmentsByProjectId } from '../../../services/tasksService';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 
-
 export const Edit = () => {
      const { id } = useParams();
      const { t } = useTranslation();
@@ -63,7 +62,7 @@ export const Edit = () => {
                Swal.fire({
                     icon: 'error',
                     text: t('Failed to load departments.'),
-                    position: 'top-right',   
+                    position: 'top-right',
                     toast: true,
                     timer: 3000,
                     showConfirmButton: false,
@@ -135,7 +134,7 @@ export const Edit = () => {
                                         id="status"
                                         className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                                         {...register('status', { required: t('Status is required!') })}>
-                                        <option value="1">{t('To Do')}</option>
+                                        <option value="1">{t('Pending')}</option>
                                         <option value="2">{t('In Progress')}</option>
                                         <option value="3">{t('Preview')}</option>
                                         <option value="4">{t('Done')}</option>
@@ -144,17 +143,17 @@ export const Edit = () => {
                               </div>
                          </div>
                          <div className="col">
-                                   <label htmlFor="task_time" className="form-label">
-                                        {t('Task Time')}
-                                   </label>
-                                   <input
-                                        type="text"
-                                        id="task_time"
-                                        className={`form-control form-control-sm ${errors.task_time ? 'is-invalid' : ''}`}
-                                        {...register('task_time')}
-                                   />
-                                   {errors.task_time && <div className="invalid-feedback">{errors.task_time.message}</div>}
-                              </div>
+                              <label htmlFor="task_time" className="form-label">
+                                   {t('Task Time')}
+                              </label>
+                              <input
+                                   type="text"
+                                   id="task_time"
+                                   className={`form-control form-control-sm ${errors.task_time ? 'is-invalid' : ''}`}
+                                   {...register('task_time')}
+                              />
+                              {errors.task_time && <div className="invalid-feedback">{errors.task_time.message}</div>}
+                         </div>
 
                          <div className="mb-3">
                               <label htmlFor="description" className="form-label">
@@ -262,7 +261,6 @@ export const Edit = () => {
                          </button>
                     </form>
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
           </div>
      );
 };

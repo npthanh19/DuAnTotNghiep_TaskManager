@@ -29,7 +29,6 @@ export const View = () => {
      useEffect(() => {
           const fetchProjectsAndUsers = async () => {
                try {
-                    // Fetch all projects
                     const projectsData = await getAllProjects();
 
                     // Sắp xếp dự án theo `id` giảm dần
@@ -196,7 +195,9 @@ export const View = () => {
                                    <tr key={project.id}>
                                         <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{project.id}</td>
-                                        <td>{project.project_name}</td>
+                                        <td title={project.project_name}>
+                                             {project.project_name.length > 20 ? `${project.project_name.slice(0, 20)}...` : project.project_name}
+                                        </td>
                                         <td>{project.start_date}</td>
                                         <td>{project.end_date}</td>
                                         <td>

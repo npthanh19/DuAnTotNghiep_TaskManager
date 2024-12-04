@@ -147,7 +147,9 @@ export const View = () => {
                                                   className="d-inline-block text-truncate"
                                                   style={{ maxWidth: '150px' }}
                                                   title={getProjectName(assignment.project_id)}>
-                                                  {getProjectName(assignment.project_id).slice(0, 20)}...
+                                                  {getProjectName(assignment.project_id).length > 20
+                                                       ? `${getProjectName(assignment.project_id).slice(0, 20)}...`
+                                                       : getProjectName(assignment.project_id)}
                                              </span>
                                         </td>
                                         <td>
@@ -155,7 +157,9 @@ export const View = () => {
                                                   className="d-inline-block text-truncate"
                                                   style={{ maxWidth: '150px' }}
                                                   title={assignment.task_name}>
-                                                  {assignment.task_name.slice(0, 20)}...
+                                                  {assignment.task_name.length > 20
+                                                       ? `${assignment.task_name.slice(0, 20)}...`
+                                                       : assignment.task_name}
                                              </span>
                                         </td>
                                         <td>
@@ -163,7 +167,9 @@ export const View = () => {
                                                   className="d-inline-block text-truncate"
                                                   style={{ maxWidth: '150px' }}
                                                   title={assignment.department_name}>
-                                                  {assignment.department_name.slice(0, 20)}...
+                                                  {assignment.department_name.length > 20
+                                                       ? `${assignment.department_name.slice(0, 20)}...`
+                                                       : assignment.department_name}
                                              </span>
                                         </td>
                                         <td>
@@ -171,18 +177,21 @@ export const View = () => {
                                                   className="d-inline-block text-truncate"
                                                   style={{ maxWidth: '150px' }}
                                                   title={assignment.user_name}>
-                                                  {assignment.user_name.slice(0, 20)}...
+                                                  {assignment.user_name.length > 20
+                                                       ? `${assignment.user_name.slice(0, 20)}...`
+                                                       : assignment.user_name}
                                              </span>
                                         </td>
                                         <td>
                                              <span className="d-inline-block text-truncate" style={{ maxWidth: '150px' }} title={assignment.note}>
-                                                  {assignment.note.slice(0, 20)}...
+                                                  {assignment.note.length > 20 ? `${assignment.note.slice(0, 20)}...` : assignment.note}
                                              </span>
                                         </td>
+
                                         <td>
                                              {assignment.status === 'to do' && (
                                                   <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('To Do')}
+                                                       {t('Pending')}
                                                   </span>
                                              )}
                                              {assignment.status === 'in progress' && (

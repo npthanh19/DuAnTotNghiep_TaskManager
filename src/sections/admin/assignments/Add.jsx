@@ -96,8 +96,9 @@ export const Add = () => {
           if (departmentId) {
                try {
                     const response = await getUsersByDepartment(departmentId);
-                    if (Array.isArray(response.users)) {
-                         setUsers(response.users);
+                    if (response && Array.isArray(response)) {
+                         const confirmedUsers = response.filter((user) => user.confirmation_status === 'confirmed');
+                         setUsers(confirmedUsers);
                     } else {
                          setUsers([]);
                     }
@@ -239,7 +240,7 @@ export const Add = () => {
                                         {...register('status', { required: t('Status is required') })}
                                         onChange={(e) => setStatus(e.target.value)}>
                                         <option value="">{t('Select Status')}</option>
-                                        <option value="1">{t('To Do')}</option>
+                                        <option value="1">{t('Pending')}</option>
                                         <option value="2">{t('In Progress')}</option>
                                         <option value="3">{t('Preview')}</option>
                                         <option value="4">{t('Done')}</option>

@@ -157,7 +157,9 @@ export function View() {
                                                   className="d-inline-block text-truncate"
                                                   style={{ maxWidth: '500px' }}
                                                   title={department.department_name}>
-                                                  {department.department_name.slice(0, 100)}...
+                                                  {department.department_name.length > 100
+                                                       ? `${department.department_name.slice(0, 100)}...`
+                                                       : department.department_name}
                                              </span>
                                         </td>
                                         <td>
@@ -165,7 +167,9 @@ export function View() {
                                                   className="d-inline-block text-truncate"
                                                   style={{ maxWidth: '500px' }}
                                                   title={department.description}>
-                                                  {department.description.slice(0, 100)}...
+                                                  {department.description.length > 100
+                                                       ? `${department.description.slice(0, 100)}...`
+                                                       : department.description}
                                              </span>
                                         </td>
                                         <td>
