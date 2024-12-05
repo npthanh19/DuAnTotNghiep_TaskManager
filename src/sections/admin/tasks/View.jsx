@@ -168,6 +168,42 @@ export const View = () => {
           setCurrentPage(1);
      };
 
+     const handleDownloadFile = async (fileId, fileName) => {
+          try {
+               // Lấy token từ localStorage
+               const userData = JSON.parse(localStorage.getItem('user')); // Nếu dùng key 'user'
+               const token = userData ? userData.access_token : localStorage.getItem('token');
+
+               if (!token) throw new Error('No token found');
+
+               const fileUrl = `http://localhost:8000/api/files/${fileId}/download`;
+               const response = await fetch(fileUrl, {
+                    method: 'GET',
+                    headers: {
+                         Accept: 'application/json',
+                         Authorization: `Bearer ${token}`, // Truyền token
+                    },
+               });
+
+               if (!response.ok) {
+                    const error = await response.json();
+                    console.error('Chi tiết lỗi từ server:', error);
+                    throw new Error('Không thể tải file');
+               }
+
+               // Tải file xuống
+               const blob = await response.blob();
+               const fileUrlBlob = URL.createObjectURL(blob);
+               const link = document.createElement('a');
+               link.href = fileUrlBlob;
+               link.download = fileName;
+               link.click();
+               URL.revokeObjectURL(fileUrlBlob);
+          } catch (error) {
+               console.error('Lỗi khi tải file:', error);
+          }
+     };
+
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
@@ -318,17 +354,26 @@ export const View = () => {
                          <div className="modal-dialog">
                               <div className="modal-content">
                                    <div className="modal-header">
-                                        <h5 className="modal-title">Danh sách file</h5>
+                                        <h5 className="modal-title">{t('List of files')}</h5>
                                         <button type="button" className="btn-close" onClick={() => setShowFilePopup(false)}></button>
                                    </div>
                                    <div className="modal-body">
                                         {taskFiles.length > 0 ? (
                                              <ul className="list-group">
                                                   {taskFiles.map((file) => (
-                                                       <li key={file.id} className="list-group-item">
+                                                       <li
+                                                            key={file.id}
+                                                            className="list-group-item d-flex justify-content-between align-items-center">
                                                             <a href={file.url} target="_blank" rel="noopener noreferrer">
                                                                  {file.file_name}
                                                             </a>
+                                                            <button
+                                                                 className="btn btn-link"
+                                                                 onClick={() => handleDownloadFile(file.id, file.file_name)}>
+                                                                 {' '}
+                                                                 {/* Sử dụng file.id thay vì file.url */}
+                                                                 <i className="bi bi-file-earmark-arrow-down"></i>
+                                                            </button>
                                                        </li>
                                                   ))}
                                              </ul>
@@ -337,7 +382,7 @@ export const View = () => {
                                         )}
                                    </div>
                                    <div className="modal-footer">
-                                        <button type="button" className="btn btn-secondary" onClick={() => setShowFilePopup(false)}>
+                                        <button type="button" className="btn btn-secondary  mt-2" onClick={() => setShowFilePopup(false)}>
                                              {t('Close')}
                                         </button>
                                    </div>
