@@ -3,7 +3,9 @@ import Modal from 'react-bootstrap/Modal';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { createComment, deleteComment, getCommentsByTask, updateComment } from '../../../services/commentService';
+import { updateTaskStatus, getRunningTasks } from '../../../services/tasksService';
 import Swal from 'sweetalert2';
+import { getAllUsers, getUserById } from '../../../services/usersService';
 
 export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
      const [isClosing, setIsClosing] = useState(false);
@@ -11,13 +13,12 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
      const [comments, setComments] = useState([]);
      const [newComment, setNewComment] = useState('');
      const [editComment, setEditComment] = useState([]);
+     const [sprints, setSprints] = useState([]);
      const [avatarUrl] = useState('/assets/admin/img/avatars/1.png');
-     const [isCreatedFormVisible, setIsCreatedFormVisible] = useState(false);
 
-     // Sync editorData with selectedTask.description
      useEffect(() => {
           if (selectedTask) {
-               setEditorData(selectedTask?.description || ''); // Default to empty string if no description
+               setEditorData(selectedTask?.description || '');
                fetchComments(selectedTask.id);
           }
      }, [selectedTask]);
@@ -25,6 +26,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
      const handleCloseModal = () => {
           setIsClosing(true);
           setTimeout(() => {
+               // Đảm bảo trạng thái task đã được cập nhật trong UI
                setShowModal(false);
                setIsClosing(false);
           }, 300);
@@ -35,24 +37,47 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
           setEditorData(data);
      };
 
-     const handleStatusChange = (status) => {
-          console.log(`Status changed to: ${status}`);
-     };
-
      const fetchComments = async (taskId) => {
           try {
                const response = await getCommentsByTask(taskId);
-               console.log('response', response);
                setComments(response);
           } catch (error) {
                console.error('Error fetching comments:', error);
           }
      };
 
+     const handleStatusChange = async (status) => {
+          if (status === selectedTask.status) {
+               return;
+          }
+
+          let dataMapping;
+          if (status === 'to do') dataMapping = 1;
+          if (status === 'in progress') dataMapping = 2;
+          if (status === 'preview') dataMapping = 3;
+          if (status === 'done') dataMapping = 4;
+
+          try {
+               const updatedTask = await updateTaskStatus(selectedTask.id, dataMapping);
+               console.log(`Task updated successfully:`, updatedTask);
+               selectedTask.status = status;
+               setSprints((prevSprints) =>
+                    prevSprints.map((sprint) => ({
+                         ...sprint,
+                         tasks: sprint.tasks.map((task) => (task.id === selectedTask.id ? { ...task, status } : task)),
+                    })),
+               );
+               Swal.fire('Cập nhật trạng thái', `Task đã được chuyển sang trạng thái: ${status}`, 'success');
+          } catch (error) {
+               console.error(`Failed to update task status:`, error);
+               Swal.fire('Lỗi!', 'Có lỗi xảy ra khi cập nhật trạng thái task.', 'error');
+          }
+     };
+
      const handleAddComment = async () => {
           if (newComment.trim() !== '') {
                try {
-                    const comment = await createComment({
+                    await createComment({
                          comment: newComment,
                          task_id: selectedTask?.id,
                          avatar: avatarUrl,
@@ -67,7 +92,6 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
      };
 
      const handleDeleteComment = async (id) => {
-          // Hiển thị hộp thoại xác nhận sử dụng SweetAlert2
           Swal.fire({
                title: 'Bạn có chắc chắn không?',
                text: 'Bạn sẽ không thể hoàn tác hành động này!',
@@ -82,7 +106,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                          setComments((prev) => prev.filter((comment) => comment.id !== id));
                          Swal.fire('Đã xóa!', 'Bình luận của bạn đã được xóa.', 'success');
                     } catch (error) {
-                         console.error('Lỗi khi xóa bình luận:', error);
+                         console.error('Error deleting comment:', error);
                          Swal.fire('Lỗi!', 'Đã có sự cố xảy ra.', 'error');
                     }
                }
@@ -91,11 +115,11 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
 
      const handleEditComment = async (id, text) => {
           try {
-               const updatedComment = await updateComment(id, { comment: text });
+               await updateComment(id, { comment: text });
                setComments((prev) =>
                     prev.map((comment) => (comment.id === id ? { ...comment, comment: text, updated_at: new Date().toISOString() } : comment)),
                );
-               setEditComment(null); // Khi chỉnh sửa xong, thoát khỏi trạng thái edit
+               setEditComment(null);
           } catch (error) {
                console.error('Error updating comment:', error);
           }
@@ -127,10 +151,11 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                               ) : (
                                    <>
                                         <span className="me-auto">{comment.comment}</span>
-                                        <button onClick={() => setEditComment(comment)} className="btn btn-link btn-sm text-primary me-2">
+                                        <button onClick={() => setEditComment(comment)} className="btn btn-sm btn-primary me-2">
                                              Sửa
                                         </button>
-                                        <button onClick={() => handleDeleteComment(comment.id)} className="btn btn-link btn-sm text-danger">
+
+                                        <button onClick={() => handleDeleteComment(comment.id)} className="btn btn-sm btn-danger">
                                              Xóa
                                         </button>
                                    </>
@@ -210,16 +235,16 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                                   id="dropdownMenuButton"
                                                   data-bs-toggle="dropdown"
                                                   aria-expanded="false">
-                                                  Todo
+                                                  {selectedTask.status ? selectedTask.status : 'Todo'}
                                              </button>
                                              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                   <li>
-                                                       <a className="dropdown-item" onClick={() => handleStatusChange('todo')}>
-                                                            Todo
+                                                       <a className="dropdown-item" onClick={() => handleStatusChange('to do')}>
+                                                            To Do
                                                        </a>
                                                   </li>
                                                   <li>
-                                                       <a className="dropdown-item" onClick={() => handleStatusChange('in-progress')}>
+                                                       <a className="dropdown-item" onClick={() => handleStatusChange('in progress')}>
                                                             In Progress
                                                        </a>
                                                   </li>
@@ -259,49 +284,23 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                                   </td>
                                              </tr>
                                              <tr>
-                                                  <td>Labels</td>
-                                                  <td>None</td>
-                                             </tr>
-                                             <tr>
-                                                  <td>Parent</td>
-                                                  <td>None</td>
+                                                  <td>Project</td>
+                                                  <td>{selectedTask?.project_name || 'N/A'}</td>
                                              </tr>
                                              <tr>
                                                   <td>Sprint</td>
-                                                  <td>FE-0001</td>
+                                                  <td>{selectedTask?.worktime_id || 'N/A'}</td>
                                              </tr>
                                              <tr>
                                                   <td>Story Point Estimate</td>
-                                                  <td>None</td>
+                                                  <td>{selectedTask?.task_time || 'N/A'}</td>
                                              </tr>
                                              <tr>
-                                                  <td>Reporter</td>
-                                                  <td>
-                                                       <img
-                                                            src="/assets/admin/img/avatars/1.png"
-                                                            alt="Reporter"
-                                                            style={{ width: '25px', height: '25px', borderRadius: '50%' }}
-                                                       />
-                                                       Jane Smith
-                                                  </td>
+                                                  <td>Người tạo</td>
+                                                  <td>{selectedTask.user_name ? selectedTask.user_name : 'Không xác định'}</td>
                                              </tr>
                                         </tbody>
                                    </table>
-
-                                   <div className="mt-3 d-flex gap-2 flex-wrap">
-                                        <div className="d-flex flex-column me-3">
-                                             <p className="mb-0 small">
-                                                  <strong>Created:</strong> ...
-                                             </p>
-                                             <p className="mb-0 small">
-                                                  <strong>Updated:</strong> Just now
-                                             </p>
-                                        </div>
-                                        <div className="d-flex align-items-center">
-                                             <i className="bi bi-gear me-2 small" title="Settings"></i>
-                                             <span className="small">Configure</span>
-                                        </div>
-                                   </div>
                               </div>
                          </div>
                     )}
