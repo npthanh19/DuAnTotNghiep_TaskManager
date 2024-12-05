@@ -145,7 +145,7 @@ export default function Update_profile() {
                                                        <li className="nav-item">
                                                             <button className="nav-link active" type="button">
                                                                  <i className="ri-group-line me-1_5" />
-                                                                 Account
+                                                                 {t('Account')}
                                                             </button>
                                                        </li>
                                                   </ul>
@@ -161,7 +161,7 @@ export default function Update_profile() {
                                                             />
                                                             <div className="button-wrapper">
                                                                  <label htmlFor="upload" className="btn btn-sm btn-primary me-3 mb-4" tabIndex={0}>
-                                                                      <span className="d-none d-sm-block">Upload new photo</span>
+                                                                      <span className="d-none d-sm-block">{t('Upload new photo')}</span>
                                                                       <i className="ri-upload-2-line d-block d-sm-none" />
                                                                       <input
                                                                            type="file"
