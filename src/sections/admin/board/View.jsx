@@ -17,7 +17,7 @@ export const View = () => {
      const [data, setData] = useState({});
      const [showModal, setShowModal] = useState(false);
      const [selectedTask, setSelectedTask] = useState(null);
-
+     const [projects, setProjects] = useState([]);
      const [selectedUsers, setSelectedUsers] = useState([]);
      const [showDropdown, setShowDropdown] = useState(false);
 
@@ -32,7 +32,7 @@ export const View = () => {
           getDataTask();
 
           async function getDataTask() {
-               const [tasks, projects, worktimes, users] = await Promise.all([getRunningTasks(), getAllProjects(), getAllWorktimes(), getAllUsers()]);
+               const [tasks, fetchedProjects, worktimes, users] = await Promise.all([getRunningTasks(), getAllProjects(), getAllWorktimes(), getAllUsers()]);
                const projectMap = projects.reduce((acc, project) => {
                     acc[project.id] = project.project_name;
                     return acc;
@@ -46,6 +46,8 @@ export const View = () => {
                     acc[user.id] = user.fullname;
                     return acc;
                }, {});
+
+               setProjects(fetchedProjects);
                console.log('Running tasks data:', tasks);
                // Tạo các card từ dữ liệu tasks
                const cards = tasks.reduce((acc, task) => {
@@ -253,12 +255,13 @@ export const View = () => {
                               {/* Search */}
                               <input type="text" className="form-control form-control-sm me-3" placeholder="Search..." style={{ width: '150px' }} />
 
-                              {/* Dropdowns */}
-                              <select className="form-select form-select-sm me-3" aria-label="Epic Dropdown">
-                                   <option value="">Epic</option>
-                                   <option value="epic1">Topic 1</option>
-                                   <option value="epic2">Topic 2</option>
-                                   <option value="epic3">Topic 3</option>
+                              <select className="form-select form-select-sm me-3" aria-label="Select Project">
+                                   <option value="">Select Project</option>
+                                   {projects.map((project) => (
+                                        <option key={project.id} value={project.id}>
+                                             {project.project_name}
+                                        </option>
+                                   ))}
                               </select>
                          </div>
                     </div>
