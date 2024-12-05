@@ -13,8 +13,10 @@ const ResetPassword = () => {
      } = useForm();
      const [resetMethod, setResetMethod] = useState('email');
      const navigate = useNavigate();
+     const [loading, setLoading] = useState(false);
 
      const onSubmit = async (data) => {
+          setLoading(true);
           const value = resetMethod === 'email' ? data.email : data.phone_number;
           try {
                const response = await requestPasswordReset(value, resetMethod);
@@ -51,6 +53,8 @@ const ResetPassword = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
+          } finally {
+               setLoading(false);
           }
      };
 
@@ -174,8 +178,9 @@ const ResetPassword = () => {
                                         <button
                                              type="submit"
                                              className="btn btn-primary btn-sm"
-                                             style={{ paddingLeft: '5rem', paddingRight: '5rem' }}>
-                                             Lấy lại mật khẩu
+                                             style={{ paddingLeft: '5rem', paddingRight: '5rem' }}
+                                             disabled={loading}>
+                                             {loading ? 'Đang xử lý...' : 'Lấy lại mật khẩu'}
                                         </button>
                                    </div>
                               </form>

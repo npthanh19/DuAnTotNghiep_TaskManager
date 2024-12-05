@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { createTask } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getDepartmentsByProjectId } from '../../../services/tasksService';
@@ -75,7 +73,6 @@ export const Add = () => {
                     end_date: data.end_date,
                };
 
-               console.log('Payload to be sent:', payload);
                await createTask(payload);
                Swal.fire({
                     icon: 'success',
@@ -85,7 +82,6 @@ export const Add = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
-               reset();
                setTimeout(() => {
                     navigate('/taskmaneger/tasks');
                }, 1000);
@@ -121,20 +117,24 @@ export const Add = () => {
                                    />
                                    {errors.task_name && <div className="invalid-feedback">{errors.task_name.message}</div>}
                               </div>
-                              <div className="row mb-3">
-                                   <div className="col">
-                                        <label htmlFor="task_time" className="form-label">
-                                             {t('Task Time')}
-                                        </label>
-                                        <input
-                                             type="number"
-                                             step="0.1"
-                                             id="task_time"
-                                             className="form-control form-control-sm"
-                                             {...register('task_time')}
-                                             placeholder={t('Enter task time in hours')}
-                                        />
-                                   </div>
+
+                              <div className="col">
+                                   <label htmlFor="task_time" className="form-label">
+                                        {t('Task Time')}
+                                   </label>
+                                   <input
+                                        type="number"
+                                        step="0.1"
+                                        id="task_time"
+                                        className="form-control form-control-sm"
+                                        {...register('task_time')}
+                                        placeholder={t('Enter task time in hours')}
+                                        onKeyDown={(e) => {
+                                             if (e.key === '-' || e.key === 'ArrowDown') {
+                                                  e.preventDefault();
+                                             }
+                                        }}
+                                   />
                               </div>
 
                               <div className="col">
@@ -146,9 +146,9 @@ export const Add = () => {
                                         className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
                                         {...register('status', { required: t('Status is required!') })}>
                                         <option value="">{t('Select Status')}</option>
-                                        <option value="1">{t('To Do')}</option>
+                                        <option value="1">{t('Pending')}</option>
                                         <option value="2">{t('In Progress')}</option>
-                                        <option value="3">{t('Priview')}</option>
+                                        <option value="3">{t('Preview')}</option>
                                         <option value="4">{t('Done')}</option>
                                    </select>
 
@@ -240,7 +240,6 @@ export const Add = () => {
                          </button>
                     </form>
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
           </div>
      );
 };

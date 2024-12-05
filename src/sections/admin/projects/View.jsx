@@ -29,9 +29,11 @@ export const View = () => {
      useEffect(() => {
           const fetchProjectsAndUsers = async () => {
                try {
-                    // Fetch all projects
                     const projectsData = await getAllProjects();
-                    setProjects(projectsData);
+
+                    // Sắp xếp dự án theo `id` giảm dần
+                    const sortedProjects = projectsData.sort((a, b) => b.id - a.id);
+                    setProjects(sortedProjects);
 
                     // Lấy tất cả người dùng
                     const usersData = await getAllUsers(); // Gọi API lấy người dùng
@@ -42,7 +44,7 @@ export const View = () => {
                     setUsers(usersMap);
 
                     // Lấy thông tin người dùng cho các dự án
-                    const userIds = [...new Set(projectsData.map((project) => project.user_id))];
+                    const userIds = [...new Set(sortedProjects.map((project) => project.user_id))];
                     const userPromises = userIds.map((id) => getUserById(id));
                     const usersDataFromProjects = await Promise.all(userPromises);
                     const usersMapFromProjects = usersDataFromProjects.reduce((acc, user) => {
@@ -60,7 +62,22 @@ export const View = () => {
           fetchProjectsAndUsers();
      }, []);
 
-     const handleDeleteClick = (id) => {
+     const handleDeleteClick = (id, projectName, role) => {
+          const project = projects.find((p) => p.id === id);
+          if (!project) return;
+
+          if (role === 'Staff' && (project.status === 'in progress' || project.status === 'done')) {
+               Swal.fire({
+                    icon: 'error',
+                    text: t('You cannot delete a project that is in progress or completed.'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
+               return;
+          }
+
           const deleteTitle = t('Delete Project');
 
           Swal.fire({
@@ -80,7 +97,7 @@ export const View = () => {
 
                          Swal.fire({
                               icon: 'success',
-                              text: t('The projects has been moved to the trash!'),
+                              text: t('The project has been moved to the trash!'),
                               position: 'top-right',
                               toast: true,
                               timer: 3000,
@@ -163,7 +180,8 @@ export const View = () => {
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th className="col">ID</th>
+                                   <th className="col">STT</th>
+                                   <th className="col">{t('ID')}</th>
                                    <th className="col">{t('Project Name')}</th>
                                    <th className="col">{t('Start Date')}</th>
                                    <th className="col">{t('End Date')}</th>
@@ -173,31 +191,34 @@ export const View = () => {
                               </tr>
                          </thead>
                          <tbody>
-                              {currentProjects.map((project) => (
+                              {currentProjects.map((project, index) => (
                                    <tr key={project.id}>
+                                        <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{project.id}</td>
-                                        <td>{project.project_name}</td>
+                                        <td title={project.project_name}>
+                                             {project.project_name.length > 20 ? `${project.project_name.slice(0, 20)}...` : project.project_name}
+                                        </td>
                                         <td>{project.start_date}</td>
                                         <td>{project.end_date}</td>
                                         <td>
                                              {project.status === 'to do' && (
                                                   <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('To Do')}
+                                                       {t('Not yet implemented')}
                                                   </span>
                                              )}
                                              {project.status === 'in progress' && (
                                                   <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('In Progress')}
+                                                       {t('Ongoing')}
                                                   </span>
                                              )}
                                              {project.status === 'preview' && (
                                                   <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Preview')}
+                                                       {t('Complete')}
                                                   </span>
                                              )}
                                              {project.status === 'done' && (
                                                   <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Done')}
+                                                       {t('Destroy')}
                                                   </span>
                                              )}
                                         </td>

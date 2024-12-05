@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { deleteWorktime, getAllWorktimes, updateWorktime, updateWorktimeStatus } from '../../../services/worktimeService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getAllUsers } from '../../../services/usersService';
 import { DeleteWorktime } from './Delete';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import './worktime.css';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +18,7 @@ export const View = () => {
      const [error, setError] = useState(null);
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedWorktimeId, setSelectedWorktimeId] = useState(null);
-     const [editingWorktime, setEditingWorktime] = useState(null); // Trạng thái cho worktime đang chỉnh sửa
+     const [editingWorktime, setEditingWorktime] = useState(null);
 
      const [currentPage, setCurrentPage] = useState(1);
      const itemsPerPage = 9;
@@ -28,21 +26,8 @@ export const View = () => {
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
      const currentWorktimes = worktimes?.slice(indexOfFirstItem, indexOfLastItem);
-     const getStatusValue = (status) => {
-          switch (status) {
-               case 'not start':
-                    return 1;
-               case 'run':
-                    return 2;
-               case 'conplete':
-                    return 3;
-               default:
-                    return 0;
-          }
-     };
 
      const { t } = useTranslation();
-     const navigate = useNavigate();
 
      useEffect(() => {
           const fetchData = async () => {
@@ -51,12 +36,12 @@ export const View = () => {
                          getAllWorktimes(),
                          getAllProjects(),
                          getAllUsers(),
-                         getAllTasks(), // Fetch tasks data
+                         getAllTasks(),
                     ]);
                     setWorktimes(worktimeData);
                     setProjects(projectData);
                     setUsers(userData);
-                    setTasks(taskData); // Set tasks state
+                    setTasks(taskData);
                } catch (err) {
                     setError(err.message || 'Cannot retrieve data');
                } finally {
@@ -69,7 +54,6 @@ export const View = () => {
 
      const handleDeleteClick = (id) => {
           const deleteTitle = t('Delete Worktime');
-          // Check if there are any tasks associated with this worktime
           const tasksInWorktime = tasks.filter((task) => task.worktime_id === id);
 
           if (tasksInWorktime.length > 0) {
@@ -79,7 +63,7 @@ export const View = () => {
                     icon: 'error',
                     confirmButtonText: 'OK',
                });
-               return; // Prevent further execution if there are tasks
+               return;
           }
 
           Swal.fire({
@@ -121,7 +105,13 @@ export const View = () => {
 
      const handleDeleteSuccess = (id) => {
           setWorktimes((prevWorktimes) => prevWorktimes.filter((worktime) => worktime.id !== id));
-          toast.success('Successfully deleted the worktime!');
+          Swal.fire({
+               icon: 'success',
+               title: t('Delete Successful!'),
+               text: t('The worktime has been deleted successfully!'),
+               timer: 2000,
+               showConfirmButton: false,
+          });
      };
 
      const handleEdit = (worktime) => {
@@ -132,10 +122,24 @@ export const View = () => {
           try {
                await updateWorktime(editingWorktime.id, editingWorktime);
                setWorktimes((prevWorktimes) => prevWorktimes.map((worktime) => (worktime.id === editingWorktime.id ? editingWorktime : worktime)));
-               toast.success('Successfully updated the worktime!');
-               setEditingWorktime(null); // Đóng modal chỉnh sửa
+               Swal.fire({
+                    icon: 'success',
+                    title: t('Update Successful!'),
+                    text: t('The worktime has been updated successfully!'),
+                    position: 'top-right',
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
+               setEditingWorktime(null);
           } catch (err) {
-               toast.error('Failed to update the worktime!');
+               Swal.fire({
+                    icon: 'error',
+                    title: t('Update Failed!'),
+                    text: t('Failed to update the worktime. Please try again later!'),
+                    position: 'top-right',
+                    timer: 2000,
+                    showConfirmButton: false,
+               });
           }
      };
 
@@ -145,21 +149,20 @@ export const View = () => {
 
      const handleStart = async (worktime_id) => {
           Swal.fire({
-               title: 'Bạn có chắc muốn bắt đầu?',
+               title: t('Are you sure you want to start?'),
                icon: 'warning',
                showCancelButton: true,
-               confirmButtonText: 'Bắt đầu',
-               cancelButtonText: 'Hủy',
+               confirmButtonText: t('Start'),
+               cancelButtonText: t('Cancel'),
           }).then(async (result) => {
                if (result.isConfirmed) {
                     try {
                          await updateWorktimeStatus(worktime_id, 2);
-                         Swal.fire('Thành công!', 'Công việc đã được bắt đầu.', 'success');
+                         Swal.fire(t('Success!'), t('The worktime has been started.'), 'success');
                          const worktimeData = await getAllWorktimes();
-                         console.log(worktimeData);
                          setWorktimes(worktimeData);
                     } catch (error) {
-                         Swal.fire('Lỗi!', 'Không thể cập nhật trạng thái. Vui lòng thử lại.', 'error');
+                         Swal.fire(t('Error!'), t('Unable to update status. Please try again.'), 'error');
                     }
                }
           });
@@ -167,20 +170,20 @@ export const View = () => {
 
      const handleComplete = async (worktime_id) => {
           Swal.fire({
-               title: 'Bạn có chắc muốn hoàn thành?',
+               title: t('Are you sure you want to complete?'),
                icon: 'warning',
                showCancelButton: true,
-               confirmButtonText: 'Hoàn thành',
-               cancelButtonText: 'Hủy',
+               confirmButtonText: t('Complete'),
+               cancelButtonText: t('Cancel'),
           }).then(async (result) => {
                if (result.isConfirmed) {
                     try {
                          await updateWorktimeStatus(worktime_id, 3);
-                         Swal.fire('Thành công!', 'Công việc đã được hoàn thành.', 'success');
+                         Swal.fire(t('Success!'), t('The worktime has been completed.'), 'success');
                          const worktimeData = await getAllWorktimes();
                          setWorktimes(worktimeData);
                     } catch (error) {
-                         Swal.fire('Lỗi!', 'Không thể cập nhật trạng thái. Vui lòng thử lại.', 'error');
+                         Swal.fire(t('Error!'), t('Unable to update status. Please try again.'), 'error');
                     }
                }
           });
@@ -349,11 +352,10 @@ export const View = () => {
                     {editingWorktime && (
                          <div className="d-flex justify-content-end mt-3">
                               <button className="btn btn-success" onClick={handleUpdate}>
-                                   Save Changes
+                                   {t('Save')}
                               </button>
                          </div>
                     )}
-                    <ToastContainer />
                     {showDeleteModal && (
                          <DeleteWorktime
                               show={showDeleteModal}

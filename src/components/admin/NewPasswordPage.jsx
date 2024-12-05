@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 
 const NewPasswordPage = () => {
      const navigate = useNavigate();
+     const [loading, setLoading] = useState(false);
 
      const {
           register,
@@ -17,6 +18,8 @@ const NewPasswordPage = () => {
 
      const onSubmit = async (data) => {
           try {
+               setLoading(true);
+
                const emailOrPhone = sessionStorage.getItem('email_or_phone');
 
                if (!emailOrPhone) {
@@ -28,6 +31,7 @@ const NewPasswordPage = () => {
                          timer: 2000,
                          showConfirmButton: false,
                     });
+                    setLoading(false);
                     return;
                }
 
@@ -41,7 +45,7 @@ const NewPasswordPage = () => {
                if (response && response.status === 200) {
                     Swal.fire({
                          icon: 'success',
-                         title: response.data?.message || 'Mật khẩu đã được thay đổi thành công!',
+                         title: 'Mật khẩu đã được thay đổi thành công!',
                          position: 'top-right',
                          toast: true,
                          timer: 2000,
@@ -53,7 +57,7 @@ const NewPasswordPage = () => {
                     console.log('Unexpected response:', response);
                     Swal.fire({
                          icon: 'error',
-                         title: response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại!',
+                         title: 'Có lỗi xảy ra, vui lòng thử lại!',
                          position: 'top-right',
                          toast: true,
                          timer: 2000,
@@ -70,6 +74,8 @@ const NewPasswordPage = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
+          } finally {
+               setLoading(false);
           }
      };
 
@@ -106,8 +112,8 @@ const NewPasswordPage = () => {
                                    </div>
 
                                    <div className="text-center mt-4 pt-2">
-                                        <button type="submit" className="btn btn-primary btn-sm">
-                                             Cập nhật mật khẩu
+                                        <button type="submit" className="btn btn-primary btn-sm" disabled={loading}>
+                                             {loading ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
                                         </button>
                                    </div>
                               </form>

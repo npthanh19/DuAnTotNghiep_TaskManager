@@ -82,60 +82,59 @@ export const getDepartmentsByProjectId = async (projectId) => {
 // Lấy các task chưa có WorkTime
 export const getTaskWithoutWorktime = async () => {
      try {
-         const response = await axiosi.get(`${taskApiEndpoint}/without-worktime`);
-         return response.data;
+          const response = await axiosi.get(`${taskApiEndpoint}/without-worktime`);
+          return response.data;
      } catch (error) {
-         console.error('Error fetching tasks without WorkTime:', error);
-         throw error.response ? error.response.data : new Error('Network error');
+          console.error('Error fetching tasks without WorkTime:', error);
+          throw error.response ? error.response.data : new Error('Network error');
      }
- };
- //viết thêm update worktime_id, đang bị lỗi kh cập nhật được vị trí của worktime_id
- // Cập nhật vị trí của một task
- export const updateLocationTask = async (taskId, locationData) => {
+};
+//viết thêm update worktime_id, đang bị lỗi kh cập nhật được vị trí của worktime_id
+// Cập nhật vị trí của một task
+export const updateLocationTask = async (taskId, locationData) => {
      try {
-         const response = await axiosi.post(`${taskApiEndpoint}/${taskId}/update-location`, locationData);
-         return response.data;
+          const response = await axiosi.post(`${taskApiEndpoint}/${taskId}/update-location`, locationData);
+          return response.data;
      } catch (error) {
-         console.error(`Error updating location for task ID ${taskId}:`, error);
-         throw error.response ? error.response.data : new Error('Network error');
+          console.error(`Error updating location for task ID ${taskId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
      }
- };
- 
- 
- // Di chuyển các task sang WorkTime khác
- export const moveTasksToAnotherWorktime = async (taskIds, newWorktimeId) => {
+};
+
+// Di chuyển các task sang WorkTime khác
+export const moveTasksToAnotherWorktime = async (taskIds, newWorktimeId) => {
      try {
-         const response = await axiosi.post(`${taskApiEndpoint}/move-to-worktime`, { taskIds, newWorktimeId });
-         return response.data;
+          const response = await axiosi.post(`${taskApiEndpoint}/move-to-worktime`, { taskIds, newWorktimeId });
+          return response.data;
      } catch (error) {
-         console.error('Error moving tasks to another WorkTime:', error);
-         throw error.response ? error.response.data : new Error('Network error');
+          console.error('Error moving tasks to another WorkTime:', error);
+          throw error.response ? error.response.data : new Error('Network error');
      }
- };
- //kh có workTimeId thì trả về 
- export const getTasksByWorktimeId = async (worktimeId) => {
+};
+//kh có workTimeId thì trả về
+export const getTasksByWorktimeId = async (worktimeId) => {
      try {
-         const response = await axiosi.get(`${taskApiEndpoint}/worktimes/${worktimeId}`);
-         return response.data;
+          const response = await axiosi.get(`${taskApiEndpoint}/worktimes/${worktimeId}`);
+          return response.data;
      } catch (error) {
-         console.error(`Error fetching tasks for WorkTime ID ${worktimeId}:`, error);
-         throw error.response ? error.response.data : new Error('Network error');
+          console.error(`Error fetching tasks for WorkTime ID ${worktimeId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
      }
- };
- // Cập nhật worktime_id cho một task
+};
+// Cập nhật worktime_id cho một task
 export const updateWorktimeTask = async (taskId, worktimeId) => {
      try {
-         const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/worktime`, {
-             worktime_id: worktimeId, // Giá trị worktime_id (có thể null)
-         });
-         return response.data;
+          const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/worktime`, {
+               worktime_id: worktimeId, // Giá trị worktime_id (có thể null)
+          });
+          return response.data;
      } catch (error) {
-         console.error(`Error updating WorkTime ID for task ID ${taskId}:`, error);
-         throw error.response ? error.response.data : new Error('Network error');
+          console.error(`Error updating WorkTime ID for task ID ${taskId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
      }
- };
- 
- export const forceDeleteTask = async (id) => {
+};
+
+export const forceDeleteTask = async (id) => {
      try {
           const response = await axiosi.delete(`${taskApiEndpoint}/${id}/force`);
           return response.data;
@@ -167,46 +166,66 @@ export const restoreTask = async (id) => {
 // Cập nhật trạng thái task
 export const updateTaskStatus = async (taskId, status) => {
      try {
-         const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/status`, { status });
-         return response.data;
+          const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/status`, { status });
+          return response.data;
      } catch (error) {
-         console.error(`Error updating status for task ID ${taskId}:`, error);
-         throw error.response ? error.response.data : new Error('Network error');
+          console.error(`Error updating status for task ID ${taskId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
      }
- };
- 
+};
+
 // services/tasksService.js
 export const getProjectIdFromTask = async (taskId) => {
      try {
-         const tasks = await getAllTasks(); // Lấy tất cả tasks
-         const worktimes = await getAllWorktimes(); // Lấy tất cả worktimes
-         const task = tasks.find((t) => t.id === taskId); // Tìm task theo id
- 
-         if (task?.worktime_id) {
-             const worktime = worktimes.find((w) => w.id === task.worktime_id); // Tìm worktime
-             return worktime?.project_id; // Trả về project_id
-         }
-         return null; // Task không liên kết worktime
+          const tasks = await getAllTasks(); // Lấy tất cả tasks
+          const worktimes = await getAllWorktimes(); // Lấy tất cả worktimes
+          const task = tasks.find((t) => t.id === taskId); // Tìm task theo id
+
+          if (task?.worktime_id) {
+               const worktime = worktimes.find((w) => w.id === task.worktime_id); // Tìm worktime
+               return worktime?.project_id; // Trả về project_id
+          }
+          return null; // Task không liên kết worktime
      } catch (error) {
-         console.error('Error getting project ID from task:', error);
-         return null;
+          console.error('Error getting project ID from task:', error);
+          return null;
      }
- };
- // Cập nhật thời gian của một task
+};
+// Cập nhật thời gian của một task
 export const updateTaskTime = async (taskId, taskTime) => {
      try {
-         const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/tasktime`, {
-             task_time: taskTime, // Dữ liệu thời gian công việc cần cập nhật
-         });
+          const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/tasktime`, {
+               task_time: taskTime,
+          });
+          return response.data;
+     } catch (error) {
+          console.error(`Error updating task time for task ID ${taskId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+export const getTasksByProject = async (projectId) => {
+     try {
+          const response = await axiosi.get(`${taskApiEndpoint}/by-project/${projectId}`);
+          return response.data;
+     } catch (error) {
+          console.error('Error fetching tasks:', error);
+          return [];
+     }
+};
+export const getRunningTasks = async (id) => {
+     try {
+         const response = await axiosi.get(`/api/tasks/by-running/${id}`);
          return response.data;
      } catch (error) {
-         console.error(`Error updating task time for task ID ${taskId}:`, error);
+         console.error('Error fetching tasks from running worktimes:', error);
          throw error.response ? error.response.data : new Error('Network error');
      }
  };
  
  
- export default {
+ 
+export default {
      getAllTasks,
      getTaskById,
      createTask,
@@ -220,4 +239,5 @@ export const updateTaskTime = async (taskId, taskTime) => {
      getTasksByWorktimeId,
      updateWorktimeTask,
      restoreTask,
- };
+     getRunningTasks,
+};

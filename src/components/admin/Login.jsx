@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import './Login.css';
@@ -9,6 +9,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
+     const [loading, setLoading] = useState(false);
      const {
           register,
           handleSubmit,
@@ -18,11 +19,14 @@ const Login = () => {
      const navigate = useNavigate();
 
      const onSubmit = async (data) => {
+          setLoading(true);
           try {
                const response = await login(data.email, data.password);
                if (response && response.access_token) {
                     localStorage.setItem('isAuthenticated', 'true');
                     localStorage.setItem('token', response.access_token);
+                    localStorage.setItem('role', response.role);
+                    localStorage.setItem('user_id', response.user_id);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
 
                     Swal.fire({
@@ -35,7 +39,11 @@ const Login = () => {
                     });
 
                     setTimeout(() => {
-                         navigate('/taskmaneger');
+                         if (response.role === 'Admin' || response.role === 'Manager') {
+                              navigate('/taskmaneger');
+                         } else {
+                              navigate('/taskmaneger/departments');
+                         }
                     }, 1000);
                }
           } catch (error) {
@@ -47,10 +55,13 @@ const Login = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
+          } finally {
+               setLoading(false);
           }
      };
 
      const handleGGLogin = async (credentialResponse) => {
+          setLoading(true);
           try {
                const token = credentialResponse.credential;
                const decoded = jwtDecode(token);
@@ -79,6 +90,8 @@ const Login = () => {
                } else if (response.data.status === 'verified') {
                     localStorage.setItem('isAuthenticated', 'true');
                     localStorage.setItem('token', response.data.access_token);
+                    localStorage.setItem('role', response.data.role);
+                    localStorage.setItem('user_id', response.user_id);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
                     Swal.fire({
@@ -89,7 +102,11 @@ const Login = () => {
                          timer: 3000,
                          showConfirmButton: false,
                     }).then(() => {
-                         navigate('/taskmaneger');
+                         if (response.data.role === 'Admin' || response.data.role === 'Manager') {
+                              navigate('/taskmaneger');
+                         } else {
+                              navigate('/taskmaneger/departments');
+                         }
                     });
                }
           } catch (error) {
@@ -101,6 +118,8 @@ const Login = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
+          } finally {
+               setLoading(false);
           }
      };
 
@@ -170,7 +189,6 @@ const Login = () => {
                                         {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                                    </div>
 
-                                   {/* Forgot Password Link */}
                                    <div className="d-flex justify-content-between">
                                         <Link
                                              to="/taskmaneger/reset-password"
@@ -180,14 +198,12 @@ const Login = () => {
                                         </Link>
                                    </div>
 
-                                   {/* Submit Button */}
                                    <div className="text-center text-lg-start pt-2 d-flex justify-content-center">
-                                        <button type="submit" className="btn btn-primary btn-lg w-100">
-                                             Đăng nhập
+                                        <button type="submit" className="btn btn-primary btn-lg w-100" disabled={loading}>
+                                             {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                                         </button>
                                    </div>
 
-                                   {/* Register Link */}
                                    <div className="text-center mt-2">
                                         <p className="small fw-bold mb-0">
                                              Bạn không có tài khoản?{' '}
@@ -198,12 +214,10 @@ const Login = () => {
                                    </div>
                               </form>
 
-                              {/* Divider */}
                               <div className="divider d-flex align-items-center my-4">
                                    <p className="text-center fw-bold mx-3 mb-0">Hoặc</p>
                               </div>
 
-                              {/* Google Login Button */}
                               <div className="d-flex justify-content-center my-4">
                                    <GoogleLogin
                                         onSuccess={handleGGLogin}
@@ -213,7 +227,7 @@ const Login = () => {
                                                   type="button"
                                                   className="btn btn-lg btn-outline-danger social-btn google-btn w-100 d-flex align-items-center justify-content-center"
                                                   onClick={renderProps.onClick}
-                                                  disabled={renderProps.disabled}>
+                                                  disabled={renderProps.disabled || loading}>
                                                   <i className="bi bi-google me-2"></i>
                                                   Đăng nhập với Google
                                              </button>

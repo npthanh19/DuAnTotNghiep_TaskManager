@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { createAssignment } from '../../../services/assignmentService';
-import { getAllTasks } from '../../../services/tasksService';
-import { getDepartmentsByTask } from '../../../services/assignmentService';
-import { getUsersByDepartment } from '../../../services/assignmentService';
+import { getAllProjects } from '../../../services/projectsService';
+import { getTasksByProject } from '../../../services/tasksService';
+import { getDepartmentsByProjectId } from '../../../services/tasksService'; // Dịch vụ lấy phòng ban theo dự án
+import { getUsersByDepartment } from '../../../services/assignmentService'; // Dịch vụ lấy người dùng theo phòng ban
 
 export const Add = () => {
      const { t } = useTranslation();
@@ -18,18 +19,20 @@ export const Add = () => {
           reset,
      } = useForm();
 
-     const [users, setUsers] = useState([]);
+     const [projects, setProjects] = useState([]);
      const [tasks, setTasks] = useState([]);
      const [departments, setDepartments] = useState([]);
-     const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+     const [users, setUsers] = useState([]);
+     const [selectedProjectId, setSelectedProjectId] = useState(null);
      const [selectedTaskId, setSelectedTaskId] = useState(null);
+     const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
      const [status, setStatus] = useState(1);
 
      useEffect(() => {
           const fetchData = async () => {
                try {
-                    const tasksData = await getAllTasks();
-                    setTasks(tasksData);
+                    const projectsData = await getAllProjects();
+                    setProjects(projectsData);
                } catch (error) {
                     console.error('Failed:', error);
                }
@@ -38,13 +41,38 @@ export const Add = () => {
           fetchData();
      }, []);
 
+     const handleProjectChange = async (e) => {
+          const projectId = e.target.value;
+          setSelectedProjectId(projectId);
+
+          if (projectId) {
+               try {
+                    const response = await getTasksByProject(projectId);
+                    if (Array.isArray(response.tasks)) {
+                         setTasks(response.tasks);
+                    } else {
+                         setTasks([]);
+                    }
+                    setSelectedTaskId(null);
+                    setDepartments([]);
+                    setUsers([]);
+               } catch (error) {
+                    setTasks([]);
+               }
+          } else {
+               setTasks([]);
+               setDepartments([]);
+               setUsers([]);
+          }
+     };
+
      const handleTaskChange = async (e) => {
           const taskId = e.target.value;
           setSelectedTaskId(taskId);
 
           if (taskId) {
                try {
-                    const response = await getDepartmentsByTask(taskId);
+                    const response = await getDepartmentsByProjectId(selectedProjectId);
                     if (Array.isArray(response.departments)) {
                          setDepartments(response.departments);
                     } else {
@@ -68,8 +96,9 @@ export const Add = () => {
           if (departmentId) {
                try {
                     const response = await getUsersByDepartment(departmentId);
-                    if (Array.isArray(response.users)) {
-                         setUsers(response.users);
+                    if (response && Array.isArray(response)) {
+                         const confirmedUsers = response.filter((user) => user.confirmation_status === 'confirmed');
+                         setUsers(confirmedUsers);
                     } else {
                          setUsers([]);
                     }
@@ -87,6 +116,7 @@ export const Add = () => {
                task_id: data.taskId,
                user_ids: [data.userId],
                department_id: selectedDepartmentId,
+               project_id: data.projectId,
                status: data.status,
                note: data.note,
           };
@@ -101,10 +131,7 @@ export const Add = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
-               reset();
-               setTimeout(() => {
-                    navigate('/taskmaneger/assignments');
-               }, 1500);
+               navigate('/taskmaneger/assignments');
           } catch (error) {
                Swal.fire({
                     icon: 'error',
@@ -123,6 +150,27 @@ export const Add = () => {
                </div>
                <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
+                         <div className="row mb-3">
+                              <div className="col">
+                                   <label htmlFor="projectId" className="form-label">
+                                        {t('Project Name')}
+                                   </label>
+                                   <select
+                                        id="projectId"
+                                        className={`form-select form-select-sm ${errors.projectId ? 'is-invalid' : ''}`}
+                                        {...register('projectId', { required: t('Project is required') })}
+                                        onChange={handleProjectChange}>
+                                        <option value="">{t('Select Project')}</option>
+                                        {projects.map((project) => (
+                                             <option key={project.id} value={project.id}>
+                                                  {project.project_name}
+                                             </option>
+                                        ))}
+                                   </select>
+                                   {errors.projectId && <div className="invalid-feedback">{errors.projectId.message}</div>}
+                              </div>
+                         </div>
+
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="taskId" className="form-label">
@@ -162,6 +210,7 @@ export const Add = () => {
                                    {errors.departmentId && <div className="invalid-feedback">{errors.departmentId.message}</div>}
                               </div>
                          </div>
+
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="userId" className="form-label">
@@ -191,7 +240,7 @@ export const Add = () => {
                                         {...register('status', { required: t('Status is required') })}
                                         onChange={(e) => setStatus(e.target.value)}>
                                         <option value="">{t('Select Status')}</option>
-                                        <option value="1">{t('To Do')}</option>
+                                        <option value="1">{t('Pending')}</option>
                                         <option value="2">{t('In Progress')}</option>
                                         <option value="3">{t('Preview')}</option>
                                         <option value="4">{t('Done')}</option>
@@ -199,20 +248,13 @@ export const Add = () => {
                                    {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
                               </div>
                          </div>
+
                          <div className="row mb-3">
                               <div className="col">
                                    <label htmlFor="note" className="form-label">
                                         {t('Note')}
                                    </label>
-                                   <textarea
-                                        id="note"
-                                        className={`form-control form-control-sm ${errors.note ? 'is-invalid' : ''}`}
-                                        rows="3"
-                                        {...register('note', {
-                                             required: t('Note is required'),
-                                             maxLength: { value: 500, message: t('Note must be less than 500 characters') },
-                                        })}></textarea>
-                                   {errors.note && <div className="invalid-feedback">{errors.note.message}</div>}
+                                   <textarea id="note" className="form-control" rows="4" {...register('note')} />
                               </div>
                          </div>
 

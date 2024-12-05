@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getDepartmentById, updateDepartment } from '../../../services/deparmentsService';
 import Swal from 'sweetalert2';
-
 
 export const Edit = () => {
      const { id } = useParams();
@@ -27,7 +25,7 @@ export const Edit = () => {
                     setDepartment(fetchedDepartment);
                     reset(fetchedDepartment);
                } catch (error) {
-                    toast.error(t('Failed.'));
+                    console.error('Error fetching department:', error);
                }
           };
           fetchDepartment();
@@ -44,7 +42,6 @@ export const Edit = () => {
                     timer: 2000,
                     showConfirmButton: false,
                });
-               reset();
                setTimeout(() => {
                     navigate('/taskmaneger/departments');
                }, 1000);
@@ -54,6 +51,10 @@ export const Edit = () => {
                     icon: 'error',
                     title: t('Edit Failed!'),
                     text: t('Something went wrong'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 2000,
+                    showConfirmButton: false,
                });
           }
      };
@@ -105,7 +106,6 @@ export const Edit = () => {
                          </button>
                     </form>
                </div>
-               <ToastContainer position="top-right" autoClose={2000} />
           </div>
      );
 };

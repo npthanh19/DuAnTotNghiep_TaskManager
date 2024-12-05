@@ -6,6 +6,7 @@ import { resendVerificationCode } from '../../services/authService';
 function ConfirmEmail() {
      const navigate = useNavigate();
      const [email, setEmail] = useState('');
+     const [loading, setLoading] = useState(false);
 
      useEffect(() => {
           const storedEmail = sessionStorage.getItem('user_email');
@@ -43,6 +44,8 @@ function ConfirmEmail() {
                return;
           }
 
+          setLoading(true);
+
           try {
                const response = await resendVerificationCode(email);
 
@@ -74,6 +77,8 @@ function ConfirmEmail() {
                     timer: 3000,
                     showConfirmButton: false,
                });
+          } finally {
+               setLoading(false);
           }
      };
 
@@ -98,7 +103,7 @@ function ConfirmEmail() {
                                    <p>Nếu bạn không nhận được email, vui lòng kiểm tra hộp thư rác.</p>
                                    <div className="text-center pt-2">
                                         <Link to="#" className="link-danger" onClick={handleResendEmail}>
-                                             Gửi lại email xác nhận
+                                             {loading ? 'Đang gửi lại email...' : 'Gửi lại email xác nhận'}
                                         </Link>
                                    </div>
                               </div>

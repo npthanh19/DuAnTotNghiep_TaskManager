@@ -114,7 +114,7 @@ function Register() {
                                         />
                                         {errors.fullname && <p className="text-danger">{errors.fullname.message}</p>}
                                    </div>
-                                   <div data-mdb-input-init className="form-outline ">
+                                   <div data-mdb-input-init className="form-outline">
                                         <label className="form-label" htmlFor="form3Example2">
                                              Địa chỉ Email
                                         </label>
@@ -126,7 +126,7 @@ function Register() {
                                         />
                                         {errors.email && <p className="text-danger">{errors.email.message}</p>}
                                    </div>
-                                   <div data-mdb-input-init className="form-outline ">
+                                   <div data-mdb-input-init className="form-outline">
                                         <label className="form-label" htmlFor="form3Example3">
                                              Mật khẩu
                                         </label>
@@ -172,12 +172,11 @@ function Register() {
                                         </div>
                                    </div>
                                    <div className="text-center text-lg-start pt-2 d-flex justify-content-center">
-                                        <button type="submit" className="btn btn-secondary btn-sm w-100 " disabled={loading}>
+                                        <button type="submit" className="btn btn-secondary btn-sm w-100" disabled={loading}>
                                              {loading ? 'Đang đăng ký...' : 'Đăng ký '}
                                         </button>
                                    </div>
                                    <div className="text-center text-lg-start pt-2">
-                                        {' '}
                                         <p className="small fw-bold pt-1 mb-0">
                                              Đã có tài khoản?{' '}
                                              <Link to="/taskmaneger/login" className="link-danger">
