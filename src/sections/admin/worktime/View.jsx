@@ -58,10 +58,10 @@ export const View = () => {
 
           if (tasksInWorktime.length > 0) {
                Swal.fire({
-                    title: 'Cannot delete worktime',
-                    text: 'This worktime contains tasks. Please delete the tasks first.',
+                    title: t('Cannot delete worktime'),
+                    text: t('This worktime contains tasks. Please delete the tasks first.'),
                     icon: 'error',
-                    confirmButtonText: 'OK',
+                    confirmButtonText: t('OK'),
                });
                return;
           }
@@ -259,10 +259,10 @@ export const View = () => {
                                                   ) : project ? (
                                                        project.project_name
                                                   ) : (
-                                                       'Unknown Project'
+                                                       '-'
                                                   )}
                                              </td>
-                                             <td>{user ? user.fullname : 'Unknown User'}</td>
+                                             <td>{user ? user.fullname : '-'}</td>
                                              <td>
                                                   {editingWorktime && editingWorktime.id === worktime.id ? (
                                                        <input
@@ -295,13 +295,13 @@ export const View = () => {
                                                             <li>
                                                                  {worktime?.status === 'not start' ? (
                                                                       <button onClick={() => handleStart(worktime?.id)} className="btn btn-primary">
-                                                                           Bắt đầu
+                                                                           {t('Starts')}
                                                                       </button>
                                                                  ) : (
                                                                       <button
                                                                            onClick={() => handleComplete(worktime?.id)}
                                                                            className="btn btn-success">
-                                                                           Hoàn thành
+                                                                           {t('Done')}
                                                                       </button>
                                                                  )}
                                                             </li>

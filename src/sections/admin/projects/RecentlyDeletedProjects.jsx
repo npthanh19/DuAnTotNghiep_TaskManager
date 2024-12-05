@@ -74,7 +74,7 @@ function RecentlyDeletedProjects() {
 
      const handleDeletePermanently = async (id) => {
           const result = await Swal.fire({
-               title: t('Delete project'),
+               title: t('Delete Project'),
                text: t('Are you sure you want to permanently delete this project?'),
                icon: 'warning',
                showCancelButton: true,

@@ -6,6 +6,7 @@ import { TaskDetail } from './TaskDetail';
 import { getAllProjects } from '../../../services/projectsService';
 import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllUsers } from '../../../services/usersService';
+import { useTranslation } from 'react-i18next';
 
 const users = [
      { id: 1, name: 'User 1', avatar: '/assets/admin/img/avatars/1.png' },
@@ -20,6 +21,7 @@ export const View = () => {
      const [projects, setProjects] = useState([]);
      const [selectedUsers, setSelectedUsers] = useState([]);
      const [showDropdown, setShowDropdown] = useState(false);
+     const { t } = useTranslation();
 
      const COLUMN_STATUS_MAP = {
           'to do': 1,
@@ -32,7 +34,12 @@ export const View = () => {
           getDataTask();
 
           async function getDataTask() {
-               const [tasks, fetchedProjects, worktimes, users] = await Promise.all([getRunningTasks(), getAllProjects(), getAllWorktimes(), getAllUsers()]);
+               const [tasks, fetchedProjects, worktimes, users] = await Promise.all([
+                    getRunningTasks(),
+                    getAllProjects(),
+                    getAllWorktimes(),
+                    getAllUsers(),
+               ]);
                const projectMap = projects.reduce((acc, project) => {
                     acc[project.id] = project.project_name;
                     return acc;
@@ -82,10 +89,10 @@ export const View = () => {
 
                // Cập nhật columns với cardIds tương ứng
                const updatedColumns = {
-                    'column-1': { id: 'column-1', title: 'To Do', cardIds: groupedCards['column-1'] },
-                    'column-2': { id: 'column-2', title: 'In Progress', cardIds: groupedCards['column-2'] },
-                    'column-3': { id: 'column-3', title: 'Preview', cardIds: groupedCards['column-3'] },
-                    'column-4': { id: 'column-4', title: 'Done', cardIds: groupedCards['column-4'] },
+                    'column-1': { id: 'column-1', title: t('To Do'), cardIds: groupedCards['column-1'] },
+                    'column-2': { id: 'column-2', title: t('In Progress'), cardIds: groupedCards['column-2'] },
+                    'column-3': { id: 'column-3', title: t('Preview'), cardIds: groupedCards['column-3'] },
+                    'column-4': { id: 'column-4', title: t('Done'), cardIds: groupedCards['column-4'] },
                };
 
                setData((prev) => ({
@@ -222,7 +229,7 @@ export const View = () => {
                <h2 className="mb-4">
                     <div className="d-flex align-items-center justify-content-between">
                          {/* Project name nằm bên trái */}
-                         <small className="mb-0 ms-4">Project name</small>
+                         <small className="mb-0 ms-4">{t('Project Name')}</small>
 
                          {/* Các phần còn lại nằm bên phải */}
                          <div className="d-flex align-items-center small">
@@ -253,10 +260,15 @@ export const View = () => {
                               </div>
 
                               {/* Search */}
-                              <input type="text" className="form-control form-control-sm me-3" placeholder="Search..." style={{ width: '150px' }} />
+                              <input
+                                   type="text"
+                                   className="form-control form-control-sm me-3"
+                                   placeholder={t('Search...')}
+                                   style={{ width: '150px' }}
+                              />
 
                               <select className="form-select form-select-sm me-3" aria-label="Select Project">
-                                   <option value="">Select Project</option>
+                                   <option value="">{t('Select Project')}</option>
                                    {projects.map((project) => (
                                         <option key={project.id} value={project.id}>
                                              {project.project_name}
@@ -300,7 +312,9 @@ export const View = () => {
                                                                                      </button>
                                                                                 </div>
                                                                                 <div className="people">
-                                                                                     <p>Status: {card.status || 'Unknown'}</p>
+                                                                                     <p>
+                                                                                          {t('Status')}: {card.status || '-'}
+                                                                                     </p>
                                                                                      <img
                                                                                           src="/assets/admin/img/avatars/1.png"
                                                                                           alt="Assignee"

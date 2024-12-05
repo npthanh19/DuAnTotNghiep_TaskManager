@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
-import { getUserById, updateUser, updateAvatar, requestDeleteAccount } from '../../services/usersService';
+import { getUserById, updateUser, updateAvatar } from '../../services/usersService';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import '../../index.css';
@@ -18,6 +18,7 @@ export default function Update_profile() {
      const userInfo = JSON.parse(localStorage.getItem('user'));
      const userId = userInfo?.user_id;
      const token = localStorage.getItem('token');
+     const [isSaving, setIsSaving] = useState(false);
 
      const toggleSidebar = () => {
           setIsSidebarOpen(!isSidebarOpen);
@@ -59,6 +60,7 @@ export default function Update_profile() {
                          setValue('fullname', userData.fullname || '');
                          setValue('email', userData.email || '');
                          setValue('phoneNumber', formatPhoneNumber(userData.phone_number) || '');
+                         setValue('emailVerified_at', userData.email_verified_at);
                     }
                } catch (error) {
                     Swal.fire({
@@ -126,12 +128,32 @@ export default function Update_profile() {
      };
 
      const onSubmit = async (data) => {
+          setIsSaving(true);
           try {
-               const updatedData = {
-                    fullname: data.fullname,
-                    email: data.email,
-                    phone_number: data.phoneNumber,
-               };
+               // Chỉ thêm các trường có giá trị vào payload
+               const updatedData = {};
+               if (data.fullname && data.fullname.trim() !== user.fullname) {
+                    updatedData.fullname = data.fullname.trim();
+               }
+               if (data.phoneNumber && formatPhoneNumber(data.phoneNumber.trim()) !== user.phone_number) {
+                    updatedData.phone_number = formatPhoneNumber(data.phoneNumber.trim());
+               }
+               if (data.email && data.email.trim() !== user.email) {
+                    updatedData.email = data.email.trim();
+               }
+
+               if (Object.keys(updatedData).length === 0) {
+                    Swal.fire({
+                         icon: 'info',
+                         text: t('No changes detected.'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
+                    setIsSaving(false);
+                    return;
+               }
 
                await updateUser(userId, updatedData, token);
                Swal.fire({
@@ -148,7 +170,7 @@ export default function Update_profile() {
                     Object.keys(errors).forEach((field) => {
                          Swal.fire({
                               icon: 'error',
-                              text: `${field}: ${errors[field].join(', ')}`,
+                              text: `${t(field)}: ${errors[field].join(', ')}`,
                               position: 'top-right',
                               toast: true,
                               timer: 3000,
@@ -165,6 +187,8 @@ export default function Update_profile() {
                          showConfirmButton: false,
                     });
                }
+          } finally {
+               setIsSaving(false);
           }
      };
 
@@ -204,7 +228,7 @@ export default function Update_profile() {
 
                                                             <div className="button-wrapper">
                                                                  <label htmlFor="upload" className="btn btn-sm btn-primary me-3 mb-4" tabIndex={0}>
-                                                                      <span className="d-none d-sm-block">Upload new photo</span>
+                                                                      <span className="d-none d-sm-block">{t('Upload new photo')}</span>
                                                                       <i className="ri-upload-2-line d-block d-sm-none" />
                                                                       <input
                                                                            type="file"
@@ -215,7 +239,7 @@ export default function Update_profile() {
                                                                            onChange={handleAvatarChange}
                                                                       />
                                                                  </label>
-                                                                 <div>Allowed JPG, GIF or PNG. Max size of 800K</div>
+                                                                 <div>{t('Allowed JPG, PNG. Max size of 800K')}</div>
                                                             </div>
                                                        </div>
                                                   </div>
@@ -224,11 +248,11 @@ export default function Update_profile() {
                                                             <div className="row mt-4">
                                                                  <div className="col-md-6">
                                                                       <div className="mb-3">
-                                                                           <label className="form-label">{t('Fullname')}</label>
+                                                                           <label className="form-label form-label-sm">{t('Fullname')}</label>
                                                                            <input
                                                                                 {...register('fullname', { required: t('Fullname is required') })}
                                                                                 type="text"
-                                                                                className="form-control"
+                                                                                className="form-control form-control-sm"
                                                                                 defaultValue={user.fullname}
                                                                            />
                                                                            {errors.fullname && (
@@ -238,32 +262,55 @@ export default function Update_profile() {
                                                                  </div>
                                                                  <div className="col-md-6">
                                                                       <div className="mb-3">
-                                                                           <label className="form-label">{t('Email')}</label>
+                                                                           <label className="form-label form-label-sm">{t('Email')}</label>
                                                                            <input
-                                                                                {...register('email', { required: t('Email is required') })}
+                                                                                {...register('email')}
                                                                                 type="email"
-                                                                                className="form-control"
+                                                                                className="form-control form-control-sm"
                                                                                 defaultValue={user.email}
-                                                                                disabled
                                                                            />
                                                                            {errors.email && <div className="text-danger">{errors.email.message}</div>}
                                                                       </div>
                                                                  </div>
                                                             </div>
-                                                            <div className="mb-3">
-                                                                 <label className="form-label">{t('Phone number')}</label>
-                                                                 <input
-                                                                      {...register('phoneNumber', { required: t('Phone number is required') })}
-                                                                      type="text"
-                                                                      className="form-control"
-                                                                      defaultValue={user.phone_number}
-                                                                 />
-                                                                 {errors.phoneNumber && (
-                                                                      <div className="text-danger">{errors.phoneNumber.message}</div>
-                                                                 )}
+                                                            <div className="row mt-4">
+                                                                 <div className="col-md-6">
+                                                                      <div className="mb-3">
+                                                                           <label className="form-label form-label-sm">{t('Phone number')}</label>
+                                                                           <input
+                                                                                {...register('phoneNumber', {
+                                                                                     required: t('Phone number is required'),
+                                                                                })}
+                                                                                type="text"
+                                                                                className="form-control form-control-sm"
+                                                                                defaultValue={user.phone_number}
+                                                                           />
+                                                                           {errors.phoneNumber && (
+                                                                                <div className="text-danger">{errors.phoneNumber.message}</div>
+                                                                           )}
+                                                                      </div>
+                                                                 </div>
+                                                                 <div className="col-md-6">
+                                                                      <div className="mb-3">
+                                                                           <label className="form-label form-label-sm">{t('Xác thực email')}</label>
+                                                                           <input
+                                                                                type="text"
+                                                                                className="form-control form-control-sm"
+                                                                                value={
+                                                                                     user.email_verified_at
+                                                                                          ? `${t('Verified')}: ${new Date(
+                                                                                                 user.email_verified_at,
+                                                                                            ).toLocaleString()}`
+                                                                                          : t('Not verified')
+                                                                                }
+                                                                                readOnly
+                                                                                disabled
+                                                                           />
+                                                                      </div>
+                                                                 </div>
                                                             </div>
-                                                            <button type="submit" className="btn btn-primary">
-                                                                 {t('Save changes')}
+                                                            <button type="submit" className="btn btn-primary" disabled={isSaving}>
+                                                                 {isSaving ? t('Saving...') : t('Save changes')}
                                                             </button>
                                                        </form>
                                                   </div>

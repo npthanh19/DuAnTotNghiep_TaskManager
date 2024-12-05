@@ -13,6 +13,7 @@ import {
 } from '../../../services/tasksService';
 import { v4 as uuidv4 } from 'uuid';
 import { getAllDepartments } from '../../../services/deparmentsService';
+import { useTranslation } from 'react-i18next';
 
 export function View() {
      const [newTask, setNewTask] = useState('');
@@ -21,6 +22,7 @@ export function View() {
      const [selectedUsers, setSelectedUsers] = useState([]);
      const [projects, setProjects] = useState([]);
      const [departments, setDepartments] = useState([]);
+     const { t } = useTranslation();
      const users = [
           { id: 1, name: 'User 1', avatar: '/assets/admin/img/avatars/1.png' },
           { id: 2, name: 'User 2', avatar: '/assets/admin/img/avatars/2.png' },
@@ -275,7 +277,7 @@ export function View() {
           <div className="container-fluid py-4">
                <h2 className="mb-4">
                     <div className="d-flex align-items-center justify-content-between">
-                         <small className="mb-0">Backlog</small>
+                         <small className="mb-0">{t('Backlog')}</small>
                          <div className="d-flex align-items-center small">
                               <div className="users_img d-flex align-items-center position-relative me-3">
                                    {/* <img src={users[0].avatar} alt={users[0].name} className="user-avatar" />
@@ -301,9 +303,9 @@ export function View() {
                                         </div>
                                    )}
                               </div>
-                              <input type="text" className="form-control form-control-sm me-3" placeholder="Search..." style={{ width: '150px' }} />
+                              <input type="text" className="form-control form-control-sm me-3" placeholder="Tìm kiếm..." style={{ width: '150px' }} />
                               <select className="form-select form-select-sm me-3" aria-label="Epic Dropdown">
-                                   <option value="">Epic</option>
+                                   <option value="">{t('Epic')}</option>
                                    {projects.map((project) => (
                                         <option key={project.id} value={project.id}>
                                              {project.project_name}
@@ -324,7 +326,7 @@ export function View() {
                                    onChange={(e) => setNewTask(e.target.value)}
                               />
                               <button className="btn btn-primary btn-sm" onClick={() => handleAddTask('FE-0001')}>
-                                   Add Task
+                                   {t('Add Tasks')}
                               </button>
                          </div>
                     </div>
@@ -352,7 +354,7 @@ export function View() {
                                                             {sprint.tasks.filter((task) => task.status === 'done').length}
                                                        </p>
                                                   </div>
-                                                  <div className="status__worktime">Bắt đầu</div>
+                                                  <div className="status__worktime">{t('Starts')}</div>
                                              </div>
                                         </h4>
                                         {sprint.tasks?.map((task, index) => {
@@ -374,10 +376,10 @@ export function View() {
                                                                            className="form-select"
                                                                            value={task?.status}
                                                                            onChange={(e) => handleStatusChange(task.id, e.target.value)}>
-                                                                           <option value="to do">To do</option>
-                                                                           <option value="in progress">In progress</option>
-                                                                           <option value="preview">Preview</option>
-                                                                           <option value="done">Done</option>
+                                                                           <option value="to do">{t('To Do')}</option>
+                                                                           <option value="in progress">{t('In Progress')}</option>
+                                                                           <option value="preview">{t('Preview')}</option>
+                                                                           <option value="done">{t('Done')}</option>
                                                                       </select>
                                                                  </div>
                                                                  <div className=" boardlist_time">{task ? task.task_time : '-'}</div>
@@ -402,7 +404,7 @@ export function View() {
                     <Droppable droppableId="unassignTasks">
                          {(provided) => (
                               <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
-                                   <h4>Unassigned Tasks</h4>
+                                   <h4>{t('Unassigned Tasks')}</h4>
                                    {taskNotWorkTime?.map((task, index) => {
                                         const project = task?.project_id ? projects.find((proj) => proj.id === task.project_id) : null;
 
@@ -421,10 +423,10 @@ export function View() {
                                                                       className="form-select"
                                                                       value={task?.status}
                                                                       onChange={(e) => handleStatusChange(task.id, e.target.value)}>
-                                                                      <option value="to do">To do</option>
-                                                                      <option value="in progress">In progress</option>
-                                                                      <option value="preview">Preview</option>
-                                                                      <option value="done">Done</option>
+                                                                      <option value="to do">{t('To Do')}</option>
+                                                                      <option value="in progress">{t('In Progress')}</option>
+                                                                      <option value="preview">{t('Preview')}</option>
+                                                                      <option value="done">{t('Done')}</option>
                                                                  </select>
                                                             </div>
                                                             <div className=" boardlist_time">{task ? task.task_time : '-'}</div>

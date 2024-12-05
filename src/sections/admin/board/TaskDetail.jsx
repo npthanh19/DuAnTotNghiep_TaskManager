@@ -6,6 +6,7 @@ import { createComment, deleteComment, getCommentsByTask, updateComment } from '
 import { updateTaskStatus, getRunningTasks } from '../../../services/tasksService';
 import Swal from 'sweetalert2';
 import { getAllUsers, getUserById } from '../../../services/usersService';
+import { useTranslation } from 'react-i18next';
 
 export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
      const [isClosing, setIsClosing] = useState(false);
@@ -15,6 +16,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
      const [editComment, setEditComment] = useState([]);
      const [sprints, setSprints] = useState([]);
      const [avatarUrl] = useState('/assets/admin/img/avatars/1.png');
+     const { t } = useTranslation();
 
      useEffect(() => {
           if (selectedTask) {
@@ -93,21 +95,36 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
 
      const handleDeleteComment = async (id) => {
           Swal.fire({
-               title: 'Bạn có chắc chắn không?',
-               text: 'Bạn sẽ không thể hoàn tác hành động này!',
+               title: t('Are you sure?'),
+               text: t('You will not be able to undo this action!'),
                icon: 'warning',
                showCancelButton: true,
-               confirmButtonText: 'Có, xóa nó!',
-               cancelButtonText: 'Hủy',
+               confirmButtonText: t('Delete'),
+               cancelButtonText: t('Cancel'),
           }).then(async (result) => {
                if (result.isConfirmed) {
                     try {
                          await deleteComment(id);
                          setComments((prev) => prev.filter((comment) => comment.id !== id));
-                         Swal.fire('Đã xóa!', 'Bình luận của bạn đã được xóa.', 'success');
+                         Swal.fire({
+                              icon: 'success',
+                              title: t('Deleted!'),
+                              text: t('Your comment has been deleted.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
                     } catch (error) {
                          console.error('Error deleting comment:', error);
-                         Swal.fire('Lỗi!', 'Đã có sự cố xảy ra.', 'error');
+                         Swal.fire({
+                              icon: 'error',
+                              text: t('Something went wrong.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         });
                     }
                }
           });
@@ -142,21 +159,21 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                         <button
                                              onClick={() => handleEditComment(comment.id, editComment?.comment)}
                                              className="btn btn-success btn-sm me-2">
-                                             Lưu
+                                             {t('Save')}
                                         </button>
                                         <button onClick={() => setEditComment(null)} className="btn btn-danger btn-sm">
-                                             Hủy
+                                             {t('Cancel')}
                                         </button>
                                    </>
                               ) : (
                                    <>
                                         <span className="me-auto">{comment.comment}</span>
                                         <button onClick={() => setEditComment(comment)} className="btn btn-sm btn-primary me-2">
-                                             Sửa
+                                             {t('Edit')}
                                         </button>
 
                                         <button onClick={() => handleDeleteComment(comment.id)} className="btn btn-sm btn-danger">
-                                             Xóa
+                                             {t('Delete')}
                                         </button>
                                    </>
                               )}
@@ -170,7 +187,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                <Modal.Body>
                     <div className="d-flex justify-content-between align-items-center mb-3">
                          <i className="bi bi-pencil" title="Edit Task">
-                              <small className="ms-3">Note</small> / Task ?
+                              <small className="ms-3">{t('Note')}</small> / {t('Task')} ?
                          </i>
                          <button onClick={handleCloseModal} className="btn-close ms-3" aria-label="Close"></button>
                     </div>
@@ -182,39 +199,39 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                         <strong className="me-2">{selectedTask.task_name}</strong>
                                    </p>
                                    <div className="d-flex align-items-center mt-2">
-                                        <p className="mb-0">Description</p>
+                                        <p className="mb-0">{t('Description')}</p>
                                    </div>
 
                                    <CKEditor editor={ClassicEditor} data={editorData} onChange={handleEditorChange} />
 
                                    <div className="d-flex align-items-center mt-2">
-                                        <button className="btn btn-primary btn-sm">Save</button>
-                                        <p className="ms-2 mb-0 small">Cancel</p>
+                                        <button className="btn btn-primary btn-sm">{t('Save')}</button>
+                                        <p className="ms-2 mb-0 small">{t('Cancel')}</p>
                                    </div>
 
                                    <div className="d-flex align-items-center mt-3">
-                                        <strong className="ms-1">Activity</strong>
+                                        <strong className="ms-1">{t('Activity')}</strong>
                                    </div>
                                    <div className="d-flex align-items-center mt-2">
-                                        <p className="mb-0 small me-2">Show:</p>
+                                        <p className="mb-0 small me-2">{t('Show')}:</p>
                                         <span className="badge bg-secondary me-2" onClick={() => {}}>
-                                             All
+                                             {t('All')}
                                         </span>
                                         <span className="badge bg-secondary me-2" onClick={() => {}}>
-                                             Comment
+                                             {t('Comment')}
                                         </span>
                                         <span className="badge bg-secondary" onClick={() => {}}>
-                                             History
+                                             {t('History')}
                                         </span>
                                    </div>
 
                                    <div className="comment-section mt-4">
-                                        <h5>Bình luận</h5>
+                                        <h5>{t('Comment')}</h5>
                                         <div className="input-group mb-3">
                                              <input
                                                   type="text"
                                                   className="form-control"
-                                                  placeholder="Thêm bình luận..."
+                                                  placeholder={t('Add Comment')}
                                                   value={newComment}
                                                   onChange={(e) => setNewComment(e.target.value)}
                                              />
@@ -235,45 +252,45 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                                   id="dropdownMenuButton"
                                                   data-bs-toggle="dropdown"
                                                   aria-expanded="false">
-                                                  {selectedTask.status ? selectedTask.status : 'Todo'}
+                                                  {selectedTask.status ? selectedTask.status : 'To do'}
                                              </button>
                                              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                   <li>
                                                        <a className="dropdown-item" onClick={() => handleStatusChange('to do')}>
-                                                            To Do
+                                                            {t('To Do')}
                                                        </a>
                                                   </li>
                                                   <li>
                                                        <a className="dropdown-item" onClick={() => handleStatusChange('in progress')}>
-                                                            In Progress
+                                                            {t('In Progress')}
                                                        </a>
                                                   </li>
                                                   <li>
                                                        <a className="dropdown-item" onClick={() => handleStatusChange('review')}>
-                                                            Review
+                                                            {t('Review')}
                                                        </a>
                                                   </li>
                                                   <li>
                                                        <a className="dropdown-item" onClick={() => handleStatusChange('done')}>
-                                                            Done
+                                                            {t('Done')}
                                                        </a>
                                                   </li>
                                              </ul>
                                         </div>
                                         <button className="btn btn-secondary">
-                                             <i className="bi bi-lightning-charge"></i> Action
+                                             <i className="bi bi-lightning-charge"></i> {t('Actions')}
                                         </button>
                                    </div>
 
                                    <table className="table table-bordered" style={{ width: '100%' }}>
                                         <thead className="table">
                                              <tr>
-                                                  <th colSpan={2}>Detail</th>
+                                                  <th colSpan={2}>{t('Detail')}</th>
                                              </tr>
                                         </thead>
                                         <tbody>
                                              <tr>
-                                                  <td>Assignee</td>
+                                                  <td>{t('Assignee')}</td>
                                                   <td>
                                                        <img
                                                             src="/assets/admin/img/avatars/1.png"
@@ -284,19 +301,19 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                                   </td>
                                              </tr>
                                              <tr>
-                                                  <td>Project</td>
+                                                  <td>{t('Projects')}</td>
                                                   <td>{selectedTask?.project_name || 'N/A'}</td>
                                              </tr>
                                              <tr>
-                                                  <td>Sprint</td>
+                                                  <td>{t('Worktimes')}</td>
                                                   <td>{selectedTask?.worktime_id || 'N/A'}</td>
                                              </tr>
                                              <tr>
-                                                  <td>Story Point Estimate</td>
+                                                  <td>{t('Score estimate')}</td>
                                                   <td>{selectedTask?.task_time || 'N/A'}</td>
                                              </tr>
                                              <tr>
-                                                  <td>Người tạo</td>
+                                                  <td>{t('User Create')}</td>
                                                   <td>{selectedTask.user_name ? selectedTask.user_name : 'Không xác định'}</td>
                                              </tr>
                                         </tbody>

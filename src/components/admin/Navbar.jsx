@@ -151,10 +151,6 @@ const Navbar = ({ onToggleSidebar }) => {
                                                        />
                                                   </div>
                                              </div>
-                                             <div className="flex-grow-1">
-                                                  <h6 className="mb-0 small">John Doe</h6>
-                                                  <small className="text-muted">Admin</small>
-                                             </div>
                                         </a>
                                    </li>
                                    <li>
@@ -168,17 +164,6 @@ const Navbar = ({ onToggleSidebar }) => {
                                         <a className="dropdown-item" href="#">
                                              <i className="ri-settings-4-line ri-22px me-2"></i>
                                              <span className="align-middle">{t('Cài đặt')}</span>
-                                        </a>
-                                   </li>
-                                   <li>
-                                        <a className="dropdown-item" href="#">
-                                             <span className="d-flex align-items-center align-middle">
-                                                  <i className="flex-shrink-0 ri-file-text-line ri-22px me-3"></i>
-                                                  <span className="flex-grow-1 align-middle">{t('Thông báo')}</span>
-                                                  <span className="flex-shrink-0 badge badge-center rounded-pill bg-danger h-px-20 d-flex align-items-center justify-content-center">
-                                                       4
-                                                  </span>
-                                             </span>
                                         </a>
                                    </li>
                                    <li>
