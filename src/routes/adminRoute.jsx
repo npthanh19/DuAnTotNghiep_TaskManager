@@ -60,6 +60,7 @@ import ConfirmDepartment from '../sections/admin/departments/ConfirmDepartment';
 // Admin Worktime
 import ViewWorktime from '../pages/admin/Worktime/List';
 import AddWorktime from '../pages/admin/Worktime/Add';
+import RecentlyDeleteWorkTime from '../sections/admin/worktime/RecentlyDeleteWorkTime'
 
 // Admin Permissions
 import ViewPer from '../pages/admin/Permission/List';
@@ -129,6 +130,7 @@ export const AdminRoutes = () => (
           {/* Worktime Management */}
           <Route path="worktimes" element={<PrivateRoute><AdminLayout><ViewWorktime /></AdminLayout></PrivateRoute>} />
           <Route path="worktimes/add" element={<PrivateRoute><AdminLayout><AddWorktime /></AdminLayout></PrivateRoute>} />
+          <Route path="worktimes/trashed" element={<PrivateRoute><AdminLayout><RecentlyDeleteWorkTime /></AdminLayout></PrivateRoute>} />
 
           {/* Permission Management */}
           {/* <Route path="permissions" element={<PrivateRoute><AdminLayout><ViewPer /></AdminLayout></PrivateRoute>} />

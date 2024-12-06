@@ -118,9 +118,9 @@ export function View() {
 
      return (
           <div className="card">
-               <div className="card-header d-flex justify-content-between align-items-center">
-                    <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span>{t('Users')}</span>
+               <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
+                    <h3 className="fw-bold text-center text-primary mb-0 fs-4">
+                         <span className="marquee">{t('Users')}</span>
                     </h3>
 
                     <div className="d-flex align-items-center ms-auto">
@@ -133,7 +133,7 @@ export function View() {
                          />
 
                          <button
-                              className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
+                              className="btn btn-outline-secondary btn-sm ms-2 rounded-pill"
                               onClick={() => navigate('/taskmaneger/users/trashed')}>
                               <i className="bi bi-trash me-2"></i>
                          </button>

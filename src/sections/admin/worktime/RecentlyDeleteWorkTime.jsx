@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
-import 'react-toastify/dist/ReactToastify.css';
-import { getTrashedTasks, restoreTask, forceDeleteTask } from '../../../services/tasksService';
+import { getTrashedWorktimes, restoreWorktime, forceDeleteWorktime } from '../../../services/worktimeService'; // Cập nhật API service cho Worktime
 import { useForm } from 'react-hook-form';
 
-function RecentlyDeletedTasks() {
-     const [tasks, setTasks] = useState([]);
+function RecentlyDeletedWorktimes() {
+     const [worktimes, setWorktimes] = useState([]);
      const { t } = useTranslation();
      const [loading, setLoading] = useState(true);
      const [error, setError] = useState(null);
@@ -21,10 +20,10 @@ function RecentlyDeletedTasks() {
      } = useForm();
 
      useEffect(() => {
-          const fetchTrashedTasks = async () => {
+          const fetchTrashedWorktimes = async () => {
                try {
-                    const trashTasks = await getTrashedTasks();
-                    setTasks(trashTasks.data);
+                    const trashWorktimes = await getTrashedWorktimes();
+                    setWorktimes(trashWorktimes.data);
                } catch (error) {
                     setError(error.message);
                } finally {
@@ -32,13 +31,13 @@ function RecentlyDeletedTasks() {
                }
           };
 
-          fetchTrashedTasks();
+          fetchTrashedWorktimes();
      }, []);
 
      const handleRestore = async (id) => {
           const result = await Swal.fire({
-               title: t('Restore task'),
-               text: t('Are you sure you want to restore this task?'),
+               title: t('Restore'),
+               text: t('Are you sure you want to restore this worktime?'),
                icon: 'warning',
                showCancelButton: true,
                confirmButtonColor: '#3085d6',
@@ -49,27 +48,25 @@ function RecentlyDeletedTasks() {
 
           if (result.isConfirmed) {
                try {
-                    await restoreTask(id);
-                    setTasks(tasks.filter((task) => task.id !== id));
+                    await restoreWorktime(id);
+                    setWorktimes(worktimes.filter((worktime) => worktime.id !== id));
                     Swal.fire({
                          icon: 'success',
-                         title: t('Restore'),
-                         text: t('Task restored successfully.'),
-                         showConfirmButton: false,
-                         timer: 2000,
-                         toast: true,
+                         text: t('Worktime restored successfully.'),
                          position: 'top-right',
+                         toast: true,
+                         timer: 2000,
+                         showConfirmButton: false,
                     });
                     reset();
                } catch (error) {
                     Swal.fire({
                          icon: 'error',
                          title: t('Restore Failed!'),
-                         text: t('Something went wrong'),
-                         showConfirmButton: false,
-                         timer: 2000,
-                         toast: true,
                          position: 'top-right',
+                         toast: true,
+                         timer: 2000,
+                         showConfirmButton: false,
                     });
                }
           }
@@ -77,8 +74,8 @@ function RecentlyDeletedTasks() {
 
      const handleDeletePermanently = async (id) => {
           const result = await Swal.fire({
-               title: t('Delete task'),
-               text: t('Are you sure you want to permanently delete this task?'),
+               title: t('Delete'),
+               text: t('Are you sure you want to permanently delete this worktime?'),
                icon: 'warning',
                showCancelButton: true,
                confirmButtonColor: '#3085d6',
@@ -89,39 +86,37 @@ function RecentlyDeletedTasks() {
 
           if (result.isConfirmed) {
                try {
-                    await forceDeleteTask(id);
-                    setTasks(tasks.filter((task) => task.id !== id));
+                    await forceDeleteWorktime(id);
+                    setWorktimes(worktimes.filter((worktime) => worktime.id !== id));
                     Swal.fire({
                          icon: 'success',
-                         title: t('Delete'),
-                         text: t('Task permanently deleted.'),
-                         showConfirmButton: false,
-                         timer: 3000,
-                         toast: true,
+                         text: t('Worktime permanently deleted.'),
                          position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
                     });
                } catch (error) {
                     Swal.fire({
                          icon: 'error',
-                         title: t('Delete Failed!'),
-                         text: t('An error occurred while deleting the task'),
-                         showConfirmButton: false,
-                         timer: 2000,
-                         toast: true,
+                         text: t('An error occurred while deleting the worktime'),
                          position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
                     });
                }
           }
      };
 
-     const filteredTasks = Array.isArray(tasks)
-          ? tasks.filter((task) => task.task_name && task.task_name.toLowerCase().includes(searchTerm.toLowerCase()))
+     const filteredWorktimes = Array.isArray(worktimes)
+          ? worktimes.filter((worktime) => worktime.name && worktime.name.toLowerCase().includes(searchTerm.toLowerCase()))
           : [];
 
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-     const currentTasks = filteredTasks.slice(indexOfFirstItem, indexOfLastItem);
-     const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
+     const currentWorktimes = filteredWorktimes.slice(indexOfFirstItem, indexOfLastItem);
+     const totalPages = Math.ceil(filteredWorktimes.length / itemsPerPage);
 
      const handlePageChange = (pageNumber) => {
           setCurrentPage(pageNumber);
@@ -146,7 +141,7 @@ function RecentlyDeletedTasks() {
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center">
                     <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span>{t('Recently Deleted Tasks')}</span>
+                         <span>{t('Recently Deleted Worktimes')}</span>
                     </h3>
                     <div className="d-flex align-items-center ms-auto">
                          <input
@@ -165,29 +160,46 @@ function RecentlyDeletedTasks() {
                     <table className="table">
                          <thead>
                               <tr className="text-center">
+                                   <th>{t('STT')}</th>
                                    <th>{t('ID')}</th>
-                                   <th>{t('Task Name')}</th>
+                                   <th>{t('Name')}</th>
+                                   <th>{t('Description')}</th>
                                    <th>{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
-                              {currentTasks.map((task) => (
-                                   <tr key={task.id} className="text-center">
-                                        <td>{task.id}</td>
-                                        <td>{task.task_name}</td>
+                              {currentWorktimes.map((worktime, index) => (
+                                   <tr key={worktime.id} className="text-center">
+                                        <td>{indexOfFirstItem + index + 1}</td>
+                                        <td>{worktime.id}</td>
+                                        <td>
+                                             <span className="d-inline-block text-truncate" style={{ maxWidth: '500px' }} title={worktime.name}>
+                                                  {worktime.name.length > 100 ? `${worktime.name.slice(0, 100)}...` : worktime.name}
+                                             </span>
+                                        </td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '500px' }}
+                                                  title={worktime.description}>
+                                                  {worktime.description.length > 100
+                                                       ? `${worktime.description.slice(0, 100)}...`
+                                                       : worktime.description}
+                                             </span>
+                                        </td>
                                         <td>
                                              <div className="dropdown">
                                                   <button
                                                        className="btn btn-sm"
                                                        type="button"
-                                                       id={`dropdownMenuButton${task.id}`}
+                                                       id={`dropdownMenuButton${worktime.id}`}
                                                        data-bs-toggle="dropdown"
                                                        aria-expanded="false">
                                                        <i className="bi bi-three-dots-vertical"></i>
                                                   </button>
-                                                  <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${task.id}`}>
+                                                  <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${worktime.id}`}>
                                                        <li>
-                                                            <button className="dropdown-item text-warning" onClick={() => handleRestore(task.id)}>
+                                                            <button className="dropdown-item text-warning" onClick={() => handleRestore(worktime.id)}>
                                                                  <i className="bi bi-arrow-clockwise me-2"></i> {t('Restore')}
                                                             </button>
                                                        </li>
@@ -195,7 +207,7 @@ function RecentlyDeletedTasks() {
                                                        <li>
                                                             <button
                                                                  className="dropdown-item text-danger"
-                                                                 onClick={() => handleDeletePermanently(task.id)}>
+                                                                 onClick={() => handleDeletePermanently(worktime.id)}>
                                                                  <i className="bi bi-trash me-2"></i> {t('Delete')}
                                                             </button>
                                                        </li>
@@ -204,10 +216,10 @@ function RecentlyDeletedTasks() {
                                         </td>
                                    </tr>
                               ))}
-                              {currentTasks.length === 0 && (
+                              {currentWorktimes.length === 0 && (
                                    <tr>
                                         <td colSpan="3" className="text-center">
-                                             {t('No recently deleted tasks found.')}
+                                             {t('No recently deleted worktimes found.')}
                                         </td>
                                    </tr>
                               )}
@@ -242,4 +254,4 @@ function RecentlyDeletedTasks() {
      );
 }
 
-export default RecentlyDeletedTasks;
+export default RecentlyDeletedWorktimes;

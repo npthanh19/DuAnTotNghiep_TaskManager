@@ -17,6 +17,7 @@ export const View = () => {
      const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
      const [loading, setLoading] = useState(true);
      const [projects, setProjects] = useState([]);
+     const [searchTerm, setSearchTerm] = useState('');
 
      useEffect(() => {
           const fetchAssignments = async () => {
@@ -105,23 +106,37 @@ export const View = () => {
           return project ? project.project_name : '';
      };
 
+     const handleSearchChange = (e) => {
+          setSearchTerm(e.target.value);
+     };
+
      return (
           <div className="card">
-               <div className="card-header d-flex justify-content-between align-items-center">
-                    <h3 className="fw-bold py-3 mb-4 highlighted-text">
+               <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
+                    <h3 className="fw-bold text-center text-primary mb-0 fs-4">
                          <span className="marquee">{t('Assignments')}</span>
                     </h3>
-                    <div className="d-flex align-items-center ms-auto">
-                         <Link to="/taskmaneger/assignments/add" className="btn btn-primary btn-sm me-2">
-                              <i className="bi bi-plus me-2"></i> {t('Add')}
-                         </Link>
-                         <button
-                              className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
-                              onClick={() => navigate('/taskmaneger/assignments/trashed')}>
-                              <i className="bi bi-trash me-2"></i>
-                         </button>
+                    <div className="d-flex align-items-center">
+                         <input
+                              type="text"
+                              className="form-control form-control-sm me-2"
+                              placeholder={t('Search...')}
+                              value={searchTerm}
+                              onChange={handleSearchChange}
+                         />
+                         <div className="d-flex align-items-center ms-3">
+                              <Link to="/taskmaneger/assignments/add" className="btn btn-primary btn-sm rounded-pill">
+                                   <i className="bi bi-plus me-2"></i> {t('Add')}
+                              </Link>
+                              <button
+                                   className="btn btn-outline-secondary btn-sm ms-2 rounded-pill"
+                                   onClick={() => navigate('/taskmaneger/assignments/trashed')}>
+                                   <i className="bi bi-trash me-2"></i>
+                              </button>
+                         </div>
                     </div>
                </div>
+
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
@@ -138,107 +153,120 @@ export const View = () => {
                               </tr>
                          </thead>
                          <tbody>
-                              {currentAssignments.map((assignment, index) => (
-                                   <tr key={assignment.id}>
-                                        <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                        <td>{assignment.id}</td>
-                                        <td>
-                                             <span
-                                                  className="d-inline-block text-truncate"
-                                                  style={{ maxWidth: '150px' }}
-                                                  title={getProjectName(assignment.project_id)}>
-                                                  {getProjectName(assignment.project_id).length > 20
-                                                       ? `${getProjectName(assignment.project_id).slice(0, 20)}...`
-                                                       : getProjectName(assignment.project_id)}
-                                             </span>
-                                        </td>
-                                        <td>
-                                             <span
-                                                  className="d-inline-block text-truncate"
-                                                  style={{ maxWidth: '150px' }}
-                                                  title={assignment.task_name}>
-                                                  {assignment.task_name.length > 20
-                                                       ? `${assignment.task_name.slice(0, 20)}...`
-                                                       : assignment.task_name}
-                                             </span>
-                                        </td>
-                                        <td>
-                                             <span
-                                                  className="d-inline-block text-truncate"
-                                                  style={{ maxWidth: '150px' }}
-                                                  title={assignment.department_name}>
-                                                  {assignment.department_name.length > 20
-                                                       ? `${assignment.department_name.slice(0, 20)}...`
-                                                       : assignment.department_name}
-                                             </span>
-                                        </td>
-                                        <td>
-                                             <span
-                                                  className="d-inline-block text-truncate"
-                                                  style={{ maxWidth: '150px' }}
-                                                  title={assignment.user_name}>
-                                                  {assignment.user_name.length > 20
-                                                       ? `${assignment.user_name.slice(0, 20)}...`
-                                                       : assignment.user_name}
-                                             </span>
-                                        </td>
-                                        <td>
-                                             <span className="d-inline-block text-truncate" style={{ maxWidth: '150px' }} title={assignment.note}>
-                                                  {assignment.note.length > 20 ? `${assignment.note.slice(0, 20)}...` : assignment.note}
-                                             </span>
-                                        </td>
-
-                                        <td>
-                                             {assignment.status === 'to do' && (
-                                                  <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Pending')}
-                                                  </span>
-                                             )}
-                                             {assignment.status === 'in progress' && (
-                                                  <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('In Progress')}
-                                                  </span>
-                                             )}
-                                             {assignment.status === 'preview' && (
-                                                  <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Preview')}
-                                                  </span>
-                                             )}
-                                             {assignment.status === 'done' && (
-                                                  <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Done')}
-                                                  </span>
-                                             )}
-                                        </td>
-                                        <td>
-                                             <div className="dropdown">
-                                                  <button
-                                                       className="btn btn-sm"
-                                                       type="button"
-                                                       id={`dropdownMenuButton${assignment.id}`}
-                                                       data-bs-toggle="dropdown"
-                                                       aria-expanded="false">
-                                                       <i className="bi bi-three-dots-vertical"></i>
-                                                  </button>
-                                                  <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${assignment.id}`}>
-                                                       <li>
-                                                            <button className="dropdown-item text-warning" onClick={() => handleEdit(assignment.id)}>
-                                                                 <i className="bi bi-pencil me-2"></i> {t('Edit')}
-                                                            </button>
-                                                       </li>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-danger"
-                                                                 onClick={() => handleDeleteClick(assignment.id)}>
-                                                                 <i className="bi bi-trash me-2"></i>
-                                                                 {t('Delete')}
-                                                            </button>
-                                                       </li>
-                                                  </ul>
-                                             </div>
+                              {currentAssignments.length === 0 ? (
+                                   <tr>
+                                        <td colSpan="9" className="text-center">
+                                             {t('No assignments found')}
                                         </td>
                                    </tr>
-                              ))}
+                              ) : (
+                                   currentAssignments.map((assignment, index) => (
+                                        <tr key={assignment.id}>
+                                             <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                             <td>{assignment.id}</td>
+                                             <td>
+                                                  <span
+                                                       className="d-inline-block text-truncate"
+                                                       style={{ maxWidth: '150px' }}
+                                                       title={getProjectName(assignment.project_id)}>
+                                                       {getProjectName(assignment.project_id).length > 20
+                                                            ? `${getProjectName(assignment.project_id).slice(0, 20)}...`
+                                                            : getProjectName(assignment.project_id)}
+                                                  </span>
+                                             </td>
+                                             <td>
+                                                  <span
+                                                       className="d-inline-block text-truncate"
+                                                       style={{ maxWidth: '150px' }}
+                                                       title={assignment.task_name}>
+                                                       {assignment.task_name.length > 20
+                                                            ? `${assignment.task_name.slice(0, 20)}...`
+                                                            : assignment.task_name}
+                                                  </span>
+                                             </td>
+                                             <td>
+                                                  <span
+                                                       className="d-inline-block text-truncate"
+                                                       style={{ maxWidth: '150px' }}
+                                                       title={assignment.department_name}>
+                                                       {assignment.department_name.length > 20
+                                                            ? `${assignment.department_name.slice(0, 20)}...`
+                                                            : assignment.department_name}
+                                                  </span>
+                                             </td>
+                                             <td>
+                                                  <span
+                                                       className="d-inline-block text-truncate"
+                                                       style={{ maxWidth: '150px' }}
+                                                       title={assignment.user_name}>
+                                                       {assignment.user_name.length > 20
+                                                            ? `${assignment.user_name.slice(0, 20)}...`
+                                                            : assignment.user_name}
+                                                  </span>
+                                             </td>
+                                             <td>
+                                                  <span
+                                                       className="d-inline-block text-truncate"
+                                                       style={{ maxWidth: '150px' }}
+                                                       title={assignment.note}>
+                                                       {assignment.note.length > 20 ? `${assignment.note.slice(0, 20)}...` : assignment.note}
+                                                  </span>
+                                             </td>
+
+                                             <td>
+                                                  {assignment.status === 'to do' && (
+                                                       <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                            {t('Pending')}
+                                                       </span>
+                                                  )}
+                                                  {assignment.status === 'in progress' && (
+                                                       <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                            {t('In Progress')}
+                                                       </span>
+                                                  )}
+                                                  {assignment.status === 'preview' && (
+                                                       <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                            {t('Preview')}
+                                                       </span>
+                                                  )}
+                                                  {assignment.status === 'done' && (
+                                                       <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                            {t('Done')}
+                                                       </span>
+                                                  )}
+                                             </td>
+                                             <td>
+                                                  <div className="dropdown">
+                                                       <button
+                                                            className="btn btn-sm"
+                                                            type="button"
+                                                            id={`dropdownMenuButton${assignment.id}`}
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                            <i className="bi bi-three-dots-vertical"></i>
+                                                       </button>
+                                                       <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${assignment.id}`}>
+                                                            <li>
+                                                                 <button
+                                                                      className="dropdown-item text-warning"
+                                                                      onClick={() => handleEdit(assignment.id)}>
+                                                                      <i className="bi bi-pencil me-2"></i> {t('Edit')}
+                                                                 </button>
+                                                            </li>
+                                                            <li>
+                                                                 <button
+                                                                      className="dropdown-item text-danger"
+                                                                      onClick={() => handleDeleteClick(assignment.id)}>
+                                                                      <i className="bi bi-trash me-2"></i>
+                                                                      {t('Delete')}
+                                                                 </button>
+                                                            </li>
+                                                       </ul>
+                                                  </div>
+                                             </td>
+                                        </tr>
+                                   ))
+                              )}
                          </tbody>
                     </table>
                     <nav aria-label="Page navigation">

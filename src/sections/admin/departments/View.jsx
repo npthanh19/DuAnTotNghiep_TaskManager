@@ -17,6 +17,8 @@ export function View() {
      const [loading, setLoading] = useState(true);
      const [error, setError] = useState(null);
      const [showAddDepartmentForm, setShowAddDepartmentForm] = useState(false);
+     const [searchTerm, setSearchTerm] = useState('');
+     const [filteredDepartments, setFilteredDepartments] = useState(departments);
 
      useEffect(() => {
           const fetchDepartments = async () => {
@@ -74,6 +76,24 @@ export function View() {
           });
      };
 
+     const handleSearchChange = async (e) => {
+          const value = e.target.value;
+          setSearchTerm(value);
+
+          if (value) {
+               // Thực hiện tìm kiếm với Ajax hoặc gọi API tìm kiếm ở backend
+               try {
+                    const fetchedDepartments = await getAllDepartments(value); // Truyền giá trị tìm kiếm vào API
+                    setFilteredDepartments(fetchedDepartments);
+               } catch (err) {
+                    setError(err.message || 'Không thể lấy danh sách departments');
+               }
+          } else {
+               // Nếu không có từ khóa tìm kiếm, hiển thị toàn bộ danh sách departments
+               setFilteredDepartments(departments);
+          }
+     };
+
      const handleCloseModal = () => {
           setShowDeleteModal(false);
           setSelectedDepartmentId(null);
@@ -121,21 +141,25 @@ export function View() {
 
      return (
           <div className="card">
-               <div className="card-header d-flex justify-content-between align-items-center">
-                    <h3 className="fw-bold py-3 mb-4 highlighted-text">
+               <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
+                    <h3 className="fw-bold text-center text-primary mb-0 fs-4">
                          <span className="marquee">{t('Departments')}</span>
                     </h3>
-                    <div className="d-flex align-items-center ms-auto">
-                         <Link to="/taskmaneger/departments/add" className="btn btn-primary">
-                              <i className="bi bi-plus me-2"></i> {t('Add')}
-                         </Link>
-                         <button
-                              className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
-                              onClick={() => navigate('/taskmaneger/departments/trashed')}>
-                              <i className="bi bi-trash me-2"></i>
-                         </button>
+                    <div className="d-flex align-items-center">
+                         <input type="text" className="form-control form-control-sm" placeholder={t('Search...')} onChange={handleSearchChange} />
+                         <div className="d-flex align-items-center ms-3">
+                              <Link to="/taskmaneger/departments/add" className="btn btn-primary btn-sm rounded-pill">
+                                   <i className="bi bi-plus me-2"></i> {t('Add')}
+                              </Link>
+                              <button
+                                   className="btn btn-outline-secondary btn-sm ms-2 rounded-pill"
+                                   onClick={() => navigate('/taskmaneger/departments/trashed')}>
+                                   <i className="bi bi-trash me-2"></i>
+                              </button>
+                         </div>
                     </div>
                </div>
+
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
@@ -148,65 +172,78 @@ export function View() {
                               </tr>
                          </thead>
                          <tbody>
-                              {currentDepartments.map((department, index) => (
-                                   <tr key={department.id}>
-                                        <td>{indexOfFirstItem + index + 1}</td>
-                                        <td>{department.id}</td>
-                                        <td>
-                                             <span
-                                                  className="d-inline-block text-truncate"
-                                                  style={{ maxWidth: '500px' }}
-                                                  title={department.department_name}>
-                                                  {department.department_name.length > 100
-                                                       ? `${department.department_name.slice(0, 100)}...`
-                                                       : department.department_name}
-                                             </span>
-                                        </td>
-                                        <td>
-                                             <span
-                                                  className="d-inline-block text-truncate"
-                                                  style={{ maxWidth: '500px' }}
-                                                  title={department.description}>
-                                                  {department.description.length > 100
-                                                       ? `${department.description.slice(0, 100)}...`
-                                                       : department.description}
-                                             </span>
-                                        </td>
-                                        <td>
-                                             <div className="dropdown">
-                                                  <button
-                                                       className="btn btn-sm"
-                                                       type="button"
-                                                       id={`dropdownMenuButton${department.id}`}
-                                                       data-bs-toggle="dropdown"
-                                                       aria-expanded="false">
-                                                       <i className="bi bi-three-dots-vertical"></i>
-                                                  </button>
-                                                  <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${department.id}`}>
-                                                       <li>
-                                                            <button className="dropdown-item text-warning" onClick={() => handleEdit(department.id)}>
-                                                                 <i className="bi bi-pencil me-2"></i> {t('Edit')}
-                                                            </button>
-                                                       </li>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-danger"
-                                                                 onClick={() => handleDeleteClick(department.id)}>
-                                                                 <i className="bi bi-trash me-2"></i> {t('Delete')}
-                                                            </button>
-                                                       </li>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-success"
-                                                                 onClick={() => handleAddUserToDepartment(department.id)}>
-                                                                 <i className="bi bi-person-plus me-2"></i> {t('Add User')}
-                                                            </button>
-                                                       </li>
-                                                  </ul>
-                                             </div>
+                              {currentDepartments.filter((department) => department.department_name.toLowerCase().includes(searchTerm.toLowerCase()))
+                                   .length === 0 ? (
+                                   <tr>
+                                        <td colSpan="5" className="text-center">
+                                             {t('No departments found')}
                                         </td>
                                    </tr>
-                              ))}
+                              ) : (
+                                   currentDepartments
+                                        .filter((department) => department.department_name.toLowerCase().includes(searchTerm.toLowerCase()))
+                                        .map((department, index) => (
+                                             <tr key={department.id}>
+                                                  <td>{indexOfFirstItem + index + 1}</td>
+                                                  <td>{department.id}</td>
+                                                  <td>
+                                                       <span
+                                                            className="d-inline-block text-truncate"
+                                                            style={{ maxWidth: '500px' }}
+                                                            title={department.department_name}>
+                                                            {department.department_name.length > 100
+                                                                 ? `${department.department_name.slice(0, 100)}...`
+                                                                 : department.department_name}
+                                                       </span>
+                                                  </td>
+                                                  <td>
+                                                       <span
+                                                            className="d-inline-block text-truncate"
+                                                            style={{ maxWidth: '500px' }}
+                                                            title={department.description}>
+                                                            {department.description.length > 100
+                                                                 ? `${department.description.slice(0, 100)}...`
+                                                                 : department.description}
+                                                       </span>
+                                                  </td>
+                                                  <td>
+                                                       <div className="dropdown">
+                                                            <button
+                                                                 className="btn btn-sm"
+                                                                 type="button"
+                                                                 id={`dropdownMenuButton${department.id}`}
+                                                                 data-bs-toggle="dropdown"
+                                                                 aria-expanded="false">
+                                                                 <i className="bi bi-three-dots-vertical"></i>
+                                                            </button>
+                                                            <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${department.id}`}>
+                                                                 <li>
+                                                                      <button
+                                                                           className="dropdown-item text-warning"
+                                                                           onClick={() => handleEdit(department.id)}>
+                                                                           <i className="bi bi-pencil me-2"></i> {t('Edit')}
+                                                                      </button>
+                                                                 </li>
+                                                                 <li>
+                                                                      <button
+                                                                           className="dropdown-item text-danger"
+                                                                           onClick={() => handleDeleteClick(department.id)}>
+                                                                           <i className="bi bi-trash me-2"></i> {t('Delete')}
+                                                                      </button>
+                                                                 </li>
+                                                                 <li>
+                                                                      <button
+                                                                           className="dropdown-item text-success"
+                                                                           onClick={() => handleAddUserToDepartment(department.id)}>
+                                                                           <i className="bi bi-person-plus me-2"></i> {t('Add User')}
+                                                                      </button>
+                                                                 </li>
+                                                            </ul>
+                                                       </div>
+                                                  </td>
+                                             </tr>
+                                        ))
+                              )}
                          </tbody>
                     </table>
                     <nav aria-label="Page navigation">

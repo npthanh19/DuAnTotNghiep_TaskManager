@@ -36,14 +36,12 @@ export const Add = () => {
      }, [t]);
 
      const getCurrentUser = async () => {
-          // Đây là hàm giả định để lấy thông tin người dùng từ backend
-          // Bạn có thể thay thế bằng cách gọi API thực tế để lấy thông tin người dùng
-          return { id: 1 }; // Giả sử người dùng có id = 1
+          return { id: 1 };
      };
 
      const onSubmit = async (data) => {
           try {
-               const worktimeData = { ...data, user_id: userId }; // Thêm user_id vào dữ liệu gửi lên
+               const worktimeData = { ...data, user_id: userId };
                await createWorktime(worktimeData);
                toast.success(t('Worktime added successfully!'));
                reset();
@@ -52,7 +50,6 @@ export const Add = () => {
                }, 1000);
           } catch (error) {
                toast.error(t('Failed to add worktime!'));
-               console.error('Failed to add worktime:', error);
           }
      };
 
@@ -68,7 +65,7 @@ export const Add = () => {
                          {/* Name */}
                          <div className="mb-3">
                               <label htmlFor="name" className="form-label">
-                                   {t('Worktime Name')}
+                                   {t('Name')}
                               </label>
                               <input
                                    type="text"
@@ -82,7 +79,7 @@ export const Add = () => {
                          {/* Project ID */}
                          <div className="mb-3">
                               <label htmlFor="project_id" className="form-label">
-                                   {t('Project')}
+                                   {t('Project Name')}
                               </label>
                               <select
                                    id="project_id"
@@ -140,7 +137,10 @@ export const Add = () => {
                          </div>
 
                          <button type="submit" className="btn btn-success">
-                              <i className="bi bi-check-circle me-3"></i> {t('Add Worktime')}
+                              <i className="bi bi-check-circle me-3"></i> {t('Add')}
+                         </button>
+                         <button type="button" className="btn btn-secondary ms-2" onClick={() => window.history.back()}>
+                              <i className="bi bi-arrow-left me-2"></i> {t('Back')}
                          </button>
                     </form>
                </div>

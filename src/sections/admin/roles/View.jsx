@@ -99,19 +99,24 @@ export function View() {
 
      return (
           <div className="card">
-               <div className="card-header d-flex justify-content-between align-items-center">
-                    <h3 className="fw-bold py-3 mb-4 highlighted-text">
-                         <span>{t('Roles')}</span>
+               <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
+                    <h3 className="fw-bold text-center text-primary mb-0 fs-4">
+                         <span className="marquee">{t('Roles')}</span>
                     </h3>
-                    <Link to="/taskmaneger/roles/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add')}
-                    </Link>
+                    <div className="d-flex align-items-center">
+                         <div className="d-flex align-items-center ms-3">
+                              <Link to="/taskmaneger/roles/add" className="btn btn-primary btn-sm rounded-pill">
+                                   <i className="bi bi-plus me-2"></i> {t('Add')}
+                              </Link>
+                         </div>
+                    </div>
                </div>
+
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th className="col">{t('STT')}</th>
+                                   <th>{t('STT')}</th>
                                    <th>{t('ID')}</th>
                                    <th>{t('Role Name')}</th>
                                    <th>{t('Description')}</th>

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
@@ -161,21 +159,31 @@ export const View = () => {
 
      return (
           <div className="card">
-               <div className="card-header d-flex justify-content-between align-items-center">
-                    <h3 className="fw-bold py-3 mb-4 highlighted-text">
+               <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
+                    <h3 className="fw-bold text-center text-primary mb-0 fs-4">
                          <span className="marquee">{t('Projects')}</span>
                     </h3>
-                    <div className="d-flex align-items-center ms-auto">
-                         <Link to="/taskmaneger/projects/add" className="btn btn-primary">
-                              <i className="bi bi-plus me-2"></i> {t('Add')}
-                         </Link>
-                         <button
-                              className="btn btn-outline-secondary btn-sm d-flex align-items-center ms-2"
-                              onClick={() => navigate('/taskmaneger/projects/trashed')}>
-                              <i className="bi bi-trash me-2"></i>
-                         </button>
+                    <div className="d-flex align-items-center">
+                         <input
+                              type="text"
+                              className="form-control form-control-sm me-2"
+                              placeholder={t('Search...')}
+                              // value={searchTerm}
+                              // onChange={handleSearchChange}
+                         />
+                         <div className="d-flex align-items-center ms-3">
+                              <Link to="/taskmaneger/projects/add" className="btn btn-primary btn-sm rounded-pill">
+                                   <i className="bi bi-plus me-2"></i> {t('Add')}
+                              </Link>
+                              <button
+                                   className="btn btn-outline-secondary btn-sm ms-2 rounded-pill"
+                                   onClick={() => navigate('/taskmaneger/projects/trashed')}>
+                                   <i className="bi bi-trash me-2"></i>
+                              </button>
+                         </div>
                     </div>
                </div>
+
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
                          <thead>
@@ -191,74 +199,88 @@ export const View = () => {
                               </tr>
                          </thead>
                          <tbody>
-                              {currentProjects.map((project, index) => (
-                                   <tr key={project.id}>
-                                        <td>{indexOfFirstItem + index + 1}</td>
-                                        <td>{project.id}</td>
-                                        <td title={project.project_name}>
-                                             {project.project_name.length > 20 ? `${project.project_name.slice(0, 20)}...` : project.project_name}
-                                        </td>
-                                        <td>{project.start_date}</td>
-                                        <td>{project.end_date}</td>
-                                        <td>
-                                             {project.status === 'to do' && (
-                                                  <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Not yet implemented')}
-                                                  </span>
-                                             )}
-                                             {project.status === 'in progress' && (
-                                                  <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Ongoing')}
-                                                  </span>
-                                             )}
-                                             {project.status === 'preview' && (
-                                                  <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Complete')}
-                                                  </span>
-                                             )}
-                                             {project.status === 'done' && (
-                                                  <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                       {t('Destroy')}
-                                                  </span>
-                                             )}
-                                        </td>
-                                        <td>{users[project.user_id] ? users[project.user_id] : <span className="badge bg-secondary">none</span>}</td>
-                                        <td>
-                                             <div className="dropdown">
-                                                  <button
-                                                       className="btn btn-sm"
-                                                       type="button"
-                                                       id={`dropdownMenuButton${project.id}`}
-                                                       data-bs-toggle="dropdown"
-                                                       aria-expanded="false">
-                                                       <i className="bi bi-three-dots-vertical me-2"></i>
-                                                  </button>
-                                                  <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${project.id}`}>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-warning"
-                                                                 onClick={() => handleAddDepartmentClick(project.id)}>
-                                                                 <i className="bi bi-plus me-2"></i> {t('Room')}
-                                                            </button>
-                                                       </li>
-                                                       <li>
-                                                            <button className="dropdown-item text-warning" onClick={() => handleEdit(project.id)}>
-                                                                 <i className="bi bi-pencil me-2"></i> {t('Edit')}
-                                                            </button>
-                                                       </li>
-                                                       <li>
-                                                            <button
-                                                                 className="dropdown-item text-danger"
-                                                                 onClick={() => handleDeleteClick(project.id, project.project_name)}>
-                                                                 <i className="bi bi-trash me-2"></i>
-                                                                 {t('Delete')}
-                                                            </button>
-                                                       </li>
-                                                  </ul>
-                                             </div>
+                              {currentProjects.length === 0 ? (
+                                   <tr>
+                                        <td colSpan="7" className="text-center">
+                                             <span>{t('No project found')}</span>
                                         </td>
                                    </tr>
-                              ))}
+                              ) : (
+                                   currentProjects.map((project, index) => (
+                                        <tr key={project.id}>
+                                             <td>{indexOfFirstItem + index + 1}</td>
+                                             <td>{project.id}</td>
+                                             <td title={project.project_name}>
+                                                  {project.project_name.length > 20
+                                                       ? `${project.project_name.slice(0, 20)}...`
+                                                       : project.project_name}
+                                             </td>
+                                             <td>{project.start_date}</td>
+                                             <td>{project.end_date}</td>
+                                             <td>
+                                                  {project.status === 'to do' && (
+                                                       <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                            {t('Not yet implemented')}
+                                                       </span>
+                                                  )}
+                                                  {project.status === 'in progress' && (
+                                                       <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                            {t('Ongoing')}
+                                                       </span>
+                                                  )}
+                                                  {project.status === 'preview' && (
+                                                       <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                            {t('Complete')}
+                                                       </span>
+                                                  )}
+                                                  {project.status === 'done' && (
+                                                       <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
+                                                            {t('Destroy')}
+                                                       </span>
+                                                  )}
+                                             </td>
+                                             <td>
+                                                  {users[project.user_id] ? users[project.user_id] : <span className="badge bg-secondary">none</span>}
+                                             </td>
+                                             <td>
+                                                  <div className="dropdown">
+                                                       <button
+                                                            className="btn btn-sm"
+                                                            type="button"
+                                                            id={`dropdownMenuButton${project.id}`}
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                            <i className="bi bi-three-dots-vertical me-2"></i>
+                                                       </button>
+                                                       <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${project.id}`}>
+                                                            <li>
+                                                                 <button
+                                                                      className="dropdown-item text-warning"
+                                                                      onClick={() => handleAddDepartmentClick(project.id)}>
+                                                                      <i className="bi bi-plus me-2"></i> {t('Room')}
+                                                                 </button>
+                                                            </li>
+                                                            <li>
+                                                                 <button
+                                                                      className="dropdown-item text-warning"
+                                                                      onClick={() => handleEdit(project.id)}>
+                                                                      <i className="bi bi-pencil me-2"></i> {t('Edit')}
+                                                                 </button>
+                                                            </li>
+                                                            <li>
+                                                                 <button
+                                                                      className="dropdown-item text-danger"
+                                                                      onClick={() => handleDeleteClick(project.id, project.project_name)}>
+                                                                      <i className="bi bi-trash me-2"></i>
+                                                                      {t('Delete')}
+                                                                 </button>
+                                                            </li>
+                                                       </ul>
+                                                  </div>
+                                             </td>
+                                        </tr>
+                                   ))
+                              )}
                          </tbody>
                     </table>
                     <nav aria-label="Page navigation">
@@ -286,7 +308,6 @@ export const View = () => {
                          </ul>
                     </nav>
                </div>
-               <ToastContainer position="top-right" />
                {showDeleteModal && (
                     <Delete show={showDeleteModal} onClose={handleCloseModal} onDeleteSuccess={handleDeleteSuccess} id={selectedProjectId} />
                )}

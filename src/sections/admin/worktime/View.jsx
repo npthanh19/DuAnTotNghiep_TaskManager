@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { deleteWorktime, getAllWorktimes, updateWorktime, updateWorktimeStatus } from '../../../services/worktimeService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getAllUsers } from '../../../services/usersService';
@@ -28,6 +28,8 @@ export const View = () => {
      const currentWorktimes = worktimes?.slice(indexOfFirstItem, indexOfLastItem);
 
      const { t } = useTranslation();
+     const navigate = useNavigate();
+     const [searchTerm, setSearchTerm] = useState('');
 
      useEffect(() => {
           const fetchData = async () => {
@@ -127,7 +129,8 @@ export const View = () => {
                     title: t('Update Successful!'),
                     text: t('The worktime has been updated successfully!'),
                     position: 'top-right',
-                    timer: 2000,
+                    toast: true,
+                    timer: 3000,
                     showConfirmButton: false,
                });
                setEditingWorktime(null);
@@ -137,7 +140,8 @@ export const View = () => {
                     title: t('Update Failed!'),
                     text: t('Failed to update the worktime. Please try again later!'),
                     position: 'top-right',
-                    timer: 2000,
+                    toast: true,
+                    timer: 3000,
                     showConfirmButton: false,
                });
           }
@@ -189,6 +193,12 @@ export const View = () => {
           });
      };
 
+     const handleSearchChange = (e) => {
+          setSearchTerm(e.target.value);
+     };
+
+     const filteredWorktimes = worktimes.filter((worktime) => worktime.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
      if (loading) {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -203,18 +213,54 @@ export const View = () => {
           return <div className="text-danger text-center">{error}</div>;
      }
 
+     const WorktimeStatusButton = ({ status, worktimeId, handleStart, handleComplete }) => {
+          return (
+               <div className="d-flex gap-2">
+                    {status === 'not start' ? (
+                         <button onClick={() => handleStart(worktimeId)} className="btn btn-primary rounded-pill px-4 py-2">
+                              <i className="bi bi-play me-2"></i> {t('Start')}
+                         </button>
+                    ) : (
+                         <button onClick={() => handleComplete(worktimeId)} className="btn btn-success rounded-pill px-4 py-2">
+                              <i className="bi bi-check-circle me-2"></i> {t('Done')}
+                         </button>
+                    )}
+               </div>
+          );
+     };
+
      return (
           <div className="card">
-               <div className="card-header d-flex justify-content-between align-items-center">
-                    <h3 className="fw-bold py-3 mb-4">{t('Worktimes')}</h3>
-                    <Link to="/taskmaneger/worktimes/add" className="btn btn-primary">
-                         <i className="bi bi-plus me-2"></i> {t('Add')}
-                    </Link>
+               <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
+                    <h3 className="fw-bold text-center text-primary mb-0 fs-4">
+                         <span className="marquee">{t('Worktimes')}</span>
+                    </h3>
+                    <div className="d-flex align-items-center">
+                         <input
+                              type="text"
+                              className="form-control form-control-sm me-2"
+                              placeholder={t('Search...')}
+                              value={searchTerm}
+                              onChange={handleSearchChange}
+                         />
+                         <div className="d-flex align-items-center ms-3">
+                              <Link to="/taskmaneger/worktimes/add" className="btn btn-primary btn-sm rounded-pill">
+                                   <i className="bi bi-plus me-2"></i> {t('Add')}
+                              </Link>
+                              <button
+                                   className="btn btn-outline-secondary btn-sm ms-2 rounded-pill"
+                                   onClick={() => navigate('/taskmaneger/worktimes/trashed')}>
+                                   <i className="bi bi-trash me-2"></i>
+                              </button>
+                         </div>
+                    </div>
                </div>
+
                <div className="card-body" style={{ padding: 0 }}>
                     <table className="table">
                          <thead>
                               <tr>
+                                   <th>{t('STT')}</th>
                                    <th>{t('ID')}</th>
                                    <th>{t('Name')}</th>
                                    <th>{t('Projects')}</th>
@@ -222,107 +268,120 @@ export const View = () => {
                                    <th>{t('Start Date')}</th>
                                    <th>{t('End Date')}</th>
                                    <th>{t('Status')}</th>
-                                   {/* <th>{t('Description')}</th> */}
                                    <th>{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
-                              {currentWorktimes.map((worktime) => {
-                                   const project = worktime.project_id ? projects.find((proj) => proj.id === worktime.project_id) : null;
-                                   const user = worktime.user_id ? users.find((usr) => usr.id === worktime.user_id) : null;
+                              {currentWorktimes.length === 0 ? (
+                                   <tr>
+                                        <td colSpan="8" className="text-center">
+                                             {t('No worktime found')}
+                                        </td>
+                                   </tr>
+                              ) : (
+                                   currentWorktimes.map((worktime, index) => {
+                                        const project = worktime.project_id ? projects.find((proj) => proj.id === worktime.project_id) : null;
+                                        const user = worktime.user_id ? users.find((usr) => usr.id === worktime.user_id) : null;
 
-                                   return (
-                                        <tr key={worktime.id}>
-                                             <td>{worktime.id}</td>
-                                             <td>
-                                                  {editingWorktime && editingWorktime.id === worktime.id ? (
-                                                       <input
-                                                            type="text"
-                                                            value={editingWorktime.name}
-                                                            onChange={(e) => setEditingWorktime({ ...editingWorktime, name: e.target.value })}
-                                                       />
-                                                  ) : (
-                                                       worktime.name
-                                                  )}
-                                             </td>
-                                             <td>
-                                                  {editingWorktime && editingWorktime.id === worktime.id ? (
-                                                       <select
-                                                            value={editingWorktime.project_id}
-                                                            onChange={(e) => setEditingWorktime({ ...editingWorktime, project_id: e.target.value })}>
-                                                            {projects.map((project) => (
-                                                                 <option key={project.id} value={project.id}>
-                                                                      {project.project_name}
-                                                                 </option>
-                                                            ))}
-                                                       </select>
-                                                  ) : project ? (
-                                                       project.project_name
-                                                  ) : (
-                                                       '-'
-                                                  )}
-                                             </td>
-                                             <td>{user ? user.fullname : '-'}</td>
-                                             <td>
-                                                  {editingWorktime && editingWorktime.id === worktime.id ? (
-                                                       <input
-                                                            type="date"
-                                                            value={editingWorktime.start_date}
-                                                            onChange={(e) => setEditingWorktime({ ...editingWorktime, start_date: e.target.value })}
-                                                       />
-                                                  ) : (
-                                                       worktime.start_date
-                                                  )}
-                                             </td>
-                                             <td>
-                                                  {editingWorktime && editingWorktime.id === worktime.id ? (
-                                                       <input
-                                                            type="date"
-                                                            value={editingWorktime.end_date}
-                                                            onChange={(e) => setEditingWorktime({ ...editingWorktime, end_date: e.target.value })}
-                                                       />
-                                                  ) : (
-                                                       worktime.end_date
-                                                  )}
-                                             </td>
-                                             <td>{worktime.status}</td>
-                                             <td>
-                                                  <div className="dropdown">
-                                                       <button className="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i className="bi bi-three-dots-vertical"></i>
-                                                       </button>
-                                                       <ul className="dropdown-menu">
-                                                            <li>
-                                                                 {worktime?.status === 'not start' ? (
-                                                                      <button onClick={() => handleStart(worktime?.id)} className="btn btn-primary">
-                                                                           {t('Starts')}
-                                                                      </button>
-                                                                 ) : (
+                                        return (
+                                             <tr key={worktime.id}>
+                                                  <td>{indexOfFirstItem + index + 1}</td>
+                                                  <td>{worktime.id}</td>
+                                                  <td>
+                                                       {editingWorktime && editingWorktime.id === worktime.id ? (
+                                                            <input
+                                                                 type="text"
+                                                                 value={editingWorktime.name}
+                                                                 onChange={(e) => setEditingWorktime({ ...editingWorktime, name: e.target.value })}
+                                                            />
+                                                       ) : (
+                                                            worktime.name
+                                                       )}
+                                                  </td>
+                                                  <td>
+                                                       {editingWorktime && editingWorktime.id === worktime.id ? (
+                                                            <select
+                                                                 value={editingWorktime.project_id}
+                                                                 onChange={(e) =>
+                                                                      setEditingWorktime({ ...editingWorktime, project_id: e.target.value })
+                                                                 }>
+                                                                 {projects.map((project) => (
+                                                                      <option key={project.id} value={project.id}>
+                                                                           {project.project_name}
+                                                                      </option>
+                                                                 ))}
+                                                            </select>
+                                                       ) : project ? (
+                                                            project.project_name
+                                                       ) : (
+                                                            '-'
+                                                       )}
+                                                  </td>
+                                                  <td>{user ? user.fullname : '-'}</td>
+                                                  <td>
+                                                       {editingWorktime && editingWorktime.id === worktime.id ? (
+                                                            <input
+                                                                 type="date"
+                                                                 value={editingWorktime.start_date}
+                                                                 onChange={(e) =>
+                                                                      setEditingWorktime({ ...editingWorktime, start_date: e.target.value })
+                                                                 }
+                                                            />
+                                                       ) : (
+                                                            worktime.start_date
+                                                       )}
+                                                  </td>
+                                                  <td>
+                                                       {editingWorktime && editingWorktime.id === worktime.id ? (
+                                                            <input
+                                                                 type="date"
+                                                                 value={editingWorktime.end_date}
+                                                                 onChange={(e) =>
+                                                                      setEditingWorktime({ ...editingWorktime, end_date: e.target.value })
+                                                                 }
+                                                            />
+                                                       ) : (
+                                                            worktime.end_date
+                                                       )}
+                                                  </td>
+                                                  <td>{worktime.status}</td>
+                                                  <td>
+                                                       <div className="dropdown">
+                                                            <button
+                                                                 className="btn btn-sm"
+                                                                 type="button"
+                                                                 data-bs-toggle="dropdown"
+                                                                 aria-expanded="false">
+                                                                 <i className="bi bi-three-dots-vertical"></i>
+                                                            </button>
+                                                            <ul className="dropdown-menu">
+                                                                 <WorktimeStatusButton
+                                                                      status={worktime.status}
+                                                                      worktimeId={worktime.id}
+                                                                      handleStart={handleStart}
+                                                                      handleComplete={handleComplete}
+                                                                 />
+                                                                 <li>
                                                                       <button
-                                                                           onClick={() => handleComplete(worktime?.id)}
-                                                                           className="btn btn-success">
-                                                                           {t('Done')}
+                                                                           className="dropdown-item text-warning"
+                                                                           onClick={() => handleEdit(worktime)}>
+                                                                           <i className="bi bi-pencil me-2"></i> {t('Edit')}
                                                                       </button>
-                                                                 )}
-                                                            </li>
-                                                            <li>
-                                                                 <button className="dropdown-item text-warning" onClick={() => handleEdit(worktime)}>
-                                                                      <i className="bi bi-pencil me-2"></i> {t('Edit')}
-                                                                 </button>
-                                                            </li>
-                                                            <li>
-                                                                 <button
-                                                                      className="dropdown-item text-danger"
-                                                                      onClick={() => handleDeleteClick(worktime.id)}>
-                                                                      <i className="bi bi-trash me-2"></i> {t('Delete')}
-                                                                 </button>
-                                                            </li>
-                                                       </ul>
-                                                  </div>
-                                             </td>
-                                        </tr>
-                                   );
-                              })}
+                                                                 </li>
+                                                                 <li>
+                                                                      <button
+                                                                           className="dropdown-item text-danger"
+                                                                           onClick={() => handleDeleteClick(worktime.id)}>
+                                                                           <i className="bi bi-trash me-2"></i> {t('Delete')}
+                                                                      </button>
+                                                                 </li>
+                                                            </ul>
+                                                       </div>
+                                                  </td>
+                                             </tr>
+                                        );
+                                   })
+                              )}
                          </tbody>
                     </table>
                     <nav aria-label="Page navigation">

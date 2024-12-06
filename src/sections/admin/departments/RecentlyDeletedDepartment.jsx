@@ -23,7 +23,7 @@ function RecentlyDeletedDepartments() {
           const fetchTrashedDepartments = async () => {
                try {
                     const trashDepartments = await getTrashedDepartments();
-                    setDepartments(trashDepartments.data);
+                    setDepartments(trashDepartments.departments);
                } catch (error) {
                     setError(error.message);
                } finally {
@@ -161,6 +161,7 @@ function RecentlyDeletedDepartments() {
                               <tr className="text-center">
                                    <th>{t('ID')}</th>
                                    <th>{t('Department Name')}</th>
+                                   <th>{t('Description')}</th>
                                    <th>{t('Actions')}</th>
                               </tr>
                          </thead>
@@ -168,7 +169,26 @@ function RecentlyDeletedDepartments() {
                               {currentDepartments.map((department) => (
                                    <tr key={department.id} className="text-center">
                                         <td>{department.id}</td>
-                                        <td>{department.department_name}</td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '500px' }}
+                                                  title={department.department_name}>
+                                                  {department.department_name.length > 100
+                                                       ? `${department.department_name.slice(0, 100)}...`
+                                                       : department.department_name}
+                                             </span>
+                                        </td>
+                                        <td>
+                                             <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: '500px' }}
+                                                  title={department.description}>
+                                                  {department.description.length > 100
+                                                       ? `${department.description.slice(0, 100)}...`
+                                                       : department.description}
+                                             </span>
+                                        </td>
                                         <td>
                                              <div className="dropdown">
                                                   <button
