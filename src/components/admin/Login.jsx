@@ -27,6 +27,7 @@ const Login = () => {
                     localStorage.setItem('token', response.access_token);
                     localStorage.setItem('role', response.role);
                     localStorage.setItem('user_id', response.user_id);
+                    localStorage.setItem('user_name', response.fullname);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
 
                     Swal.fire({
@@ -92,6 +93,7 @@ const Login = () => {
                     localStorage.setItem('token', response.data.access_token);
                     localStorage.setItem('role', response.data.role);
                     localStorage.setItem('user_id', response.user_id);
+                    localStorage.setItem('user_name', response.fullname);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
                     Swal.fire({

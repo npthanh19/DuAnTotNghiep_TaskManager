@@ -9,7 +9,6 @@ import Select from 'react-select';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 
-
 export const Add = () => {
      const { t } = useTranslation();
      const navigate = useNavigate();
@@ -120,6 +119,9 @@ export const Add = () => {
 
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-3"></i> {t('Add')}
+                         </button>
+                         <button type="button" className="btn btn-secondary ms-2" onClick={() => window.history.back()}>
+                              <i className="bi bi-arrow-left me-2"></i> {t('Back')}
                          </button>
                     </form>
                </div>

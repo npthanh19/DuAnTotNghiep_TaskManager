@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { getUserById, updateUser, updateAvatar, getAvatarUrl } from '../../../services/usersService';
 import { getAllRoles } from '../../../services/rolesService';
 import Swal from 'sweetalert2';
-
 
 export const Edit = () => {
      const { id } = useParams();
@@ -41,7 +38,7 @@ export const Edit = () => {
                     const fetchedRoles = await getAllRoles();
                     setRoles(fetchedRoles);
                } catch (error) {
-                    toast.error(t('Failed to fetch user data'));
+                    console.log(error);
                }
           };
           fetchData();
@@ -228,6 +225,9 @@ export const Edit = () => {
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-2"></i> {t('Confirm')}
                          </button>
+                         <button type="button" className="btn btn-secondary ms-2" onClick={() => window.history.back()}>
+                              <i className="bi bi-arrow-left me-2"></i> {t('Back')}
+                         </button>
                     </form>
                </div>
 
@@ -252,10 +252,6 @@ export const Edit = () => {
                          </div>
                     </div>
                )}
-
-               <ToastContainer position="top-right" autoClose={1000} />
           </div>
      );
 };
-
-

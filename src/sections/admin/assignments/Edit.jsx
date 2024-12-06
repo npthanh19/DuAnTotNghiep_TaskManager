@@ -221,6 +221,9 @@ export const Edit = () => {
                          <button type="submit" className="btn btn-success">
                               <i className="bi bi-check-circle me-3"></i> {t('Confirm')}
                          </button>
+                         <button type="button" className="btn btn-secondary ms-2" onClick={() => window.history.back()}>
+                              <i className="bi bi-arrow-left me-2"></i> {t('Back')}
+                         </button>
                     </form>
                </div>
           </div>

@@ -7,14 +7,13 @@ import { getUserById, updateUser, updateAvatar } from '../../services/usersServi
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import '../../index.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Update_profile() {
      const [isSidebarOpen, setIsSidebarOpen] = useState(true);
      const [user, setUser] = useState({});
      const { t } = useTranslation();
      const [avatar, setAvatar] = useState(null);
-     const navigate = useNavigate();
      const userInfo = JSON.parse(localStorage.getItem('user'));
      const userId = userInfo?.user_id;
      const token = localStorage.getItem('token');
@@ -41,18 +40,6 @@ export default function Update_profile() {
      useEffect(() => {
           const fetchUserData = async () => {
                try {
-                    if (!userInfo || !userInfo.access_token) {
-                         Swal.fire({
-                              icon: 'error',
-                              text: t('User not found! Please login again.'),
-                              position: 'top-right',
-                              toast: true,
-                              timer: 3000,
-                              showConfirmButton: false,
-                         });
-                         return;
-                    }
-
                     const userData = await getUserById(userId, token);
                     if (userData) {
                          setUser(userData);
@@ -130,17 +117,12 @@ export default function Update_profile() {
      const onSubmit = async (data) => {
           setIsSaving(true);
           try {
-               // Chỉ thêm các trường có giá trị vào payload
-               const updatedData = {};
-               if (data.fullname && data.fullname.trim() !== user.fullname) {
-                    updatedData.fullname = data.fullname.trim();
-               }
-               if (data.phoneNumber && formatPhoneNumber(data.phoneNumber.trim()) !== user.phone_number) {
-                    updatedData.phone_number = formatPhoneNumber(data.phoneNumber.trim());
-               }
-               if (data.email && data.email.trim() !== user.email) {
-                    updatedData.email = data.email.trim();
-               }
+               const updatedData = {
+                    fullname: data.fullname.trim(),
+                    email: data.email.trim(),
+                    phone_number: data.phoneNumber.trim(),
+                    password: data.password ? data.password.trim() : undefined,
+               };
 
                if (Object.keys(updatedData).length === 0) {
                     Swal.fire({
@@ -170,7 +152,7 @@ export default function Update_profile() {
                     Object.keys(errors).forEach((field) => {
                          Swal.fire({
                               icon: 'error',
-                              text: `${t(field)}: ${errors[field].join(', ')}`,
+                              text: t('Failed to update the user.'),
                               position: 'top-right',
                               toast: true,
                               timer: 3000,

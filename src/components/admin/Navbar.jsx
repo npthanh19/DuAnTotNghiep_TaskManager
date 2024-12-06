@@ -27,10 +27,13 @@ const Navbar = ({ onToggleSidebar }) => {
      const handleLogout = async () => {
           try {
                await logout();
-               localStorage.removeItem('isAuthenticated');
-               localStorage.removeItem('token');
-               sessionStorage.removeItem('user_email');
-               axiosi.defaults.headers.common['Authorization'] = '';
+
+               const keysToRemove = ['isAuthenticated', 'token', 'role', 'user_id', 'user_name'];
+               keysToRemove.forEach((key) => localStorage.removeItem(key));
+
+               sessionStorage.clear();
+
+               delete axiosi.defaults.headers.common['Authorization'];
 
                Swal.fire({
                     icon: 'success',
@@ -135,34 +138,38 @@ const Navbar = ({ onToggleSidebar }) => {
                                    id="dropdownUser"
                                    data-bs-toggle="dropdown"
                                    aria-expanded="false">
-                                   <div className="avatar avatar-online">
+                                   <div className="avatar">
                                         <img src="/assets/admin/img/avatars/1.png" alt="User Avatar" className="w-px-40 h-auto rounded-circle" />
                                    </div>
                               </a>
                               <ul className="dropdown-menu dropdown-menu-end mt-3 py-2" aria-labelledby="dropdownUser">
-                                   <li>
-                                        <a className="dropdown-item d-flex align-items-center" href="#">
-                                             <div className="flex-shrink-0 me-2">
-                                                  <div className="avatar avatar-online">
-                                                       <img
-                                                            src="/assets/admin/img/avatars/1.png"
-                                                            alt="User Avatar"
-                                                            className="w-px-40 h-auto rounded-circle"
-                                                       />
-                                                  </div>
+                                   <li className="px-3 py-2">
+                                        <div className="d-flex align-items-center">
+                                             <div className="avatar me-3">
+                                                  <img
+                                                       src="/assets/admin/img/avatars/1.png"
+                                                       alt="User Avatar"
+                                                       className="w-px-40 h-auto rounded-circle"
+                                                  />
                                              </div>
-                                        </a>
+                                             <div className="row" style={{ fontSize: '13px' }}>
+                                                  <div className="col-12" style={{ fontWeight: '600' }}>
+                                                       {localStorage.getItem('user_name')}
+                                                  </div>
+                                                  <div className="col-12 text-muted">{localStorage.getItem('role')}</div>
+                                             </div>
+                                        </div>
                                    </li>
                                    <li>
                                         <div className="dropdown-divider"></div>
                                    </li>
-                                   <Link className="dropdown-item" to="/taskmaneger/update_profile">
-                                        <i className="ri-user-3-line ri-22px me-2"></i>
+                                   <Link className="dropdown-item d-flex align-items-center" to="/taskmaneger/update_profile">
+                                        <i className="ri-user-3-line ri-18px me-2"></i>
                                         <span className="align-middle">{t('Thông tin cá nhân')}</span>
                                    </Link>
                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                             <i className="ri-settings-4-line ri-22px me-2"></i>
+                                        <a className="dropdown-item d-flex align-items-center" href="#">
+                                             <i className="ri-settings-4-line ri-18px me-2"></i>
                                              <span className="align-middle">{t('Cài đặt')}</span>
                                         </a>
                                    </li>
@@ -171,9 +178,11 @@ const Navbar = ({ onToggleSidebar }) => {
                                    </li>
                                    <li>
                                         <div className="d-grid px-4 pt-2 pb-1">
-                                             <button className="btn btn-danger d-flex" onClick={handleLogout}>
-                                                  <small className="align-middle">{t('Logout')}</small>
-                                                  <i className="ri-logout-box-r-line ms-2 ri-16px"></i>
+                                             <button
+                                                  className="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                                                  onClick={handleLogout}>
+                                                  <i className="ri-logout-box-r-line me-2"></i>
+                                                  <span>{t('Logout')}</span>
                                              </button>
                                         </div>
                                    </li>
