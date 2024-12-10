@@ -140,7 +140,7 @@ export const View = () => {
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
      const currentTasks = filterTask.slice(indexOfFirstItem, indexOfLastItem);
      const totalPages = Math.ceil(filterTask.length / itemsPerPage);
-
+/////////////////
      const handlePageChange = (pageNumber) => {
           setCurrentPage(pageNumber);
      };
@@ -162,7 +162,7 @@ export const View = () => {
                </div>
           );
      }
-
+////////////////////////
      const handleSearchChange = (e) => {
           setSearchTerm(e.target.value);
           setCurrentPage(1);

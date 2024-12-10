@@ -10,6 +10,7 @@ const projectApiEndpoint = '/api/projects';
 //bắt đầu worktime
 //kết thúc worktime -> kết thúc nếu còn task trong worktime thì cho phép dời sang wortime khác
 
+// Lấy tất cả
 export const getAllTasks = async () => {
      try {
           const response = await axiosi.get(taskApiEndpoint);
@@ -20,6 +21,7 @@ export const getAllTasks = async () => {
      }
 };
 
+// Lấy thông tin từ task ID
 export const getTaskById = async (id) => {
      try {
           const response = await axiosi.get(`${taskApiEndpoint}/${id}`);
@@ -29,6 +31,8 @@ export const getTaskById = async (id) => {
           throw error.response ? error.response.data : new Error('Network error');
      }
 };
+
+
 export const getTaskDetails = async (taskId) => {
      try {
           const response = await axiosi.get(`${taskApiEndpoint}/${taskId}/details`);
@@ -39,6 +43,7 @@ export const getTaskDetails = async (taskId) => {
      }
 };
 
+//Thêm task mới
 export const createTask = async (taskData) => {
      try {
           const response = await axiosi.post(taskApiEndpoint, taskData);
@@ -49,6 +54,7 @@ export const createTask = async (taskData) => {
      }
 };
 
+// Cập nhật task
 export const updateTask = async (id, taskData) => {
      try {
           const response = await axiosi.put(`${taskApiEndpoint}/${id}`, taskData);
@@ -59,6 +65,7 @@ export const updateTask = async (id, taskData) => {
      }
 };
 
+//Xoá task
 export const deleteTask = async (id) => {
      try {
           const response = await axiosi.delete(`${taskApiEndpoint}/${id}`);
@@ -69,6 +76,8 @@ export const deleteTask = async (id) => {
      }
 };
 
+
+//Thêm users vào task
 export const addUsersToTask = async (taskId, users) => {
      try {
           const response = await axiosi.post(`${taskApiEndpoint}/${taskId}/add-users`, { users });
@@ -79,6 +88,7 @@ export const addUsersToTask = async (taskId, users) => {
      }
 };
 
+// Lây phòng ban dựa trên projectId
 export const getDepartmentsByProjectId = async (projectId) => {
      try {
           const response = await axiosi.get(`${projectApiEndpoint}/${projectId}/departments`);

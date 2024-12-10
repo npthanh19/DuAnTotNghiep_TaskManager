@@ -48,6 +48,10 @@ export const updateComment = async (id, commentData) => {
 };
 
 // Xóa bình luận
+// Xóa bình luận
+// Xóa bình luận
+// Xóa bình luận
+
 export const deleteComment = async (id) => {
      try {
           const response = await axiosi.delete(`${apiEndpoint}/${id}`); // Sử dụng axiosi thay vì axios
@@ -58,7 +62,9 @@ export const deleteComment = async (id) => {
      }
 };
 
-// Lấy bình luận theo Task ID
+// Lấy bình luận theo TaskID
+// Lấy bình luận theo TaskID
+// Lấy bình luận theo TaskID
 export const getCommentsByTask = async (taskId) => {
      try {
           const response = await axiosi.get(`${taskApiEndpoint}/${taskId}/comments`);

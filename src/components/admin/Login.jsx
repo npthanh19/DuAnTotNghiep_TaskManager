@@ -7,9 +7,13 @@ import { axiosi } from '../../config/axios';
 import { login } from '../../services/authService';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import { useTranslation } from 'react-i18next';
+
 
 const Login = () => {
      const [loading, setLoading] = useState(false);
+     const { t } = useTranslation();
+
      const {
           register,
           handleSubmit,
@@ -30,7 +34,7 @@ const Login = () => {
                     localStorage.setItem('user_name', response.fullname);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
 
-                    Swal.fire({
+                    Swal.fire({    
                          icon: 'success',
                          title: `Chào mừng bạn, ${data.email}!`,
                          position: 'top-right',
@@ -50,7 +54,7 @@ const Login = () => {
           } catch (error) {
                Swal.fire({
                     icon: 'error',
-                    title: error.response && error.response.status === 401 ? 'Email hoặc Mật khẩu đã sai' : 'Đăng nhập thất bại. Vui lòng thử lại.',
+                    title: error.response && error.response.status === 401 ? t('Email or Password is wrong') : t('Login failed. Please try again.'),
                     position: 'top-right',
                     toast: true,
                     timer: 2000,
@@ -78,7 +82,7 @@ const Login = () => {
 
                     Swal.fire({
                          icon: 'info',
-                         title: 'Vui lòng kiểm tra email để xác minh tài khoản.',
+                         title: t('Please check your email to verify your account.'),
                          position: 'top-right',
                          toast: true,
                          timer: 2000,
@@ -98,7 +102,7 @@ const Login = () => {
 
                     Swal.fire({
                          icon: 'success',
-                         title: 'Đăng nhập thành công!',
+                         title: t('Log in successfully!'),
                          position: 'top-right',
                          toast: true,
                          timer: 3000,
@@ -114,7 +118,7 @@ const Login = () => {
           } catch (error) {
                Swal.fire({
                     icon: 'error',
-                    title: 'Đăng nhập Google thất bại. Vui lòng thử lại.',
+                    title: t('Google login failed. Please try again.'),
                     position: 'top-right',
                     toast: true,
                     timer: 2000,
@@ -128,7 +132,7 @@ const Login = () => {
      const handleGGError = () => {
           Swal.fire({
                icon: 'error',
-               title: 'Đăng nhập Google thất bại.',
+               title: t('Google login failed.'),
                position: 'top-right',
                toast: true,
                timer: 2000,
@@ -152,18 +156,18 @@ const Login = () => {
                                    {/* Email Input */}
                                    <div className="form-outline mb-4 mt-3">
                                         <label className="form-label" htmlFor="form3Example3">
-                                             Địa chỉ Email
+                                             {t('Email Address')}
                                         </label>
                                         <input
                                              type="email"
                                              id="form3Example3"
                                              className={`form-control form-control-lg ${errors.email ? 'is-invalid' : ''}`}
-                                             placeholder="Nhập địa chỉ Email"
+                                             placeholder= {t('Email Address')}
                                              {...register('email', {
-                                                  required: 'Email không được để trống',
+                                                  required: t('Email cannot be blank'),
                                                   pattern: {
                                                        value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                                                       message: 'Định dạng email không hợp lệ',
+                                                       message: t('Invalid email format'),
                                                   },
                                              })}
                                         />
@@ -173,18 +177,18 @@ const Login = () => {
                                    {/* Password Input */}
                                    <div className="form-outline mb-4">
                                         <label className="form-label" htmlFor="form3Example4">
-                                             Mật khẩu
+                                             {t('Password')}
                                         </label>
                                         <input
                                              type="password"
                                              id="form3Example4"
                                              className={`form-control form-control-lg ${errors.password ? 'is-invalid' : ''}`}
-                                             placeholder="Nhập mật khẩu"
+                                             placeholder= {t('Enter password')}
                                              {...register('password', {
-                                                  required: 'Mật khẩu không được để trống',
+                                                  required: t('Password cannot be blank'),
                                                   minLength: {
                                                        value: 6,
-                                                       message: 'Mật khẩu không được dưới 6 kí tự',
+                                                       message: t('Password must not be less than 6 characters'),
                                                   },
                                              })}
                                         />
@@ -196,28 +200,28 @@ const Login = () => {
                                              to="/taskmaneger/reset-password"
                                              className="text-decoration-none text-primary fw-semibold d-flex align-items-center">
                                              <i className="bi bi-question-circle me-2"></i>
-                                             <span>Quên mật khẩu?</span>
+                                             <span>{t('Forgot password?')}</span>
                                         </Link>
                                    </div>
 
                                    <div className="text-center text-lg-start pt-2 d-flex justify-content-center">
                                         <button type="submit" className="btn btn-primary btn-lg w-100" disabled={loading}>
-                                             {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                                             {loading ? t('Signing in...') : t('Login')}
                                         </button>
                                    </div>
 
                                    <div className="text-center mt-2">
                                         <p className="small fw-bold mb-0">
-                                             Bạn không có tài khoản?{' '}
+                                             {t('Dont have an account yet?')}{' '}
                                              <Link to="/taskmaneger/register" className="link-danger">
-                                                  Đăng ký
+                                                  {t('Register')}
                                              </Link>
                                         </p>
                                    </div>
                               </form>
 
                               <div className="divider d-flex align-items-center my-4">
-                                   <p className="text-center fw-bold mx-3 mb-0">Hoặc</p>
+                                   <p className="text-center fw-bold mx-3 mb-0">{t('Or')}</p>
                               </div>
 
                               <div className="d-flex justify-content-center my-4">
@@ -231,7 +235,7 @@ const Login = () => {
                                                   onClick={renderProps.onClick}
                                                   disabled={renderProps.disabled || loading}>
                                                   <i className="bi bi-google me-2"></i>
-                                                  Đăng nhập với Google
+                                                  {t('Sign in with Google')}
                                              </button>
                                         )}
                                    />
