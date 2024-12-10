@@ -423,6 +423,14 @@ const resources = {
                'The project has been moved to the trash!': 'Dự án đã được đưa vào thùng rác!',
                'An error occurred while deleting the task.': 'Có lỗi khi xoá vui lòng kiểm tra lại ràng buộc.',
                'No project found': 'Không có dự án nào',
+               'Are you sure you want to restore this department?': 'Bạn chắc chắn muốn khôi phục phòng ban này?',
+               'Department restored successfully.': 'Phòng ban khôi phục thành công.',
+               'Are you sure you want to permanently delete this department?': 'Bạn chắc chắn muốn xoá vĩnh viễn phòng ban này?',
+               'Department permanently deleted.': 'Phòng ban xoá vĩnh viễn thành công.',
+               'Save Comment': 'Lưu bình luận',
+               'Select an image': 'Chọn một hình ảnh',
+               'Write a comment...': 'Viết Bình luận...',
+               
           },
      },
 };

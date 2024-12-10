@@ -50,27 +50,24 @@ export const updateComment = async (id, commentData) => {
 // Xóa bình luận
 export const deleteComment = async (id) => {
      try {
-          const response = await axiosi.delete(`${apiEndpoint}/${id}`);
+          const response = await axiosi.delete(`${apiEndpoint}/${id}`); // Sử dụng axiosi thay vì axios
           return response.data;
      } catch (error) {
-          console.error(`Error updating comment with ID ${id}:`, error);
+          console.error(`Error deleting comment with ID ${id}:`, error);
           throw error; // Bỏ lỗi để có thể xử lý ở nơi gọi
      }
 };
 
 // Lấy bình luận theo Task ID
 export const getCommentsByTask = async (taskId) => {
-  try {
-       const response = await axiosi.get(`${taskApiEndpoint}/${taskId}/comments`);
-       return response.data;
-  } catch (error) {
-       console.error(`Lỗi khi lấy bình luận cho task ${taskId}:`, error.response.data); // Log lỗi chi tiết
-       throw error.response ? error.response.data : new Error('Đã có lỗi xảy ra');
-  }
+     try {
+          const response = await axiosi.get(`${taskApiEndpoint}/${taskId}/comments`);
+          return response.data;
+     } catch (error) {
+          console.error(`Lỗi khi lấy bình luận cho task ${taskId}:`, error.response.data); // Log lỗi chi tiết
+          throw error.response ? error.response.data : new Error('Đã có lỗi xảy ra');
+     }
 };
-
-
-
 
 export default {
      getAllComments,

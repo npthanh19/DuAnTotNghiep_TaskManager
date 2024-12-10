@@ -29,6 +29,15 @@ export const getTaskById = async (id) => {
           throw error.response ? error.response.data : new Error('Network error');
      }
 };
+export const getTaskDetails = async (taskId) => {
+     try {
+          const response = await axiosi.get(`${taskApiEndpoint}/${taskId}/details`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error fetching task details for ID ${taskId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
 
 export const createTask = async (taskData) => {
      try {
@@ -215,19 +224,18 @@ export const getTasksByProject = async (projectId) => {
 };
 export const getRunningTasks = async (id) => {
      try {
-         const response = await axiosi.get(`/api/tasks/by-running/${id}`);
-         return response.data;
+          const response = await axiosi.get(`/api/tasks/by-running/${id}`);
+          return response.data;
      } catch (error) {
-         console.error('Error fetching tasks from running worktimes:', error);
-         throw error.response ? error.response.data : new Error('Network error');
+          console.error('Error fetching tasks from running worktimes:', error);
+          throw error.response ? error.response.data : new Error('Network error');
      }
- };
- 
- 
- 
+};
+
 export default {
      getAllTasks,
      getTaskById,
+     getTaskDetails,
      createTask,
      updateTask,
      deleteTask,

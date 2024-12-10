@@ -36,7 +36,7 @@ function RecentlyDeletedDepartments() {
 
      const handleRestore = async (id) => {
           const result = await Swal.fire({
-               title: t('Restore department'),
+               title: t('Restore'),
                text: t('Are you sure you want to restore this department?'),
                icon: 'warning',
                showCancelButton: true,
@@ -71,7 +71,7 @@ function RecentlyDeletedDepartments() {
 
      const handleDeletePermanently = async (id) => {
           const result = await Swal.fire({
-               title: t('Delete department'),
+               title: t('Delete'),
                text: t('Are you sure you want to permanently delete this department?'),
                icon: 'warning',
                showCancelButton: true,
