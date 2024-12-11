@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
 import { getAllUsers } from '../../../services/usersService';
-import { getAllProjects, deleteProject } from '../../../services/projectsService';
+import { getAllProjects, deleteProject, getProjectById, updateProjectStatus } from '../../../services/projectsService';
 import { getUserById } from '../../../services/usersService';
 import AddDepartmentForm from './AddDepartmentForm';
 import Swal from 'sweetalert2';
+import styled from 'styled-components';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,29 +20,30 @@ export const View = () => {
      const [showDeleteModal, setShowDeleteModal] = useState(false);
      const [selectedProjectId, setSelectedProjectId] = useState(null);
      const [projects, setProjects] = useState([]);
-     const [users, setUsers] = useState({}); // Lưu danh sách người dùng
+     const [users, setUsers] = useState({});
      const [loading, setLoading] = useState(true);
+     const [filteredProject, setFilteredProject] = useState(null);
      const [showAddDepartmentForm, setShowAddDepartmentForm] = useState(false);
      const [currentProjectId, setCurrentProjectId] = useState(null);
+     const [filteredProjects, setFilteredProjects] = useState([]);
+     const [selectedProjectName, setSelectedProjectName] = useState(null);
+     const [searchTerm, setSearchTerm] = useState('');
 
      useEffect(() => {
-          const fetchProjectsAndUsers = async () => {
+          const fetchData = async () => {
                try {
                     const projectsData = await getAllProjects();
 
-                    // Sắp xếp dự án theo `id` giảm dần
                     const sortedProjects = projectsData.sort((a, b) => b.id - a.id);
                     setProjects(sortedProjects);
 
-                    // Lấy tất cả người dùng
-                    const usersData = await getAllUsers(); // Gọi API lấy người dùng
+                    const usersData = await getAllUsers();
                     const usersMap = usersData.reduce((acc, user) => {
                          acc[user.id] = user.fullname;
                          return acc;
                     }, {});
                     setUsers(usersMap);
 
-                    // Lấy thông tin người dùng cho các dự án
                     const userIds = [...new Set(sortedProjects.map((project) => project.user_id))];
                     const userPromises = userIds.map((id) => getUserById(id));
                     const usersDataFromProjects = await Promise.all(userPromises);
@@ -49,15 +51,16 @@ export const View = () => {
                          acc[user.id] = user.fullname;
                          return acc;
                     }, {});
+
                     setUsers((prevUsers) => ({ ...prevUsers, ...usersMapFromProjects }));
                } catch (error) {
-                    console.error('Error fetching projects or users:', error);
+                    console.error('Error fetching data:', error);
                } finally {
                     setLoading(false);
                }
           };
 
-          fetchProjectsAndUsers();
+          fetchData();
      }, []);
 
      const handleDeleteClick = (id, projectName, role) => {
@@ -139,12 +142,72 @@ export const View = () => {
 
      const indexOfLastItem = currentPage * itemsPerPage;
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-     const currentProjects = projects.slice(indexOfFirstItem, indexOfLastItem);
-
+     const currentProjects = filteredProject ? [filteredProject] : projects.slice(indexOfFirstItem, indexOfLastItem);
      const totalPages = Math.ceil(projects.length / itemsPerPage);
+
+     const handleSearchChange = (event) => {
+          setSearchTerm(event.target.value);
+     };
 
      const handlePageChange = (pageNumber) => {
           setCurrentPage(pageNumber);
+     };
+
+     const handleFilterChange = async (projectName) => {
+          setSelectedProjectName(projectName);
+          if (projectName === null) {
+               setFilteredProject(null);
+          } else {
+               const project = projects.find((p) => p.project_name === projectName);
+               if (project) {
+                    try {
+                         const projectDetails = await getProjectById(project.id);
+                         setFilteredProject(projectDetails);
+                    } catch (error) {
+                         console.error('Error fetching project details:', error);
+                    }
+               }
+          }
+     };
+
+     const handleChangeStatus = async (projectId, newStatus) => {
+          const result = await Swal.fire({
+               title: t('Are you sure you want to change the status?'),
+               text: t('The project status will be updated.'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonText: t('Yes, change'),
+               cancelButtonText: t('Cancel'),
+          });
+
+          if (result.isConfirmed) {
+               try {
+                    await updateProjectStatus(projectId, newStatus);
+                    setProjects((prevProjects) =>
+                         prevProjects.map((project) => (project.id === projectId ? { ...project, status: newStatus } : project)),
+                    );
+                    Swal.fire({
+                         title: t('Success!'),
+                         text: t('The project status has been updated.'),
+                         icon: 'success',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
+               } catch (error) {
+                    console.error('Error updating status:', error);
+                    Swal.fire({
+                         title: t('Error!'),
+                         text: t('Failed to update the status. Please try again.'),
+                         icon: 'error',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
+               }
+          }
      };
 
      if (loading) {
@@ -157,6 +220,33 @@ export const View = () => {
           );
      }
 
+     const StatusSelect = styled.select`
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          width: 100%;
+          padding: 5px 10px;
+          border: none;
+          border-radius: 5px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+
+          background-color: ${({ status }) =>
+               status === 'to do' ? '#f8f9fa' : status === 'in progress' ? '#ffc107' : status === 'preview' ? '#17a2b8' : '#28a745'};
+          color: ${({ status }) => (status === 'to do' || status === 'in progress' ? '#212529' : '#fff')};
+
+          &:focus {
+               background-color: #ffffff;
+               color: #212529;
+          }
+     `;
+
+     const StatusOption = styled.option`
+          text-align: center;
+     `;
+
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
@@ -164,14 +254,50 @@ export const View = () => {
                          <span className="marquee">{t('Projects')}</span>
                     </h3>
                     <div className="d-flex align-items-center">
-                         <input
-                              type="text"
-                              className="form-control form-control-sm me-2"
-                              placeholder={t('Search...')}
-                              // value={searchTerm}
-                              // onChange={handleSearchChange}
-                         />
                          <div className="d-flex align-items-center ms-3">
+                              <div className="dropdown ms-2">
+                                   <button
+                                        className="btn btn-outline-secondary btn-sm dropdown-toggle rounded-pill"
+                                        type="button"
+                                        id="dropdownFilterButton"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i className="bi bi-funnel me-2"></i> {t('Filter')}
+                                   </button>
+                                   <ul className="dropdown-menu" aria-labelledby="dropdownFilterButton">
+                                        <li>
+                                             <a
+                                                  className={`dropdown-item ${selectedProjectName === null ? 'bg-success text-white' : ''}`}
+                                                  href="#"
+                                                  onClick={() => handleFilterChange(null)}>
+                                                  {t('Show all')}
+                                                  {selectedProjectName === null && (
+                                                       <span className={`${selectedProjectName === null ? 'd-inline-block' : 'd-none'} ms-2`}></span>
+                                                  )}
+                                             </a>
+                                        </li>
+
+                                        {projects.map((project) => (
+                                             <li key={project.id}>
+                                                  <a
+                                                       className={`dropdown-item ${
+                                                            selectedProjectName === project.project_name ? 'bg-success text-white' : ''
+                                                       }`}
+                                                       href="#"
+                                                       onClick={() => handleFilterChange(project.project_name)}>
+                                                       {project.project_name}
+                                                       {selectedProjectName === project.project_name && (
+                                                            <span
+                                                                 className={`${
+                                                                      selectedProjectName === project.project_name ? 'd-inline-block' : 'd-none'
+                                                                 } ms-2`}></span>
+                                                       )}
+                                                  </a>
+                                             </li>
+                                        ))}
+                                   </ul>
+                              </div>
+
                               <Link to="/taskmaneger/projects/add" className="btn btn-primary btn-sm rounded-pill">
                                    <i className="bi bi-plus me-2"></i> {t('Add')}
                               </Link>
@@ -218,29 +344,26 @@ export const View = () => {
                                              <td>{project.start_date}</td>
                                              <td>{project.end_date}</td>
                                              <td>
-                                                  {project.status === 'to do' && (
-                                                       <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Not yet implemented')}
-                                                       </span>
-                                                  )}
-                                                  {project.status === 'in progress' && (
-                                                       <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Ongoing')}
-                                                       </span>
-                                                  )}
-                                                  {project.status === 'preview' && (
-                                                       <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Complete')}
-                                                       </span>
-                                                  )}
-                                                  {project.status === 'done' && (
-                                                       <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Destroy')}
-                                                       </span>
-                                                  )}
+                                                  <StatusSelect
+                                                       status={project.status}
+                                                       value={project.status}
+                                                       onChange={(e) => handleChangeStatus(project.id, e.target.value)}>
+                                                       <StatusOption value="to do">{t('Not yet implemented')}</StatusOption>
+                                                       <StatusOption value="in progress">{t('Ongoing')}</StatusOption>
+                                                       <StatusOption value="preview">{t('Complete')}</StatusOption>
+                                                       <StatusOption value="done">{t('Destroy')}</StatusOption>
+                                                  </StatusSelect>
                                              </td>
                                              <td>
-                                                  {users[project.user_id] ? users[project.user_id] : <span className="badge bg-secondary">none</span>}
+                                                  {users[project.user_id] ? (
+                                                       <span title={users[project.user_id]}>
+                                                            {users[project.user_id].length > 20
+                                                                 ? `${users[project.user_id].slice(0, 20)}...`
+                                                                 : users[project.user_id]}
+                                                       </span>
+                                                  ) : (
+                                                       <span className="badge bg-secondary">-</span>
+                                                  )}
                                              </td>
                                              <td>
                                                   <div className="dropdown">

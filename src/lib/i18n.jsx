@@ -444,14 +444,22 @@ const resources = {
                'Password must not be less than 6 characters': 'Mật khẩu không được ít hơn 6 ký tự',
                'Forgot password?': 'Quên mật khẩu?',
                'Signing in...': 'Đang đăng nhập...',
-               'Login': 'Đăng nhập',
+               Login: 'Đăng nhập',
                'Dont have an account yet?': 'Bạn chưa có tài khoản?',
-               'Register': 'Đăng ký',
-               'Or': 'Hoặc',
+               Register: 'Đăng ký',
+               Or: 'Hoặc',
                'Sign in with Google': 'Đăng nhập bằng Google',
-               
-
-               
+               Filter: 'Lọc',
+               'Show all': 'Hiển thị tất cả',
+               'Are you sure you want to change the status?': 'Bạn có chắc chắn muốn thay đổi trạng thái?',
+               'The project status will be updated.': 'Trạng thái dự án sẽ được cập nhật.',
+               'Yes, change': 'Đúng, thay đổi',
+               Cancel: 'Hủy',
+               'Success!': 'Thành công!',
+               'The project status has been updated.': 'Trạng thái dự án đã được cập nhật.',
+               'Error!': 'Lỗi!',
+               'Failed to update the status. Please try again.': 'Cập nhật trạng thái thất bại. Vui lòng thử lại.',
+               'Project is required': 'Dự án bắt buộc chọn',
           },
      },
 };

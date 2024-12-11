@@ -12,15 +12,15 @@ export const getAllProjects = async () => {
      }
 };
 
-export const getProjectById = async (id) => {
-     try {
-          const response = await axiosi.get(`${apiEndpoint}/${id}`);
-          return response.data;
-     } catch (error) {
-          console.error(`Error fetching project with ID ${id}:`, error);
-          throw error.response ? error.response.data : new Error('Network error');
-     }
-};
+// export const getProjectById = async (id) => {
+//      try {
+//           const response = await axiosi.get(`${apiEndpoint}/${id}`);
+//           return response.data;
+//      } catch (error) {
+//           console.error(`Error fetching project with ID ${id}:`, error);
+//           throw error.response ? error.response.data : new Error('Network error');
+//      }
+// };
 
 export const createProject = async (projectData) => {
      try {
@@ -108,6 +108,26 @@ export const forceDeleteProject = async (id) => {
      }
 };
 
+export const getProjectById = async (projectId) => {
+     try {
+          const response = await axiosi.get(`${apiEndpoint}/${projectId}`);
+          return response.data;
+     } catch (error) {
+          console.error(`Error fetching project with ID ${projectId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+export const updateProjectStatus = async (projectId, status) => {
+     try {
+          const response = await axiosi.put(`/api/projects/${projectId}/status`, { status });
+          return response.data;
+     } catch (error) {
+          console.error(`Error fetching project with ID ${projectId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
 export default {
      getAllProjects,
      getProjectById,
@@ -119,4 +139,5 @@ export default {
      getTrashedProjects,
      restoreProject,
      forceDeleteProject,
+     getProjectById,
 };
