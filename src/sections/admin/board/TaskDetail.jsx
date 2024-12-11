@@ -41,12 +41,13 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
 
      const fetchComments = async (taskId) => {
           try {
-               const response = await getCommentsByTask(taskId);
-               setComments(response);
+              const response = await getCommentsByTask(taskId);
+              console.log('Fetched comments:', response); 
+              setComments(Array.isArray(response) ? response : []);
           } catch (error) {
-               console.error('Error fetching comments:', error);
+              console.error('Error fetching comments:', error);
           }
-     };
+      };
 
      const handleStatusChange = async (status) => {
           if (status === selectedTask.status) {
