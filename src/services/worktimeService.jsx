@@ -13,7 +13,17 @@ export const getAllWorktimes = async () => {
           throw error.response ? error.response.data : new Error('Network error');
      }
 };
-
+export const moveTasks = async (worktimeId, targetWorktimeId) => {
+     try {
+         const response = await axiosi.put(`${apiEndpoint}/${worktimeId}/move-tasks`, {
+             target_worktime_id: targetWorktimeId,
+         });
+         return response.data;
+     } catch (error) {
+         console.error('Error moving tasks:', error);
+         throw error.response ? error.response.data : new Error('Network error');
+     }
+ };
 export const getWorktimeById = async (id) => {
      try {
           const response = await axiosi.get(`${apiEndpoint}/${id}`);

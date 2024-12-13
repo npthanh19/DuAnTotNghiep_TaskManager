@@ -22,6 +22,10 @@ export function View() {
      const [selectedUsers, setSelectedUsers] = useState([]);
      const [projects, setProjects] = useState([]);
      const [departments, setDepartments] = useState([]);
+     const [sprints, setSprints] = useState();
+     const [taskNotWorkTime, setTaskNotWorkTime] = useState();
+     const [isInputVisible, setIsInputVisible] = useState({});
+
      const { t } = useTranslation();
      const users = [
           { id: 1, name: 'User 1', avatar: '/assets/admin/img/avatars/1.png' },
@@ -112,7 +116,7 @@ export function View() {
                try {
                     // Lấy tasks không có worktime_id
                     const tasks = await getTaskWithoutWorktime();
-                    console.log('tasks without worktime', tasks);
+                    console.log('tasks --', tasks);
                     setTaskNotWorkTime(tasks);
                } catch (error) {
                     console.error('Error fetching tasks without worktime:', error);
@@ -122,10 +126,6 @@ export function View() {
           fetchWorkTimes();
           fetchTask();
      }, []);
-
-     const [sprints, setSprints] = useState();
-     const [taskNotWorkTime, setTaskNotWorkTime] = useState();
-     const [isInputVisible, setIsInputVisible] = useState({});
 
      const handleToggleDropdown = () => {
           setShowDropdown((prev) => !prev);
@@ -383,12 +383,52 @@ export function View() {
                                                                       </select>
                                                                  </div>
                                                                  <div className=" boardlist_time">{task ? task.task_time : '-'}</div>
-                                                                 <div className="">
-                                                                      <img
-                                                                           src="https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
-                                                                           alt=""
-                                                                           style={{ width: '50px' }}
-                                                                      />
+                                                                 {/* Assigned Users */}
+                                                                 <div className="assigned_users">
+                                                                      {task.assigned_users.map((user) => (
+                                                                           <div
+                                                                                key={user.user_id}
+                                                                                className="assigned_user"
+                                                                                style={{
+                                                                                     position: 'relative',
+                                                                                     display: 'inline-block',
+                                                                                     marginRight: '5px',
+                                                                                }}>
+                                                                                <img
+                                                                                     src={
+                                                                                          user.avatar
+                                                                                               ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
+                                                                                               : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                                                     }
+                                                                                     alt={user.fullname}
+                                                                                     title={user.fullname}
+                                                                                     style={{
+                                                                                          width: '30px',
+                                                                                          height: '30px',
+                                                                                          borderRadius: '50%',
+                                                                                          cursor: 'pointer',
+                                                                                     }}
+                                                                                />
+
+                                                                                <div
+                                                                                     className="user_fullname"
+                                                                                     style={{
+                                                                                          display: 'none',
+                                                                                          position: 'absolute',
+                                                                                          bottom: '-25px',
+                                                                                          left: '50%',
+                                                                                          transform: 'translateX(-50%)',
+                                                                                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                                                                          color: '#fff',
+                                                                                          padding: '5px',
+                                                                                          borderRadius: '3px',
+                                                                                          fontSize: '12px',
+                                                                                          whiteSpace: 'nowrap',
+                                                                                     }}>
+                                                                                     {user.fullname}
+                                                                                </div>
+                                                                           </div>
+                                                                      ))}
                                                                  </div>
                                                                  <div className=" bi bi-trash menu-icon boardlist_trash"></div>
                                                             </div>
@@ -430,12 +470,52 @@ export function View() {
                                                                  </select>
                                                             </div>
                                                             <div className=" boardlist_time">{task ? task.task_time : '-'}</div>
-                                                            <div className="">
-                                                                 <img
-                                                                      src="https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
-                                                                      alt=""
-                                                                      style={{ width: '50px' }}
-                                                                 />
+                                                            {/* Assigned Users */}
+                                                            <div className="assigned_users">
+                                                                 {task.assigned_users.map((user) => (
+                                                                      <div
+                                                                           key={user.user_id}
+                                                                           className="assigned_user"
+                                                                           style={{
+                                                                                position: 'relative',
+                                                                                display: 'inline-block',
+                                                                                marginRight: '5px',
+                                                                           }}>
+                                                                           <img
+                                                                                src={
+                                                                                     user.avatar
+                                                                                          ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
+                                                                                          : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                                                }
+                                                                                alt={user.fullname}
+                                                                                title={user.fullname}
+                                                                                style={{
+                                                                                     width: '30px',
+                                                                                     height: '30px',
+                                                                                     borderRadius: '50%',
+                                                                                     cursor: 'pointer',
+                                                                                }}
+                                                                           />
+
+                                                                           <div
+                                                                                className="user_fullname"
+                                                                                style={{
+                                                                                     display: 'none',
+                                                                                     position: 'absolute',
+                                                                                     bottom: '-25px',
+                                                                                     left: '50%',
+                                                                                     transform: 'translateX(-50%)',
+                                                                                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                                                                     color: '#fff',
+                                                                                     padding: '5px',
+                                                                                     borderRadius: '3px',
+                                                                                     fontSize: '12px',
+                                                                                     whiteSpace: 'nowrap',
+                                                                                }}>
+                                                                                {user.fullname}
+                                                                           </div>
+                                                                      </div>
+                                                                 ))}
                                                             </div>
 
                                                             <div className=" bi bi-trash menu-icon boardlist_trash"></div>

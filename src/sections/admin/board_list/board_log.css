@@ -170,3 +170,7 @@
 }
 
 
+.assigned_users img {
+  width: 100%;
+  object-fit: cover;
+}

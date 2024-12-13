@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { deleteWorktime, getAllWorktimes, updateWorktime, updateWorktimeStatus } from '../../../services/worktimeService';
+import { deleteWorktime, getAllWorktimes, moveTasks, updateWorktime, updateWorktimeStatus } from '../../../services/worktimeService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getAllUsers } from '../../../services/usersService';
 import { DeleteWorktime } from './Delete';
 import './worktime.css';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
-import { getAllTasks } from '../../../services/tasksService';
+import { getAllTasks, getTasksByWorktimeId } from '../../../services/tasksService';
 
 export const View = () => {
      const [worktimes, setWorktimes] = useState([]);
@@ -30,6 +30,8 @@ export const View = () => {
      const { t } = useTranslation();
      const navigate = useNavigate();
      const [searchTerm, setSearchTerm] = useState('');
+
+     console.log(worktimes)
 
      useEffect(() => {
           const fetchData = async () => {
@@ -173,25 +175,98 @@ export const View = () => {
      };
 
      const handleComplete = async (worktime_id) => {
+          const tasks = await getTasksByWorktimeId(worktime_id);
+          const completedTasks = tasks.tasks.filter((task) => task.status === "to do").length;
+          const inProgressTasks = tasks.tasks.filter((task) => task.status === "in progress").length;
+      
+          // Chỉ tạo optionsHtml nếu có task "to do"
+          const optionsHtml = completedTasks > 0
+              ? `
+                  <option value="no_worktime">${t("No worktime (Default)")}</option>
+                  ${worktimes
+                      .filter((worktime) => worktime.id !== worktime_id) // Loại bỏ worktime trùng với worktime_id
+                      .map(
+                          (worktime) =>
+                              `<option value="${worktime.id}">${worktime.name} (${worktime.status})</option>`
+                      )
+                      .join("")}
+              `
+              : "";
+      
+          const selectHtml = completedTasks > 0
+              ? `
+                  <p>${t("Choose a worktime to manage remaining tasks:")}</p>
+                  <div style="text-align: center;">
+                      <select id="task-action" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                          ${optionsHtml}
+                      </select>
+                  </div>
+              `
+              : `<p>${t("No remaining tasks to transfer.")}</p>`;
+      
           Swal.fire({
-               title: t('Are you sure you want to complete?'),
-               icon: 'warning',
-               showCancelButton: true,
-               confirmButtonText: t('Complete'),
-               cancelButtonText: t('Cancel'),
-          }).then(async (result) => {
-               if (result.isConfirmed) {
-                    try {
-                         await updateWorktimeStatus(worktime_id, 3);
-                         Swal.fire(t('Success!'), t('The worktime has been completed.'), 'success');
-                         const worktimeData = await getAllWorktimes();
-                         setWorktimes(worktimeData);
-                    } catch (error) {
-                         Swal.fire(t('Error!'), t('Unable to update status. Please try again.'), 'error');
-                    }
-               }
-          });
-     };
+              title: t("Are you sure you want to complete?"),
+              icon: "warning",
+              html: `
+                  <p>${t("Tasks Summary:")}</p>
+                  <ul>
+                      <li>${t("Completed tasks:")} ${completedTasks}</li>
+                      <li>${t("In-progress tasks:")} ${inProgressTasks}</li>
+                  </ul>
+                  ${selectHtml}
+              `,
+              showCancelButton: true,
+              confirmButtonText: t("Confirm"),
+              cancelButtonText: t("Cancel"),
+              preConfirm: () => {
+                  if (completedTasks > 0) {
+                      const selectedWorktime = document.getElementById("task-action").value;
+                      return { selectedWorktime };
+                  }
+                  return null;
+              },
+          })
+              .then((result) => {
+                  if (result.isConfirmed) {
+                      console.log("Selected worktime:", result.value?.selectedWorktime);
+                      return result; // Trả về để sử dụng trong `then` tiếp theo
+                  } else {
+                      throw new Error("Action canceled");
+                  }
+              })
+              .then(async (result) => {
+                  if (!result.value) return; // Nếu không có worktime được chọn (vì không có tasks "to do"), kết thúc.
+      
+                  const { selectedWorktime } = result.value;
+                  try {
+                      // Gọi API để chuyển task
+                      await moveTasks(worktime_id, selectedWorktime === "no_worktime" ? null : selectedWorktime);
+      
+                      // Cập nhật trạng thái worktime sau khi move task
+                      await updateWorktimeStatus(worktime_id, 3); // Truyền trạng thái mới (3)
+      
+                      Swal.fire(t("Success!"), t("The worktime has been updated."), "success");
+      
+                      // Cập nhật danh sách worktime
+                      const worktimeData = await getAllWorktimes();
+                      setWorktimes(worktimeData);
+                  } catch (error) {
+                      Swal.fire(t("Error!"), t("Unable to update status. Please try again."), "error");
+                  }
+              })
+              .catch((error) => {
+                  if (error.message !== "Action canceled") {
+                      console.error("Unexpected error:", error);
+                  }
+              });
+      };
+      
+      
+      
+      
+      
+      
+      
 
      const handleSearchChange = (e) => {
           setSearchTerm(e.target.value);

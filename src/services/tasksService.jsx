@@ -3,14 +3,7 @@ import { getAllWorktimes } from './worktimeService';
 const taskApiEndpoint = '/api/tasks';
 const projectApiEndpoint = '/api/projects';
 
-//thêm 1 api lất task chưa có WorkTime
-//thêm 1 api cập nhật task ( chỉ cập nhật vị tri )
-//lấy task theo workTime id
 
-//bắt đầu worktime
-//kết thúc worktime -> kết thúc nếu còn task trong worktime thì cho phép dời sang wortime khác
-
-// Lấy tất cả
 export const getAllTasks = async () => {
      try {
           const response = await axiosi.get(taskApiEndpoint);
@@ -20,7 +13,15 @@ export const getAllTasks = async () => {
           throw error.response ? error.response.data : new Error('Network error');
      }
 };
-
+export const updateTaskDescription = async (taskId, description) => {
+    try {
+        const response = await axiosi.put(`/tasks/${taskId}/description`, { description });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating task description:', error);
+        throw error.response ? error.response.data : new Error('Network error');
+    }
+};
 // Lấy thông tin từ task ID
 export const getTaskById = async (id) => {
      try {
@@ -130,6 +131,7 @@ export const moveTasksToAnotherWorktime = async (taskIds, newWorktimeId) => {
           throw error.response ? error.response.data : new Error('Network error');
      }
 };
+
 //kh có workTimeId thì trả về
 export const getTasksByWorktimeId = async (worktimeId) => {
      try {

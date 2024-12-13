@@ -5,7 +5,7 @@ import { getRunningTasks, updateTaskStatus } from '../../../services/tasksServic
 import { TaskDetail } from './TaskDetail';
 import { getAllProjects } from '../../../services/projectsService';
 import { getAllWorktimes } from '../../../services/worktimeService';
-import { getAllUsers } from '../../../services/usersService';
+import { getAllUsers, getUserById } from '../../../services/usersService';
 import { useTranslation } from 'react-i18next';
 
 const users = [
@@ -26,14 +26,13 @@ export const View = () => {
      const COLUMN_STATUS_MAP = {
           'to do': 1,
           'in progress': 2,
-          'preview': 3,
-          'done': 4,
+          preview: 3,
+          done: 4,
      };
 
      useEffect(() => {
           getDataTask();
-          console.log(getDataTask);
-          
+
           async function getDataTask() {
                const [tasks, fetchedProjects, worktimes, users] = await Promise.all([
                     getRunningTasks(),
@@ -41,12 +40,13 @@ export const View = () => {
                     getAllWorktimes(),
                     getAllUsers(),
                ]);
-     
+
+               console.log('tasks', tasks);
+
                const projectMap = fetchedProjects.reduce((acc, project) => {
                     acc[project.id] = project.project_name;
                     return acc;
                }, {});
-               
 
                const worktimeMap = worktimes.reduce((acc, worktime) => {
                     acc[worktime.id] = worktime.name;
@@ -70,6 +70,7 @@ export const View = () => {
                          task_time: task.task_time,
                          description: task.description,
                          worktime_id: worktimeMap[task.worktime_id] || 'Unknown Worktime',
+                         assigned_users: task.assigned_users,
                     };
                     return acc;
                }, {});
@@ -318,15 +319,53 @@ export const View = () => {
                                                                                      <p>
                                                                                           {t('Status')}: {card.status || '-'}
                                                                                      </p>
-                                                                                     <img
-                                                                                          src="/assets/admin/img/avatars/1.png"
-                                                                                          alt="Assignee"
-                                                                                          style={{
-                                                                                               width: '25px',
-                                                                                               height: '25px',
-                                                                                               borderRadius: '50%',
-                                                                                          }}
-                                                                                     />
+                                                                                     {/* Assigned Users */}
+                                                                                     <div className="assigned_users">
+                                                                                          {card.assigned_users.map((user) => (
+                                                                                               <div
+                                                                                                    key={user.user_id}
+                                                                                                    className="assigned_user"
+                                                                                                    style={{
+                                                                                                         position: 'relative',
+                                                                                                         display: 'inline-block',
+                                                                                                         marginRight: '5px',
+                                                                                                    }}>
+                                                                                                    <img
+                                                                                                         src={
+                                                                                                              user.avatar
+                                                                                                                   ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
+                                                                                                                   : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                                                                         }
+                                                                                                         alt={user.fullname}
+                                                                                                         title={user.fullname}
+                                                                                                         style={{
+                                                                                                              width: '30px',
+                                                                                                              height: '30px',
+                                                                                                              borderRadius: '50%',
+                                                                                                              cursor: 'pointer',
+                                                                                                         }}
+                                                                                                    />
+
+                                                                                                    <div
+                                                                                                         className="user_fullname"
+                                                                                                         style={{
+                                                                                                              display: 'none',
+                                                                                                              position: 'absolute',
+                                                                                                              bottom: '-25px',
+                                                                                                              left: '50%',
+                                                                                                              transform: 'translateX(-50%)',
+                                                                                                              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                                                                                              color: '#fff',
+                                                                                                              padding: '5px',
+                                                                                                              borderRadius: '3px',
+                                                                                                              fontSize: '12px',
+                                                                                                              whiteSpace: 'nowrap',
+                                                                                                         }}>
+                                                                                                         {user.fullname}
+                                                                                                    </div>
+                                                                                               </div>
+                                                                                          ))}
+                                                                                     </div>
                                                                                 </div>
                                                                            </div>
                                                                       )}
