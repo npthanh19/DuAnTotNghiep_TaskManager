@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Delete } from './Delete';
 import { CommentForm } from '../comment/View';
-import { getAllTasks, deleteTask as deleteTaskService } from '../../../services/tasksService';
+import { getAllTasks, deleteTask as deleteTaskService, updateTaskStatus } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getFilesByTaskId } from '../../../services/fileService';
 import Swal from 'sweetalert2';
+import styled from 'styled-components';
 
 export const View = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -140,7 +141,7 @@ export const View = () => {
      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
      const currentTasks = filterTask.slice(indexOfFirstItem, indexOfLastItem);
      const totalPages = Math.ceil(filterTask.length / itemsPerPage);
-/////////////////
+     /////////////////
      const handlePageChange = (pageNumber) => {
           setCurrentPage(pageNumber);
      };
@@ -162,7 +163,7 @@ export const View = () => {
                </div>
           );
      }
-////////////////////////
+     ////////////////////////
      const handleSearchChange = (e) => {
           setSearchTerm(e.target.value);
           setCurrentPage(1);
@@ -204,6 +205,80 @@ export const View = () => {
           }
      };
 
+     const statusMapping = {
+          'to do': 1,
+          'in progress': 2,
+          preview: 3,
+          done: 4,
+     };
+
+     const handleChangeTaskStatus = async (taskId, newStatus) => {
+          const result = await Swal.fire({
+               title: t('Are you sure you want to change the status?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonText: t('Yes, change'),
+               cancelButtonText: t('Cancel'),
+          });
+
+          if (result.isConfirmed) {
+               try {
+                    const statusValue = statusMapping[newStatus];
+                    if (!statusValue) throw new Error('Invalid status selected');
+
+                    await updateTaskStatus(taskId, statusValue);
+                    setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task)));
+                    Swal.fire({
+                         title: t('Success!'),
+                         text: t('The task status has been updated.'),
+                         icon: 'success',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
+               } catch (error) {
+                    console.error('Error updating task status:', error);
+                    Swal.fire({
+                         title: t('Error!'),
+                         text: t('Failed to update the status. Please try again.'),
+                         icon: 'error',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
+               }
+          }
+     };
+
+     const StatusSelect = styled.select`
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          width: 100%;
+          padding: 5px 10px;
+          border: none;
+          border-radius: 5px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+
+          background-color: ${({ status }) =>
+               status === 'to do' ? '#f8f9fa' : status === 'in progress' ? '#ffc107' : status === 'preview' ? '#17a2b8' : '#28a745'};
+          color: ${({ status }) => (status === 'to do' || status === 'in progress' ? '#212529' : '#fff')};
+
+          &:focus {
+               background-color: #ffffff;
+               color: #212529;
+          }
+     `;
+
+     const StatusOption = styled.option`
+          text-align: center;
+     `;
+
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
@@ -233,57 +308,46 @@ export const View = () => {
 
                <div className="card-body" style={{ padding: '0' }}>
                     <table className="table">
-                         <thead>
+                         <thead className="table-light">
                               <tr>
-                                   <th className="col">{t('STT')}</th>
-                                   <th className="col">{t('ID')}</th>
-                                   <th className="col">{t('Projects')}</th>
-                                   <th className="col">{t('Task Name')}</th>
-                                   <th className="col">{t('Start Date')}</th>
-                                   <th className="col">{t('End Date')}</th>
-                                   <th className="col">{t('Time')}</th>
-                                   <th className="col">{t('Status')}</th>
-                                   <th className="col">{t('Actions')}</th>
+                                   <th className="text-center">{t('STT')}</th>
+                                   <th className="text-center">{t('ID')}</th>
+                                   <th>{t('Projects')}</th>
+                                   <th>{t('Task Name')}</th>
+                                   <th>{t('Start Date')}</th>
+                                   <th>{t('End Date')}</th>
+                                   <th className="text-center">{t('Time')}</th>
+                                   <th>{t('Status')}</th>
+                                   <th>{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
                               {currentTasks.length === 0 ? (
                                    <tr>
-                                        <td colSpan="10" className="text-center">
+                                        <td colSpan="9" className="text-center">
                                              {t('No tasks found')}
                                         </td>
                                    </tr>
                               ) : (
                                    currentTasks.map((task, index) => (
                                         <tr key={task.id}>
-                                             <td>{index + 1}</td>
-                                             <td>{task.id}</td>
+                                             <td className="text-center">{index + 1}</td>
+                                             <td className="text-center">{task.id}</td>
                                              <td>{getProjectNameById(task.project_id)}</td>
                                              <td>{task.task_name}</td>
                                              <td>{task.start_date}</td>
                                              <td>{task.end_date}</td>
-                                             <td>{task.task_time}</td>
+                                             <td className="text-center">{task.task_time}</td>
                                              <td>
-                                                  {task.status === 'to do' && (
-                                                       <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('To Do')}
-                                                       </span>
-                                                  )}
-                                                  {task.status === 'in progress' && (
-                                                       <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('In Progress')}
-                                                       </span>
-                                                  )}
-                                                  {task.status === 'preview' && (
-                                                       <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Preview')}
-                                                       </span>
-                                                  )}
-                                                  {task.status === 'done' && (
-                                                       <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Done')}
-                                                       </span>
-                                                  )}
+                                                  <StatusSelect
+                                                       status={task.status}
+                                                       value={task.status}
+                                                       onChange={(e) => handleChangeTaskStatus(task.id, e.target.value)}>
+                                                       <StatusOption value="to do">{t('To Do')}</StatusOption>
+                                                       <StatusOption value="in progress">{t('In Progress')}</StatusOption>
+                                                       <StatusOption value="preview">{t('Preview')}</StatusOption>
+                                                       <StatusOption value="done">{t('Done')}</StatusOption>
+                                                  </StatusSelect>
                                              </td>
                                              <td>
                                                   <div className="dropdown">
@@ -330,6 +394,7 @@ export const View = () => {
                               )}
                          </tbody>
                     </table>
+
                     <nav aria-label="Page navigation">
                          <ul className="pagination mt-2">
                               <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>

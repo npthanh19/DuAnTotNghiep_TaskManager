@@ -179,13 +179,14 @@ export const Add = () => {
                                         id="endDate"
                                         className={`form-control form-control-sm ${errors.endDate ? 'is-invalid' : ''}`}
                                         {...register('endDate', {
-                                             required: t('End date is required!'),
                                              validate: (value) => {
                                                   const startDate = new Date(getValues('startDate'));
-                                                  const endDate = new Date(value);
-                                                  if (endDate < startDate) {
+                                                  const endDate = value ? new Date(value) : null;
+
+                                                  if (endDate && endDate < startDate) {
                                                        return t('End date cannot be earlier than start date');
                                                   }
+
                                                   return true;
                                              },
                                         })}
@@ -193,6 +194,7 @@ export const Add = () => {
                                    {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
                               </div>
                          </div>
+
                          {/* 
                          <div className="row mb-3">
                               <div className="col">

@@ -30,24 +30,18 @@ export default function Update_profile() {
           formState: { errors },
      } = useForm();
 
-     const formatPhoneNumber = (phoneNumber) => {
-          if (phoneNumber && phoneNumber.startsWith('0')) {
-               return '84' + phoneNumber.slice(1);
-          }
-          return phoneNumber;
-     };
-
      useEffect(() => {
           const fetchUserData = async () => {
                try {
                     const userData = await getUserById(userId, token);
+
                     if (userData) {
                          setUser(userData);
                          setAvatar(userData.avatar);
                          setValue('fullname', userData.fullname || '');
                          setValue('email', userData.email || '');
-                         setValue('phoneNumber', formatPhoneNumber(userData.phone_number) || '');
-                         setValue('emailVerified_at', userData.email_verified_at);
+                         setValue('phoneNumber', userData.phone_number || '');
+                         setValue('emailVerified_at', userData.email_verified_at || '');
                     }
                } catch (error) {
                     Swal.fire({
@@ -138,6 +132,12 @@ export default function Update_profile() {
                }
 
                await updateUser(userId, updatedData, token);
+
+               setUser((prevUser) => ({
+                    ...prevUser,
+                    ...updatedData,
+               }));
+
                Swal.fire({
                     icon: 'success',
                     text: t('User updated successfully!'),
@@ -146,6 +146,10 @@ export default function Update_profile() {
                     timer: 3000,
                     showConfirmButton: false,
                });
+
+               setValue('fullname', updatedData.fullname);
+               setValue('email', updatedData.email);
+               setValue('phoneNumber', updatedData.phone_number);
           } catch (error) {
                if (error.response && error.response.data.errors) {
                     const errors = error.response.data.errors;
@@ -174,6 +178,16 @@ export default function Update_profile() {
           }
      };
 
+     const handlePhoneNumberChange = (event) => {
+          let phoneNumber = event.target.value;
+
+          if (phoneNumber.startsWith('0')) {
+               phoneNumber = '84' + phoneNumber.slice(1);
+          }
+
+          setValue('phoneNumber', phoneNumber);
+     };
+
      return (
           <div className="layout-wrapper layout-content-navbar">
                <div className="layout-container">
@@ -181,7 +195,7 @@ export default function Update_profile() {
                     <div className={`layout-page ${isSidebarOpen ? 'sidebar-open' : ''}`}>
                          <Navbar onToggleSidebar={toggleSidebar} />
                          <div className="content-wrapper">
-                              <div className="container-xxl flex-grow-1 container-p-y">
+                              <div className="container-fluid flex-grow-1 container-p-y">
                                    <div className="row">
                                         <div className="col-md-12">
                                              <div className="nav-align-top">
@@ -190,6 +204,10 @@ export default function Update_profile() {
                                                             <Link to="/taskmaneger/update_profile" className="nav-link active">
                                                                  <i className="ri-group-line me-1_5" />
                                                                  {t('Account')}
+                                                            </Link>
+                                                            <Link to="/taskmaneger/notifications" className="nav-link active">
+                                                                 <i className="ri-notification-2-line me-1_5" />
+                                                                 {t('Notifications')}
                                                             </Link>
                                                        </li>
                                                   </ul>
@@ -262,10 +280,15 @@ export default function Update_profile() {
                                                                            <input
                                                                                 {...register('phoneNumber', {
                                                                                      required: t('Phone number is required'),
+                                                                                     pattern: {
+                                                                                          value: /^[0-9]{10,13}$/,
+                                                                                          message: t('Phone number must be between 10 and 13 digits'),
+                                                                                     },
                                                                                 })}
                                                                                 type="text"
                                                                                 className="form-control form-control-sm"
                                                                                 defaultValue={user.phone_number}
+                                                                                onChange={handlePhoneNumberChange}
                                                                            />
                                                                            {errors.phoneNumber && (
                                                                                 <div className="text-danger">{errors.phoneNumber.message}</div>

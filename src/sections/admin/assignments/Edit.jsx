@@ -75,9 +75,13 @@ export const Edit = () => {
      useEffect(() => {
           const fetchUsers = async () => {
                if (selectedDepartment) {
-                    const response = await getUsersByDepartment(selectedDepartment);
-                    setUsers(response.users || []);
-                    setValue('userId', '');
+                    try {
+                         const response = await getUsersByDepartment(selectedDepartment);
+                         setUsers(response);
+                         setValue('userId', '');
+                    } catch (error) {
+                         console.error('Failed to fetch users:', error);
+                    }
                }
           };
           if (selectedDepartment) fetchUsers();
@@ -183,12 +187,19 @@ export const Edit = () => {
                                         {...register('userId', { required: t('User is required') })}
                                         className={`form-select form-select-sm ${errors.userId ? 'is-invalid' : ''}`}>
                                         <option value="">{t('Select User')}</option>
-                                        {users.map((user) => (
-                                             <option key={user.id} value={user.id}>
-                                                  {user.fullname}
-                                             </option>
-                                        ))}
+                                        {users && users.length > 0 ? (
+                                             users
+                                                  .filter((user) => user.confirmation_status === 'confirmed')
+                                                  .map((user) => (
+                                                       <option key={user.id} value={user.id}>
+                                                            {user.fullname}
+                                                       </option>
+                                                  ))
+                                        ) : (
+                                             <option disabled>{t('No users found')}</option>
+                                        )}
                                    </select>
+
                                    {errors.userId && <div className="invalid-feedback">{errors.userId.message}</div>}
                               </div>
                          </div>

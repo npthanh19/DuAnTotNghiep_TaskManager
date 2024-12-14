@@ -31,6 +31,7 @@ const resources = {
      },
      vi: {
           translation: {
+               Notifications: 'Thông báo',
                Dashboard: 'Thống kê',
                Categories: 'Danh mục',
                Admin: 'Quản trị viên',
@@ -460,6 +461,20 @@ const resources = {
                'Error!': 'Lỗi!',
                'Failed to update the status. Please try again.': 'Cập nhật trạng thái thất bại. Vui lòng thử lại.',
                'Project is required': 'Dự án bắt buộc chọn',
+               'No recently deleted projects found.': 'Không có dự án nào ở thùng rác',
+               'Add New Worktime': 'Thêm thời gian làm việc',
+               Project: 'Dự án',
+               'No users found': 'Không có người dùng nào',
+               'Phone number must be between 10 and 13 digits': 'Số điện thoại phải từ 10-13 số',
+               'The task status has been updated.': 'Trạng thái của nhiệm vụ thay đổi thành công.',
+               'The assignment status has been updated.': 'Trạng thái của phân công thay đổi thành công.',
+               Time: 'Thời gian',
+               'Failed to fetch user data.': 'Lỗi không lấy được người dùng.',
+               'Notifications not found': 'Không có thông báo',
+               'Do you want to delete this notification?': 'Bạn muốn xoá thông báo này?',
+               'Yes, delete it!': 'Đồng ý, xoá!',
+               'Notification deleted successfully.': 'Thông báo xoá thành công.',
+               'Failed to delete notification.': 'Có lỗi khi xoá thông báo',
           },
      },
 };
