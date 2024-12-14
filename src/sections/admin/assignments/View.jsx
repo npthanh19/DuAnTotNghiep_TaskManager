@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { getAllAssignments, deleteAssignment } from '../../../services/assignmentService';
+import { getAllAssignments, deleteAssignment, updateAssignmentStatus } from '../../../services/assignmentService';
 import { getAllProjects } from '../../../services/projectsService';
 import Swal from 'sweetalert2';
+import styled from 'styled-components';
 
 export const View = () => {
      const [currentPage, setCurrentPage] = useState(1);
@@ -110,6 +111,82 @@ export const View = () => {
           setSearchTerm(e.target.value);
      };
 
+     const statusMapping = {
+          'to do': 1,
+          'in progress': 2,
+          preview: 3,
+          done: 4,
+     };
+
+     const handleChangeAssignmentStatus = async (assignmentId, newStatus) => {
+          const result = await Swal.fire({
+               title: t('Are you sure you want to change the status?'),
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonText: t('Yes, change'),
+               cancelButtonText: t('Cancel'),
+          });
+
+          if (result.isConfirmed) {
+               try {
+                    const statusValue = statusMapping[newStatus];
+                    if (!statusValue) throw new Error('Invalid status selected');
+
+                    await updateAssignmentStatus(assignmentId, statusValue);
+                    setAssignments((prevAssignments) =>
+                         prevAssignments.map((assignment) => (assignment.id === assignmentId ? { ...assignment, status: newStatus } : assignment)),
+                    );
+                    Swal.fire({
+                         title: t('Success!'),
+                         text: t('The assignment status has been updated.'),
+                         icon: 'success',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
+               } catch (error) {
+                    console.error('Error updating assignment status:', error);
+                    Swal.fire({
+                         title: t('Error!'),
+                         text: t('Failed to update the status. Please try again.'),
+                         icon: 'error',
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    });
+               }
+          }
+     };
+
+     const StatusSelect = styled.select`
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          width: 100%;
+          padding: 5px 10px;
+          border: none;
+          border-radius: 5px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+
+          background-color: ${({ status }) =>
+               status === 'to do' ? '#f8f9fa' : status === 'in progress' ? '#ffc107' : status === 'preview' ? '#17a2b8' : '#28a745'};
+          color: ${({ status }) => (status === 'to do' || status === 'in progress' ? '#212529' : '#fff')};
+
+          &:focus {
+               background-color: #ffffff;
+               color: #212529;
+          }
+     `;
+
+     const StatusOption = styled.option`
+          text-align: center;
+     `;
+
      return (
           <div className="card">
                <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3">
@@ -141,15 +218,15 @@ export const View = () => {
                     <table className="table">
                          <thead>
                               <tr>
-                                   <th className="">{t('STT')}</th>
-                                   <th className="">{t('ID')}</th>
-                                   <th className="">{t('Project Name')}</th>
-                                   <th className="">{t('Task Name')}</th>
-                                   <th className="">{t('Department Name')}</th>
-                                   <th className="">{t('User Name')}</th>
-                                   <th className="">{t('Note')}</th>
-                                   <th className="">{t('Status')}</th>
-                                   <th className="col-1">{t('Actions')}</th>
+                                   <th className="text-center">{t('STT')}</th>
+                                   <th className="text-center">{t('ID')}</th>
+                                   <th>{t('Project Name')}</th>
+                                   <th>{t('Task Name')}</th>
+                                   <th>{t('Department Name')}</th>
+                                   <th className="text-center">{t('User Name')}</th>
+                                   <th className="text-center">{t('Note')}</th>
+                                   <th className="text-center">{t('Status')}</th>
+                                   <th className="text-center">{t('Actions')}</th>
                               </tr>
                          </thead>
                          <tbody>
@@ -162,8 +239,8 @@ export const View = () => {
                               ) : (
                                    currentAssignments.map((assignment, index) => (
                                         <tr key={assignment.id}>
-                                             <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                             <td>{assignment.id}</td>
+                                             <td className="text-center">{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                             <td className="text-center">{assignment.id}</td>
                                              <td>
                                                   <span
                                                        className="d-inline-block text-truncate"
@@ -194,7 +271,7 @@ export const View = () => {
                                                             : assignment.department_name}
                                                   </span>
                                              </td>
-                                             <td>
+                                             <td className="text-center">
                                                   <span
                                                        className="d-inline-block text-truncate"
                                                        style={{ maxWidth: '150px' }}
@@ -204,38 +281,26 @@ export const View = () => {
                                                             : assignment.user_name}
                                                   </span>
                                              </td>
-                                             <td>
+                                             <td className="text-center">
                                                   <span
                                                        className="d-inline-block text-truncate"
-                                                       style={{ maxWidth: '150px' }}
+                                                       style={{ maxWidth: '250px' }}
                                                        title={assignment.note}>
-                                                       {assignment.note.length > 20 ? `${assignment.note.slice(0, 20)}...` : assignment.note}
+                                                       {assignment.note.length > 30 ? `${assignment.note.slice(0, 30)}...` : assignment.note}
                                                   </span>
                                              </td>
-
-                                             <td>
-                                                  {assignment.status === 'to do' && (
-                                                       <span className="badge bg-secondary text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Pending')}
-                                                       </span>
-                                                  )}
-                                                  {assignment.status === 'in progress' && (
-                                                       <span className="badge bg-warning text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('In Progress')}
-                                                       </span>
-                                                  )}
-                                                  {assignment.status === 'preview' && (
-                                                       <span className="badge bg-info text-dark text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Preview')}
-                                                       </span>
-                                                  )}
-                                                  {assignment.status === 'done' && (
-                                                       <span className="badge bg-success text-wrap status-badge d-flex justify-content-center align-items-center">
-                                                            {t('Done')}
-                                                       </span>
-                                                  )}
+                                             <td className="text-center">
+                                                  <StatusSelect
+                                                       status={assignment.status}
+                                                       value={assignment.status}
+                                                       onChange={(e) => handleChangeAssignmentStatus(assignment.id, e.target.value)}>
+                                                       <StatusOption value="to do">{t('Pending')}</StatusOption>
+                                                       <StatusOption value="in progress">{t('In Progress')}</StatusOption>
+                                                       <StatusOption value="preview">{t('Preview')}</StatusOption>
+                                                       <StatusOption value="done">{t('Done')}</StatusOption>
+                                                  </StatusSelect>
                                              </td>
-                                             <td>
+                                             <td className="text-center">
                                                   <div className="dropdown">
                                                        <button
                                                             className="btn btn-sm"
@@ -257,8 +322,7 @@ export const View = () => {
                                                                  <button
                                                                       className="dropdown-item text-danger"
                                                                       onClick={() => handleDeleteClick(assignment.id)}>
-                                                                      <i className="bi bi-trash me-2"></i>
-                                                                      {t('Delete')}
+                                                                      <i className="bi bi-trash me-2"></i> {t('Delete')}
                                                                  </button>
                                                             </li>
                                                        </ul>

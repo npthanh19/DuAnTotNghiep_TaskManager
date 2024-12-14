@@ -6,8 +6,8 @@ import Swal from 'sweetalert2';
 import { createAssignment } from '../../../services/assignmentService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getTasksByProject } from '../../../services/tasksService';
-import { getDepartmentsByProjectId } from '../../../services/tasksService'; // Dịch vụ lấy phòng ban theo dự án
-import { getUsersByDepartment } from '../../../services/assignmentService'; // Dịch vụ lấy người dùng theo phòng ban
+import { getDepartmentsByProjectId } from '../../../services/tasksService';
+import { getUsersByDepartment } from '../../../services/assignmentService';
 
 export const Add = () => {
      const { t } = useTranslation();
@@ -111,7 +111,6 @@ export const Add = () => {
      };
 
      const onSubmit = async (data) => {
-          console.log('Form data:', data);
           const assignmentData = {
                task_id: data.taskId,
                user_ids: [data.userId],

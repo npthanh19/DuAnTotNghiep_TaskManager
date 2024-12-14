@@ -327,7 +327,7 @@ export const View = () => {
                          <tbody>
                               {currentProjects.length === 0 ? (
                                    <tr>
-                                        <td colSpan="7" className="text-center">
+                                        <td colSpan="8" className="text-center">
                                              <span>{t('No project found')}</span>
                                         </td>
                                    </tr>

@@ -13,6 +13,7 @@ import OtpReset from '../components/admin/otp';
 import NewPasswordPage from '../components/admin/NewPasswordPage';
 import ConfirmEmail from '../components/admin/ConfirmEmail';
 import VerifyEmaill from '../components/admin/VerifyEmail';
+import NotificationsPage from '../components/admin/NotificationsPage';
 
 // Admin Users
 import ViewUser from '../pages/admin/Users/List';
@@ -24,8 +25,6 @@ import RecentlyDeletedUsers from '../sections/admin/users/RecentlyDeletedUsers';
 import ViewRoles from '../pages/admin/Roles/List';
 import AddRoles from '../pages/admin/Roles/Add';
 import EditRoles from '../pages/admin/Roles/Edit';
-
-
 
 // Admin Drag & Drop Board
 import ViewBoard from '../pages/admin/Board/Board';
@@ -83,6 +82,7 @@ export const AdminRoutes = () => (
 
           {/* Profile */}
           <Route path="update_profile" element={<PrivateRoute><UpdateProfile /></PrivateRoute>} />
+          <Route path="notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
 
           {/* User Management */}
           <Route path="users" element={<PrivateRoute><AdminLayout><ViewUser /></AdminLayout></PrivateRoute>} />

@@ -9,7 +9,6 @@ import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useTranslation } from 'react-i18next';
 
-
 const Login = () => {
      const [loading, setLoading] = useState(false);
      const { t } = useTranslation();
@@ -34,7 +33,7 @@ const Login = () => {
                     localStorage.setItem('user_name', response.fullname);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
 
-                    Swal.fire({    
+                    Swal.fire({
                          icon: 'success',
                          title: `Chào mừng bạn, ${data.email}!`,
                          position: 'top-right',
@@ -77,45 +76,48 @@ const Login = () => {
                     credential: token,
                });
 
-               if (response.data.status === 'verification_required') {
-                    sessionStorage.setItem('user_email', userEmail);
+               if (response && response.data) {
+                    if (response.data.status === 'verification_required') {
+                         sessionStorage.setItem('user_email', userEmail);
 
-                    Swal.fire({
-                         icon: 'info',
-                         title: t('Please check your email to verify your account.'),
-                         position: 'top-right',
-                         toast: true,
-                         timer: 2000,
-                         showConfirmButton: false,
-                    });
+                         Swal.fire({
+                              icon: 'info',
+                              title: t('Please check your email to verify your account.'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 2000,
+                              showConfirmButton: false,
+                         });
 
-                    setTimeout(() => {
-                         navigate('/taskmaneger/confirm-email');
-                    }, 2000);
-               } else if (response.data.status === 'verified') {
-                    localStorage.setItem('isAuthenticated', 'true');
-                    localStorage.setItem('token', response.data.access_token);
-                    localStorage.setItem('role', response.data.role);
-                    localStorage.setItem('user_id', response.user_id);
-                    localStorage.setItem('user_name', response.fullname); // Lưu fullname
-                    axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
+                         setTimeout(() => {
+                              navigate('/taskmaneger/confirm-email');
+                         }, 2000);
+                    } else if (response.data.status === 'verified') {
+                         localStorage.setItem('isAuthenticated', 'true');
+                         localStorage.setItem('token', response.data.access_token);
+                         localStorage.setItem('role', response.data.role);
+                         localStorage.setItem('user_id', response.data.user_id);
+                         localStorage.setItem('user_name', response.data.user_name);
+                         axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
-                    Swal.fire({
-                         icon: 'success',
-                         title: t('Log in successfully!'),
-                         position: 'top-right',
-                         toast: true,
-                         timer: 3000,
-                         showConfirmButton: false,
-                    }).then(() => {
-                         if (response.data.role === 'Admin' || response.data.role === 'Manager') {
-                              navigate('/taskmaneger');
-                         } else {
-                              navigate('/taskmaneger/departments');
-                         }
-                    });
+                         Swal.fire({
+                              icon: 'success',
+                              title: t('Log in successfully!'),
+                              position: 'top-right',
+                              toast: true,
+                              timer: 3000,
+                              showConfirmButton: false,
+                         }).then(() => {
+                              if (response.data.role === 'Admin' || response.data.role === 'Manager') {
+                                   navigate('/taskmaneger');
+                              } else {
+                                   navigate('/taskmaneger/departments');
+                              }
+                         });
+                    }
                }
           } catch (error) {
+               console.error(error);
                Swal.fire({
                     icon: 'error',
                     title: t('Google login failed. Please try again.'),
@@ -162,7 +164,7 @@ const Login = () => {
                                              type="email"
                                              id="form3Example3"
                                              className={`form-control form-control-lg ${errors.email ? 'is-invalid' : ''}`}
-                                             placeholder= {t('Email Address')}
+                                             placeholder={t('Email Address')}
                                              {...register('email', {
                                                   required: t('Email cannot be blank'),
                                                   pattern: {
@@ -183,7 +185,7 @@ const Login = () => {
                                              type="password"
                                              id="form3Example4"
                                              className={`form-control form-control-lg ${errors.password ? 'is-invalid' : ''}`}
-                                             placeholder= {t('Enter password')}
+                                             placeholder={t('Enter password')}
                                              {...register('password', {
                                                   required: t('Password cannot be blank'),
                                                   minLength: {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { logout } from '../../services/authService';
+import { getAllNotifications, markNotificationAsRead } from '../../services/notificationsService';
 import { axiosi } from '../../config/axios';
 import Swal from 'sweetalert2';
 
@@ -9,7 +10,9 @@ const Navbar = ({ onToggleSidebar }) => {
      const { t, i18n } = useTranslation();
      const [isDarkMode, setIsDarkMode] = useState(false);
      const [language, setLanguage] = useState('vi');
+     const [notifications, setNotifications] = useState([]);
      const navigate = useNavigate();
+     const [unreadCount, setUnreadCount] = useState(0);
 
      const handleDarkModeToggle = () => {
           setIsDarkMode(!isDarkMode);
@@ -23,6 +26,43 @@ const Navbar = ({ onToggleSidebar }) => {
      useEffect(() => {
           document.body.className = isDarkMode ? 'dark-mode' : '';
      }, [isDarkMode]);
+
+     useEffect(() => {
+          const fetchNotifications = async () => {
+               try {
+                    const data = await getAllNotifications();
+                    const unreadNotifications = data.filter((notification) => !notification.read_at);
+                    setNotifications(
+                         data.map((notification) => ({
+                              ...notification,
+                              read: notification.read_at !== null,
+                         })),
+                    );
+                    // Cập nhật số lượng thông báo chưa đọc
+                    setUnreadCount(unreadNotifications.length);
+               } catch (error) {
+                    console.error('Error fetching notifications:', error);
+               }
+          };
+
+          fetchNotifications();
+     }, []);
+
+     const handleNotificationClick = async (notificationId) => {
+          try {
+               await markNotificationAsRead(notificationId);
+
+               // Cập nhật lại thông báo đã đọc
+               setNotifications((prevNotifications) =>
+                    prevNotifications.map((notification) => (notification.id === notificationId ? { ...notification, read: true } : notification)),
+               );
+
+               // Giảm số lượng thông báo chưa đọc
+               setUnreadCount((prevCount) => prevCount - 1);
+          } catch (error) {
+               console.error('Error marking notification as read:', error);
+          }
+     };
 
      const handleLogout = async () => {
           try {
@@ -74,6 +114,7 @@ const Navbar = ({ onToggleSidebar }) => {
                          </div>
                     </div>
                     <ul className="navbar-nav flex-row align-items-center ms-auto">
+                         {/* Dropdown thông báo */}
                          <li className="nav-item dropdown me-3">
                               <div className="d-flex align-items-center">
                                    <button
@@ -82,34 +123,35 @@ const Navbar = ({ onToggleSidebar }) => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false">
                                         <i className="bi bi-bell"></i>
+                                        {unreadCount > 0 && <span className="badge bg-danger">{unreadCount}</span>}
                                    </button>
 
                                    <ul className="dropdown-menu dropdown-menu-end border-0 shadow-none" aria-labelledby="notificationDropdown">
-                                        <li>
-                                             <a className="dropdown-item" href="#">
-                                                  <i className="bi bi-star-fill me-2 text-warning"></i>
-                                                  {truncateText(
-                                                       'NHDT đã giao cho bạn 1 nhiệm vụ cực kì quan trọng bạn nên xem mau không nên bỏ lở',
-                                                       50,
-                                                  )}
-                                             </a>
-                                        </li>
-                                        <li>
-                                             <a className="dropdown-item" href="#">
-                                                  <i className="bi bi-info-circle me-2 text-primary"></i>
-                                                  {truncateText('Đã có nhiệm vụ mới bạn vui lòng xem qua!', 50)}
-                                             </a>
-                                        </li>
-                                        <li>
-                                             <a className="dropdown-item" href="#">
-                                                  <i className="bi bi-check-circle me-2 text-success"></i>
-                                                  {truncateText('Nhiệm vụ mới vui lòng xem!!!', 50)}
-                                             </a>
-                                        </li>
+                                        {notifications.length === 0 ? (
+                                             <li>
+                                                  <span className="dropdown-item text-muted">{t('Không có thông báo')}</span>
+                                             </li>
+                                        ) : (
+                                             notifications.map((notification) => (
+                                                  <li key={notification.id}>
+                                                       <a
+                                                            className={`dropdown-item ${notification.read ? 'text-muted' : ''}`}
+                                                            href="#"
+                                                            onClick={() => handleNotificationClick(notification.id)}>
+                                                            <i
+                                                                 className={`bi ${
+                                                                      notification.read ? 'bi-check-circle' : 'bi-info-circle'
+                                                                 } me-2 text-primary`}></i>
+                                                            {truncateText(notification.data.message, 50)}
+                                                       </a>
+                                                  </li>
+                                             ))
+                                        )}
                                    </ul>
                               </div>
                          </li>
 
+                         {/* Chuyển ngôn ngữ */}
                          <li className="nav-item dropdown me-3">
                               <div className="language-switcher">
                                    <button
@@ -125,11 +167,7 @@ const Navbar = ({ onToggleSidebar }) => {
                                    <span className={`language-slider ${language === 'vi' ? 'slider-vie' : 'slider-eng'}`}></span>
                               </div>
                          </li>
-                         {/* <li className="nav-item me-3">
-                              <button className="nav-link px-0 dark-mode-toggle" aria-label="Toggle Dark Mode" onClick={handleDarkModeToggle}>
-                                   <i className={`bi ${isDarkMode ? 'bi-moon-fill' : 'bi-sun-fill'} ri-24px`}></i>
-                              </button>
-                         </li> */}
+
                          <li className="nav-item dropdown">
                               <a
                                    className="nav-link dropdown-toggle hide-arrow p-0"
@@ -167,6 +205,12 @@ const Navbar = ({ onToggleSidebar }) => {
                                         <i className="ri-user-3-line ri-18px me-2"></i>
                                         <span className="align-middle">{t('Thông tin cá nhân')}</span>
                                    </Link>
+                                   <li>
+                                        <Link className="dropdown-item d-flex align-items-center" to="/taskmaneger/notifications">
+                                             <i className="ri-notification-4-line ri-18px me-2"></i>
+                                             <span className="align-middle">{t('Thông báo')}</span>
+                                        </Link>
+                                   </li>
                                    <li>
                                         <a className="dropdown-item d-flex align-items-center" href="#">
                                              <i className="ri-settings-4-line ri-18px me-2"></i>

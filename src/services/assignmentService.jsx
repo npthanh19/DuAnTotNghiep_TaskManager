@@ -30,9 +30,9 @@ export const getAllAssignments = async () => {
 
           return assignments.map((assignment) => ({
                ...assignment,
-               user_name: userMap[assignment.user_id] || 'Unknown User',
-               task_name: taskMap[assignment.task_id] || 'Unknown Task',
-               department_name: departmentMap[assignment.department_id] || 'Unknown Department',
+               user_name: userMap[assignment.user_id] || '-',
+               task_name: taskMap[assignment.task_id] || '-',
+               department_name: departmentMap[assignment.department_id] || '-',
           }));
      } catch (error) {
           console.error('Error fetching all assignments:', error);
@@ -130,6 +130,16 @@ export const restoreAssignment = async (id) => {
      } catch (error) {
           console.error('Error restoring assignment:', error);
           throw error;
+     }
+};
+
+export const updateAssignmentStatus = async (assignmentId, status) => {
+     try {
+          const response = await axiosi.put(`/api/assignments/${assignmentId}/status`, { status });
+          return response.data;
+     } catch (error) {
+          console.error(`Error updating status for assignment ID ${assignmentId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
      }
 };
 

@@ -128,12 +128,7 @@ export const Add = () => {
                               <label htmlFor="description" className="form-label">
                                    {t('Description')}
                               </label>
-                              <textarea
-                                   id="description"
-                                   className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
-                                   rows="5"
-                                   {...register('description', { required: t('Description cannot be empty!') })}></textarea>
-                              {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+                              <textarea id="description" className={`form-control form-control-sm`} rows="5"></textarea>
                          </div>
 
                          <button type="submit" className="btn btn-success">
