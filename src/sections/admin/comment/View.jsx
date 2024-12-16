@@ -38,6 +38,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
           };
           fetchUserFullName();
      }, []);
+
      useEffect(() => {
           const fetchTaskDetails = async () => {
                try {
@@ -46,22 +47,19 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                          setTaskDetails(response.task);
                          setTaskName(response.task.task_name || '');
 
-                         // Đảm bảo comments được lưu với đầy đủ thông tin
-                         const commentsWithFiles = response.comments.map((comment) => ({
-                              ...comment,
-                              files: comment.files || [],
-                              replies: (comment.replies || []).map((reply) => ({
-                                   ...reply,
-                                   files: reply.files || [],
-                                   user: reply.user || {},
-                                   replies: (reply.replies || []).map((subReply) => ({
-                                        ...subReply,
-                                        files: subReply.files || [],
-                                        user: subReply.user || {},
-                                   })),
-                              })),
-                         }));
-                         setFilteredComments(commentsWithFiles);
+                         // Đảm bảo comments được lưu với đầy đủ thông tin và cấu trúc phân cấp
+                         const processComments = (comments) => {
+                              return comments.map((comment) => ({
+                                   ...comment,
+                                   files: comment.files || [],
+                                   replies: comment.replies ? processComments(comment.replies) : [],
+                                   user: comment.user || {},
+                              }));
+                         };
+
+                         const processedComments = processComments(response.comments || []);
+                         setFilteredComments(processedComments);
+                         setComments(processedComments);
                     }
                } catch (error) {
                     console.error('Error fetching task details:', error);
@@ -244,68 +242,66 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                     formData.append('comment', replyContent);
                     formData.append('task_id', taskId);
                     formData.append('parent_id', replyCommentId);
-
+     
                     if (selectedFile) {
                          formData.append('files[]', selectedFile);
                     }
-
+     
                     const response = await createComment(formData);
-
-                    const updateCommentsRecursively = (comments) => {
-                         return comments.map((comment) => {
+     
+                    // Hàm đệ quy để cập nhật comments
+                    const updateCommentsWithNewReply = (comments) => {
+                         return comments.map(comment => {
                               if (comment.id === replyCommentId) {
-                                   const newReply = {
-                                        id: response.comment.id,
-                                        comment: response.comment.comment,
-                                        created_at: response.comment.created_at,
-                                        user: {
-                                             id: response.comment.user.id,
-                                             fullname: response.comment.user.fullname,
-                                             avatar: response.comment.user.avatar,
-                                        },
-                                        files: response.comment.files || [],
-                                        replies: [],
-                                   };
-
                                    return {
                                         ...comment,
-                                        replies: [...(comment.replies || []), newReply],
+                                        replies: [...(comment.replies || []), {
+                                             id: response.comment.id,
+                                             comment: response.comment.comment,
+                                             created_at: response.comment.created_at,
+                                             user: response.comment.user,
+                                             files: response.comment.files || [],
+                                             replies: [] // Thêm mảng replies rỗng cho comment mới
+                                        }]
                                    };
                               }
                               if (comment.replies && comment.replies.length > 0) {
                                    return {
                                         ...comment,
-                                        replies: updateCommentsRecursively(comment.replies),
+                                        replies: updateCommentsWithNewReply(comment.replies)
                                    };
                               }
                               return comment;
                          });
                     };
-
-                    setFilteredComments((prevComments) => updateCommentsRecursively(prevComments));
-
+     
+                    // Cập nhật cả hai state
+                    const updatedComments = updateCommentsWithNewReply(filteredComments);
+                    setFilteredComments(updatedComments);
+                    setComments(updatedComments);
+     
+                    // Tự động hiển thị replies sau khi thêm
+                    setRepliesVisibility(prev => ({
+                         ...prev,
+                         [replyCommentId]: true
+                    }));
+     
+                    // Reset form
                     setReplyContent('');
                     setReplyCommentId(null);
                     setSelectedFile(null);
-
+     
                     Swal.fire({
                          icon: 'success',
                          text: t('Reply added successfully'),
                          position: 'top-right',
                          toast: true,
                          timer: 3000,
-                         showConfirmButton: false,
+                         showConfirmButton: false
                     });
                } catch (error) {
                     console.error('Error submitting reply:', error);
-                    Swal.fire({
-                         icon: 'error',
-                         text: t('An error occurred while adding the reply.'),
-                         position: 'top-right',
-                         toast: true,
-                         timer: 3000,
-                         showConfirmButton: false,
-                    });
+                    // Xử lý lỗi...
                }
           }
      };
