@@ -150,6 +150,22 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
           }
      };
 
+     const handleSaveClick = (taskId) => {
+          Swal.fire({
+               title: 'Bạn có chắc chắn muốn lưu?',
+               text: 'Dữ liệu sẽ được lưu lại!',
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonText: 'Lưu',
+               cancelButtonText: 'Hủy',
+          }).then((result) => {
+               if (result.isConfirmed) {
+                    handleEditDescription(taskId);
+                    Swal.fire('Đã lưu!', 'Dữ liệu đã được lưu.', 'success');
+               }
+          });
+     };
+
      const renderComments = (comments) =>
           comments.map((comment) => (
                <li key={comment.id} className="list-group-item">
@@ -209,7 +225,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                    <CKEditor editor={ClassicEditor} data={editorData} onChange={handleEditorChange} />
 
                                    <div className="d-flex align-items-center mt-2">
-                                        <button className="btn btn-primary btn-sm" onClick={() => handleEditDescription(selectedTask.id)}>
+                                        <button className="btn btn-primary btn-sm" onClick={() => handleSaveClick(selectedTask.id)}>
                                              {t('Save')}
                                         </button>
                                         <p className="ms-2 mb-0 small">{t('Cancel')}</p>

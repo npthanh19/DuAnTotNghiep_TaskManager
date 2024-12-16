@@ -25,7 +25,8 @@ export const View = () => {
 
      const [runningTask, setRunningTask] = useState();
      const [members, setMembers] = useState();
-
+     const uniqueMembers = [];
+     const memberIds = new Set();
      const [selectedUsers, setSelectedUsers] = useState([]);
      const [searchTerm, setSearchTerm] = useState('');
      const [selectedProject, setSelectedProject] = useState('');
@@ -40,12 +41,13 @@ export const View = () => {
      useEffect(() => {
           const fetchMember = async () => {
                try {
-                    const fetchMember = await getAllAssignments();
-                    setMembers(fetchMember);
+                    const fetchedMembers = await getAllAssignments();
+                    setMembers(fetchedMembers);
                } catch (error) {
                     console.error('Error fetching projects:', error);
                }
           };
+
           fetchMember();
           getDataTask();
 
@@ -75,17 +77,18 @@ export const View = () => {
 
                const filterTasks = () => {
                     return tasks?.filter((task) => {
-                         const isUserMatched = selectedUsers.length > 0 ? task.assigned_users.some((user) => selectedUsers.includes(user.user_id)) : true;
-     
+                         const isUserMatched =
+                              selectedUsers.length > 0 ? task.assigned_users.some((user) => selectedUsers.includes(user.user_id)) : true;
+
                          const isProjectMatched = selectedProject ? task.project_id.toString() === selectedProject.toString() : true;
 
                          const isSearchMatched = task?.task_name.toLowerCase().includes(searchTerm.toLowerCase());
-     
+
                          return isUserMatched && isProjectMatched && isSearchMatched;
                     });
-               }
+               };
 
-               const dataFilter = filterTasks()
+               const dataFilter = filterTasks();
 
                // Tạo các card từ dữ liệu tasks
                const cards = dataFilter?.reduce((acc, task) => {
@@ -103,8 +106,7 @@ export const View = () => {
                     return acc;
                }, {});
 
-               console.log(cards)
-
+               console.log(cards);
 
                // Nhóm các card theo status
                const groupedCards = dataFilter.reduce(
@@ -277,7 +279,6 @@ export const View = () => {
           });
      };
 
-
      return (
           <>
                <h2 className="mb-4">
@@ -297,7 +298,16 @@ export const View = () => {
 
                                    {showDropdown && (
                                         <div className="dropdown-menu show" style={{ position: 'absolute', zIndex: 1000, top: '100%', left: '0' }}>
-                                             {members?.slice(1).map((member) => (
+                                             {members?.slice(1).map((member) => {
+                                                  // Kiểm tra nếu thành viên đã xuất hiện rồi, nếu chưa thì hiển thị và thêm vào Set
+                                                  if (!memberIds.has(member.user.id)) {
+                                                       memberIds.add(member.user.id);
+                                                       uniqueMembers.push(member);
+                                                  }
+                                                  return null; // Chỉ thêm vào uniqueMembers, không render ở đây
+                                             })}
+
+                                             {uniqueMembers.map((member) => (
                                                   <div key={member.id} className="dropdown-item d-flex align-items-center">
                                                        <input
                                                             type="checkbox"
@@ -305,7 +315,6 @@ export const View = () => {
                                                             onChange={(event) => handleUserChange(event, member)}
                                                             className="me-2"
                                                        />
-
                                                        <img
                                                             src={
                                                                  member.user.avatar
@@ -346,7 +355,7 @@ export const View = () => {
                               </select>
 
                               <button className="btn btn-secondary ms-3" onClick={handleResetFilter}>
-                              Reset
+                                   Reset
                               </button>
                          </div>
                     </div>
@@ -377,7 +386,9 @@ export const View = () => {
                                                                                 {...provided.dragHandleProps}
                                                                                 className="card">
                                                                                 <div className="card-header">
-                                                                                     <h4 className="task_name">{card?.task_name || 'Unnamed Task'}</h4>
+                                                                                     <h4 className="task_name">
+                                                                                          {card?.task_name || 'Unnamed Task'}
+                                                                                     </h4>
                                                                                      <button
                                                                                           className="details-button"
                                                                                           onClick={() => handleShowDetails(card)}>

@@ -31,6 +31,8 @@ export function View() {
      const [filteredTasks, setFilteredTasks] = useState([]);
      const [filteredSprints, setFilteredSprints] = useState([]);
      const [searchQuery, setSearchQuery] = useState('');
+     const uniqueMembers = [];
+     const memberIds = new Set();
 
      const { t } = useTranslation();
      const users = [
@@ -356,27 +358,36 @@ export function View() {
 
                                    {showDropdown && (
                                         <div className="dropdown-menu show" style={{ position: 'absolute', zIndex: 1000, top: '100%', left: '0' }}>
-                                             {members.slice(1).map((member) => (
-                                                  <div key={member.id} className="dropdown-item d-flex align-items-center">
-                                                       <input
-                                                            type="checkbox"
-                                                            checked={selectedUsers.includes(member.user.id)} // Kiểm tra xem user đã được chọn chưa
-                                                            onChange={(event) => handleUserChange(event, member)} // Gọi hàm handleUserChange khi thay đổi
-                                                            className="me-2"
-                                                       />
-                                                       <img
-                                                            src={
-                                                                 member.user.avatar
-                                                                      ? `${process.env.REACT_APP_BASE_URL}/avatar/${member.user.avatar}`
-                                                                      : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
-                                                            }
-                                                            alt={member.user.fullname}
-                                                            className="user-avatar me-2"
-                                                       />
-                                                       {member.user.fullname}
-                                                  </div>
-                                             ))}
-                                        </div>
+                                        {members.slice(1).map((member) => {
+                                            // Kiểm tra nếu thành viên đã xuất hiện rồi, nếu chưa thì hiển thị và thêm vào Set
+                                            if (!memberIds.has(member.user.id)) {
+                                                memberIds.add(member.user.id);
+                                                uniqueMembers.push(member);
+                                            }
+                                            return null; // Không render ở đây, chỉ thêm vào uniqueMembers
+                                        })}
+                                
+                                        {uniqueMembers.map((member) => (
+                                            <div key={member.id} className="dropdown-item d-flex align-items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedUsers.includes(member.user.id)} // Kiểm tra xem user đã được chọn chưa
+                                                    onChange={(event) => handleUserChange(event, member)} // Gọi hàm handleUserChange khi thay đổi
+                                                    className="me-2"
+                                                />
+                                                <img
+                                                    src={
+                                                        member.user.avatar
+                                                            ? `${process.env.REACT_APP_BASE_URL}/avatar/${member.user.avatar}`
+                                                            : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                    }
+                                                    alt={member.user.fullname}
+                                                    className="user-avatar me-2"
+                                                />
+                                                {member.user.fullname}
+                                            </div>
+                                        ))}
+                                    </div>
                                    )}
                               </div>
                               <input
