@@ -14,14 +14,16 @@ export const getAllTasks = async () => {
      }
 };
 export const updateTaskDescription = async (taskId, description) => {
-    try {
-        const response = await axiosi.put(`/tasks/${taskId}/description`, { description });
-        return response.data;
-    } catch (error) {
-        console.error('Error updating task description:', error);
-        throw error.response ? error.response.data : new Error('Network error');
-    }
-};
+     try {
+         // Sửa dấu backtick ``
+         const response = await axiosi.put(`${taskApiEndpoint}/${taskId}/description`, { description });
+         return response.data;
+     } catch (error) {
+         console.error('Error updating task description:', error?.response?.data || error.message);
+         throw error.response ? error.response.data : new Error('Network error');
+     }
+ };
+ 
 // Lấy thông tin từ task ID
 export const getTaskById = async (id) => {
      try {
@@ -261,3 +263,4 @@ export default {
      restoreTask,
      getRunningTasks,
 };
+// 1

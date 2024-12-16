@@ -10,7 +10,7 @@ import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllDepartments } from '../../../services/deparmentsService';
 // import { getAllActivityLogs } from '../../../services/activityService';
 import { useTranslation } from 'react-i18next';
-
+const role = localStorage.getItem('role');
 
 const MainContainer = styled.main`
      padding: 2rem;
@@ -124,7 +124,6 @@ const DateRangePicker = styled.div`
 `;
 
 export const View = () => {
-
      const { t } = useTranslation();
 
      const taskData = [
@@ -321,7 +320,8 @@ export const View = () => {
                               <Button>{t('Share')}</Button>
                               <Button>{t('Export')}</Button>
                               <DropdownButton data-bs-toggle="dropdown" aria-expanded="false">
-                                   <i className="bi bi-calendar"></i>{t('Choose a time period')}
+                                   <i className="bi bi-calendar"></i>
+                                   {t('Choose a time period')}
                               </DropdownButton>
                               <DateRangePicker>
                                    <div className="dropdown-menu" id="dateRangePicker">
@@ -339,44 +339,48 @@ export const View = () => {
                </Header>
                <div className="row row-cols-1 row-cols-md-3 g-4 mb-4">
                     {/* Card 1 */}
-                    <div className="col-12 col-md-6 col-lg-4">
-                         <Card>
-                              <CardHeader>
-                                   <div>
-                                        <Number>{role1Count}</Number>
-                                        <Label>{t('Website administration')}</Label>
-                                   </div>
-                                   <div>
-                                        <Icon className="bi bi-house-door text-success" />
-                                   </div>
-                              </CardHeader>
-                              <CardBody>
-                                   <ShowInfoLink href="#" onClick={() => handleShowInfoClick('admin')}>
-                                        {showUserInfo['admin'] ? t('Hide Info') : t('Show info')}
-                                   </ShowInfoLink>
-                              </CardBody>
-                         </Card>
-                    </div>
+                    {role !== 'Staff' && (
+                         <div className="col-12 col-md-6 col-lg-4">
+                              <Card>
+                                   <CardHeader>
+                                        <div>
+                                             <Number>{role1Count}</Number>
+                                             <Label>{t('Website administration')}</Label>
+                                        </div>
+                                        <div>
+                                             <Icon className="bi bi-house-door text-success" />
+                                        </div>
+                                   </CardHeader>
+                                   <CardBody>
+                                        <ShowInfoLink href="#" onClick={() => handleShowInfoClick('admin')}>
+                                             {showUserInfo['admin'] ? t('Hide Info') : t('Show info')}
+                                        </ShowInfoLink>
+                                   </CardBody>
+                              </Card>
+                         </div>
+                    )}
 
                     {/* Card 2 */}
-                    <div className="col-12 col-md-6 col-lg-4">
-                         <Card>
-                              <CardHeader>
-                                   <div>
-                                        <Number>{otherRolesCount}</Number>
-                                        <Label>{t('User')}</Label>
-                                   </div>
-                                   <div>
-                                        <Icon className="bi bi-person text-warning" />
-                                   </div>
-                              </CardHeader>
-                              <CardBody>
-                                   <ShowInfoLink href="#" onClick={() => handleShowInfoClick('others')}>
-                                        {showUserInfo['others'] ? t('Hide Info') : t('Show info')}
-                                   </ShowInfoLink>
-                              </CardBody>
-                         </Card>
-                    </div>
+                    {role !== 'Staff' && (
+                         <div className="col-12 col-md-6 col-lg-4">
+                              <Card>
+                                   <CardHeader>
+                                        <div>
+                                             <Number>{otherRolesCount}</Number>
+                                             <Label>{t('User')}</Label>
+                                        </div>
+                                        <div>
+                                             <Icon className="bi bi-person text-warning" />
+                                        </div>
+                                   </CardHeader>
+                                   <CardBody>
+                                        <ShowInfoLink href="#" onClick={() => handleShowInfoClick('others')}>
+                                             {showUserInfo['others'] ? t('Hide Info') : t('Show info')}
+                                        </ShowInfoLink>
+                                   </CardBody>
+                              </Card>
+                         </div>
+                    )}
                     {/* Card 3 */}
                     <div className="col-12 col-md-6 col-lg-4">
                          <Card>
@@ -646,3 +650,4 @@ export const View = () => {
           </MainContainer>
      );
 };
+// 1
