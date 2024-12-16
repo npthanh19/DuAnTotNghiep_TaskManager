@@ -378,7 +378,7 @@ const resources = {
                'Failed to load data!': 'Lỗi không thấy dữ liệu!',
                'Save changes': 'Lưu lại',
                'Upload new photo': 'Tải lên hình ảnh',
-               'Allowed JPG, PNG. Max size of 800K': 'Sử dụng JPG, PNG. Max size of 800k',
+               'Allowed JPG, PNG.': 'Sử dụng JPG, PNG.',
                Verified: 'Đã xác thực',
                'Not verified': 'Chưa xác thực',
                'Saving...': 'Đang lưu',
@@ -475,6 +475,7 @@ const resources = {
                'Yes, delete it!': 'Đồng ý, xoá!',
                'Notification deleted successfully.': 'Thông báo xoá thành công.',
                'Failed to delete notification.': 'Có lỗi khi xoá thông báo',
+               'Role is required!': 'Vai trò không để trống!',
           },
      },
 };

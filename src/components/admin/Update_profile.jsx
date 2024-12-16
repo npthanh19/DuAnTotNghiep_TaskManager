@@ -33,6 +33,9 @@ export default function Update_profile() {
      useEffect(() => {
           const fetchUserData = async () => {
                try {
+                    const userId = localStorage.getItem('user_id');
+                    const token = localStorage.getItem('token');
+
                     const userData = await getUserById(userId, token);
 
                     if (userData) {
@@ -217,8 +220,8 @@ export default function Update_profile() {
                                                        <div className="d-flex align-items-start align-items-sm-center gap-6">
                                                             <img
                                                                  src={
-                                                                      avatar
-                                                                           ? `${process.env.REACT_APP_BASE_URL}/avatar/${avatar}`
+                                                                      user.avatar
+                                                                           ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
                                                                            : '/default-avatar.png'
                                                                  }
                                                                  alt={user.fullname || 'User Avatar'}
@@ -239,7 +242,7 @@ export default function Update_profile() {
                                                                            onChange={handleAvatarChange}
                                                                       />
                                                                  </label>
-                                                                 <div>{t('Allowed JPG, PNG. Max size of 800K')}</div>
+                                                                 <div>{t('Allowed JPG, PNG.')}</div>
                                                             </div>
                                                        </div>
                                                   </div>
