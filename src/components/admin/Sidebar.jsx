@@ -71,18 +71,18 @@ const Sidebar = ({ isOpen }) => {
                               <span>{t('Departments')}</span>
                          </Link>
                     </li>
+                    <li className={`menu-item ${isActive('/taskmaneger')}`}>
+                         <Link to="/taskmaneger" className="menu-link text-decoration-none">
+                              <i className="bi bi-house-door menu-icon"></i>
+                              <span>{t('Dashboard')}</span>
+                         </Link>
+                    </li>
 
                     {/* Các mục menu chỉ dành cho Admin và Manager */}
                     {role === 'Admin' || role === 'Manager' ? (
                          <>
                               <li className="menu-header fw-medium mt-4">
                                    <span className="menu-header-text">{t('Admin')}</span>
-                              </li>
-                              <li className={`menu-item ${isActive('/taskmaneger')}`}>
-                                   <Link to="/taskmaneger" className="menu-link text-decoration-none">
-                                        <i className="bi bi-house-door menu-icon"></i>
-                                        <span>{t('Dashboard')}</span>
-                                   </Link>
                               </li>
                               <li className={`menu-item ${isActive('/taskmaneger/users')}`}>
                                    <Link to="/taskmaneger/users" className="menu-link text-decoration-none">

@@ -105,9 +105,9 @@ export function View() {
                     </h3>
                     <div className="d-flex align-items-center">
                          <div className="d-flex align-items-center ms-3">
-                              <Link to="/taskmaneger/roles/add" className="btn btn-primary btn-sm rounded-pill">
+                              {/* <Link to="/taskmaneger/roles/add" className="btn btn-primary btn-sm rounded-pill">
                                    <i className="bi bi-plus me-2"></i> {t('Add')}
-                              </Link>
+                              </Link> */}
                          </div>
                     </div>
                </div>
@@ -146,11 +146,11 @@ export function View() {
                                                                  <i className="bi bi-pencil me-2"></i> {t('Edit')}
                                                             </button>
                                                        </li>
-                                                       <li>
+                                                       {/* <li>
                                                             <button className="dropdown-item text-danger" onClick={() => handleDeleteClick(role.id)}>
                                                                  <i className="bi bi-trash me-2"></i> {t('Delete')}
                                                             </button>
-                                                       </li>
+                                                       </li> */}
                                                        {/* <li>
                                                             <button className="dropdown-item" onClick={() => handleViewPermissions(role.id)}>
                                                                  <i className="bi bi-eye me-2"></i> {t('View Permissions')}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { logout } from '../../services/authService';
 import { getAllNotifications, markNotificationAsRead } from '../../services/notificationsService';
+import { getUserById } from '../../services/usersService';
 import { axiosi } from '../../config/axios';
 import Swal from 'sweetalert2';
 
@@ -13,6 +14,10 @@ const Navbar = ({ onToggleSidebar }) => {
      const [notifications, setNotifications] = useState([]);
      const navigate = useNavigate();
      const [unreadCount, setUnreadCount] = useState(0);
+     const userId = localStorage.getItem('user_id');
+     const [userData, setUserData] = useState(null);
+     const [loading, setLoading] = useState(true);
+     const [error, setError] = useState(null);
 
      const handleDarkModeToggle = () => {
           setIsDarkMode(!isDarkMode);
@@ -26,6 +31,23 @@ const Navbar = ({ onToggleSidebar }) => {
      useEffect(() => {
           document.body.className = isDarkMode ? 'dark-mode' : '';
      }, [isDarkMode]);
+
+     useEffect(() => {
+          const fetchUserData = async () => {
+               if (userId) {
+                    try {
+                         const data = await getUserById(userId);
+                         setUserData(data);
+                    } catch (error) {
+                         setError('Không thể tải thông tin người dùng');
+                    } finally {
+                         setLoading(false);
+                    }
+               }
+          };
+
+          fetchUserData();
+     }, [userId]);
 
      useEffect(() => {
           const fetchNotifications = async () => {
@@ -177,7 +199,15 @@ const Navbar = ({ onToggleSidebar }) => {
                                    data-bs-toggle="dropdown"
                                    aria-expanded="false">
                                    <div className="avatar">
-                                        <img src="/assets/admin/img/avatars/1.png" alt="User Avatar" className="w-px-40 h-auto rounded-circle" />
+                                        <img
+                                             src={
+                                                  userData && userData.avatar
+                                                       ? `http://localhost:8000/avatar/${userData.avatar}`
+                                                       : '/assets/admin/img/avatars/3.png'
+                                             }
+                                             alt="User Avatar"
+                                             className="w-px-40 h-40 rounded-circle"
+                                        />
                                    </div>
                               </a>
                               <ul className="dropdown-menu dropdown-menu-end mt-3 py-2" aria-labelledby="dropdownUser">
@@ -185,9 +215,13 @@ const Navbar = ({ onToggleSidebar }) => {
                                         <div className="d-flex align-items-center">
                                              <div className="avatar me-3">
                                                   <img
-                                                       src="/assets/admin/img/avatars/1.png"
+                                                       src={
+                                                            userData && userData.avatar
+                                                                 ? `http://localhost:8000/avatar/${userData.avatar}`
+                                                                 : '/assets/admin/img/avatars/3.png'
+                                                       }
                                                        alt="User Avatar"
-                                                       className="w-px-40 h-auto rounded-circle"
+                                                       className="w-px-40 h-40 rounded-circle"
                                                   />
                                              </div>
                                              <div className="row" style={{ fontSize: '13px' }}>

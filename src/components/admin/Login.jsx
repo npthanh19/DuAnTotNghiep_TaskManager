@@ -69,6 +69,8 @@ const Login = () => {
           try {
                const token = credentialResponse.credential;
                const decoded = jwtDecode(token);
+               console.log(decoded);
+               console.log('Google Response:', credentialResponse);
 
                const userEmail = decoded.email;
 
@@ -76,48 +78,46 @@ const Login = () => {
                     credential: token,
                });
 
-               if (response && response.data) {
-                    if (response.data.status === 'verification_required') {
-                         sessionStorage.setItem('user_email', userEmail);
+               if (response.data.status === 'verification_required') {
+                    sessionStorage.setItem('user_email', userEmail);
 
-                         Swal.fire({
-                              icon: 'info',
-                              title: t('Please check your email to verify your account.'),
-                              position: 'top-right',
-                              toast: true,
-                              timer: 2000,
-                              showConfirmButton: false,
-                         });
+                    Swal.fire({
+                         icon: 'info',
+                         title: t('Please check your email to verify your account.'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 2000,
+                         showConfirmButton: false,
+                    });
 
-                         setTimeout(() => {
-                              navigate('/taskmaneger/confirm-email');
-                         }, 2000);
-                    } else if (response.data.status === 'verified') {
-                         localStorage.setItem('isAuthenticated', 'true');
-                         localStorage.setItem('token', response.data.access_token);
-                         localStorage.setItem('role', response.data.role);
-                         localStorage.setItem('user_id', response.data.user_id);
-                         localStorage.setItem('user_name', response.data.user_name);
-                         axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
+                    setTimeout(() => {
+                         navigate('/taskmaneger/confirm-email');
+                    }, 2000);
+               } else if (response.data.status === 'verified') {
+                    localStorage.setItem('isAuthenticated', 'true');
+                    localStorage.setItem('token', response.data.access_token);
+                    localStorage.setItem('role', response.data.role);
+                    localStorage.setItem('user_id', response.data.user_id);
+                    localStorage.setItem('email', decoded.email); 
+                    localStorage.setItem('user_name', response.data.user_name);
+                    axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
-                         Swal.fire({
-                              icon: 'success',
-                              title: t('Log in successfully!'),
-                              position: 'top-right',
-                              toast: true,
-                              timer: 3000,
-                              showConfirmButton: false,
-                         }).then(() => {
-                              if (response.data.role === 'Admin' || response.data.role === 'Manager') {
-                                   navigate('/taskmaneger');
-                              } else {
-                                   navigate('/taskmaneger/departments');
-                              }
-                         });
-                    }
+                    Swal.fire({
+                         icon: 'success',
+                         title: t('Log in successfully!'),
+                         position: 'top-right',
+                         toast: true,
+                         timer: 3000,
+                         showConfirmButton: false,
+                    }).then(() => {
+                         if (response.data.role === 'Admin' || response.data.role === 'Manager') {
+                              navigate('/taskmaneger');
+                         } else {
+                              navigate('/taskmaneger/departments');
+                         }
+                    });
                }
           } catch (error) {
-               console.error(error);
                Swal.fire({
                     icon: 'error',
                     title: t('Google login failed. Please try again.'),

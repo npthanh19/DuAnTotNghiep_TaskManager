@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
 import { getTaskById, updateTask as updateTaskService } from '../../../services/tasksService';
 import { getAllProjects } from '../../../services/projectsService';
 import { getDepartmentsByProjectId } from '../../../services/tasksService';
@@ -217,15 +216,6 @@ export const Edit = () => {
                                         className={`form-control form-control-sm ${errors.start_date ? 'is-invalid' : ''}`}
                                         {...register('start_date', {
                                              required: t('Start date is required!'),
-                                             validate: {
-                                                  isToday: (value) => {
-                                                       const today = new Date().toISOString().split('T')[0];
-                                                       if (value !== today) {
-                                                            return t('Start date must be today');
-                                                       }
-                                                       return true;
-                                                  },
-                                             },
                                         })}
                                    />
                                    {errors.start_date && <div className="invalid-feedback">{errors.start_date.message}</div>}
