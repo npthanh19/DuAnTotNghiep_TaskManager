@@ -110,3 +110,4 @@ const Sidebar = ({ isOpen }) => {
 };
 
 export default Sidebar;
+// 1
