@@ -48,22 +48,18 @@ export const updateComment = async (id, commentData) => {
 };
 
 // Xóa bình luận
-// Xóa bình luận
-// Xóa bình luận
-// Xóa bình luận
 
 export const deleteComment = async (id) => {
      try {
-          const response = await axiosi.delete(`${apiEndpoint}/${id}`); // Sử dụng axiosi thay vì axios
+          const response = await axiosi.delete(`${apiEndpoint}/${id}`); // Đảm bảo axios thay vì axiosi
           return response.data;
      } catch (error) {
           console.error(`Error deleting comment with ID ${id}:`, error);
-          throw error; // Bỏ lỗi để có thể xử lý ở nơi gọi
+          throw error; // Ném lỗi để xử lý ở nơi gọi hàm
      }
 };
 
-// Lấy bình luận theo TaskID
-// Lấy bình luận theo TaskID
+
 // Lấy bình luận theo TaskID
 export const getCommentsByTask = async (taskId) => {
      try {
