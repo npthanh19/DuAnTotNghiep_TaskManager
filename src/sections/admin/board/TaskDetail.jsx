@@ -18,7 +18,6 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
      const [avatarUrl] = useState('/assets/admin/img/avatars/1.png');
      const { t } = useTranslation();
 
-
      useEffect(() => {
           if (selectedTask) {
                setEditorData(selectedTask?.description || '');
@@ -42,13 +41,13 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
 
      const fetchComments = async (taskId) => {
           try {
-              const response = await getCommentsByTask(taskId);
-              console.log('Fetched comments:', response); 
-              setComments(Array.isArray(response) ? response : []);
+               const response = await getCommentsByTask(taskId);
+               console.log('Fetched comments:', response);
+               setComments(Array.isArray(response) ? response : []);
           } catch (error) {
-              console.error('Error fetching comments:', error);
+               console.error('Error fetching comments:', error);
           }
-      };
+     };
 
      const handleStatusChange = async (status) => {
           if (status === selectedTask.status) {
@@ -132,29 +131,24 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
           });
      };
 
-     const handleEditComment = async (taskId, description) => {
+     const handleEditDescription = async (taskId) => {
           try {
-              // Gọi tới hàm updateTaskDescription để cập nhật mô tả
-              await updateTaskDescription(taskId, description);
+               // Gọi tới hàm updateTaskDescription để cập nhật mô tả
+               await updateTaskDescription(taskId, editorData);
 
-          
-      
-              // Cập nhật danh sách comments với mô tả mới (nếu cần đồng bộ frontend)
-              setComments((prev) =>
-                  prev.map((comment) =>
-                      comment.id === taskId
-                          ? { ...comment, comment: description, updated_at: new Date().toISOString() }
-                          : comment
-                  ),
-              );
-      
-              // Đặt trạng thái chỉnh sửa về null
-              setEditComment(null);
+               // Cập nhật danh sách comments với mô tả mới (nếu cần đồng bộ frontend)
+               setComments((prev) =>
+                    prev.map((comment) =>
+                         comment.id === taskId ? { ...comment, comment: editorData, updated_at: new Date().toISOString() } : comment,
+                    ),
+               );
+
+               // Đặt trạng thái chỉnh sửa về null
+               setEditComment(null);
           } catch (error) {
-              console.error('Error updating task description:', error);
+               console.error('Error updating task description:', error);
           }
-      };
-      
+     };
 
      const renderComments = (comments) =>
           comments.map((comment) => (
@@ -170,10 +164,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                              onChange={(e) => setEditComment({ ...editComment, comment: e.target.value })}
                                              className="form-control me-2"
                                         />
-                                        <button
-                                             className="btn btn-success btn-sm me-2">
-                                             {t('Save')}
-                                        </button>
+                                        <button className="btn btn-success btn-sm me-2">{t('Save')}</button>
                                         <button onClick={() => setEditComment(null)} className="btn btn-danger btn-sm">
                                              {t('Cancel')}
                                         </button>
@@ -218,7 +209,9 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                    <CKEditor editor={ClassicEditor} data={editorData} onChange={handleEditorChange} />
 
                                    <div className="d-flex align-items-center mt-2">
-                                        <button className="btn btn-primary btn-sm" onClick={() => handleEditComment(selectedTask.id, editComment?.comment)}>{t('Save')}</button>
+                                        <button className="btn btn-primary btn-sm" onClick={() => handleEditDescription(selectedTask.id)}>
+                                             {t('Save')}
+                                        </button>
                                         <p className="ms-2 mb-0 small">{t('Cancel')}</p>
                                    </div>
 
@@ -305,53 +298,55 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
                                              <tr>
                                                   <td>{t('Assignee')}</td>
                                                   <td>
-                                                      {/* Assigned Users */}
-                                                      <div className="assigned_users">
-                                                                 {selectedTask.assigned_users.map((user) => (
-                                                                      <div
-                                                                           key={user.user_id}
-                                                                           className="assigned_user"
+                                                       {/* Assigned Users */}
+                                                       <div className="assigned_users" style={{ display: 'flex', position: 'relative' }}>
+                                                            {selectedTask.assigned_users.map((user, index) => (
+                                                                 <div
+                                                                      key={user.user_id}
+                                                                      className="assigned_user"
+                                                                      style={{
+                                                                           position: 'relative',
+                                                                           display: 'inline-block',
+                                                                           marginRight: index === 0 ? '5px' : '0', // Margin phải cho thành viên đầu tiên
+                                                                           zIndex: selectedTask.assigned_users.length - index, // Thứ tự lớp chồng
+                                                                           marginLeft: index > 0 ? '-15px' : '0', // Dịch ngược cho avatar sau
+                                                                      }}>
+                                                                      <img
+                                                                           src={
+                                                                                user.avatar
+                                                                                     ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
+                                                                                     : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                                           }
+                                                                           alt={user.fullname}
+                                                                           title={user.fullname}
                                                                            style={{
-                                                                                position: 'relative',
-                                                                                display: 'inline-block',
-                                                                                marginRight: '5px',
+                                                                                width: '30px',
+                                                                                height: '30px',
+                                                                                borderRadius: '50%',
+                                                                                cursor: 'pointer',
+                                                                                border: '2px solid #fff', // Viền trắng giữa các avatar
+                                                                           }}
+                                                                      />
+                                                                      <div
+                                                                           className="user_fullname"
+                                                                           style={{
+                                                                                display: 'none',
+                                                                                position: 'absolute',
+                                                                                bottom: '-25px',
+                                                                                left: '50%',
+                                                                                transform: 'translateX(-50%)',
+                                                                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                                                                color: '#fff',
+                                                                                padding: '5px',
+                                                                                borderRadius: '3px',
+                                                                                fontSize: '12px',
+                                                                                whiteSpace: 'nowrap',
                                                                            }}>
-                                                                           <img
-                                                                                src={
-                                                                                     user.avatar
-                                                                                          ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
-                                                                                          : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
-                                                                                }
-                                                                                alt={user.fullname}
-                                                                                title={user.fullname}
-                                                                                style={{
-                                                                                     width: '30px',
-                                                                                     height: '30px',
-                                                                                     borderRadius: '50%',
-                                                                                     cursor: 'pointer',
-                                                                                }}
-                                                                           />
-
-                                                                           <div
-                                                                                className="user_fullname"
-                                                                                style={{
-                                                                                     display: 'none',
-                                                                                     position: 'absolute',
-                                                                                     bottom: '-25px',
-                                                                                     left: '50%',
-                                                                                     transform: 'translateX(-50%)',
-                                                                                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                                                                     color: '#fff',
-                                                                                     padding: '5px',
-                                                                                     borderRadius: '3px',
-                                                                                     fontSize: '12px',
-                                                                                     whiteSpace: 'nowrap',
-                                                                                }}>
-                                                                                {user.fullname}
-                                                                           </div>
+                                                                           {user.fullname}
                                                                       </div>
-                                                                 ))}
-                                                            </div>
+                                                                 </div>
+                                                            ))}
+                                                       </div>
                                                   </td>
                                              </tr>
                                              <tr>

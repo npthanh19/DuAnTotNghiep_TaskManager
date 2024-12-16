@@ -15,7 +15,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { getAllDepartments } from '../../../services/deparmentsService';
 import { useTranslation } from 'react-i18next';
 import { getAllAssignments } from '../../../services/assignmentService';
-
 export function View() {
      const [newTask, setNewTask] = useState('');
      const [isCreatedFormVisible, setIsCreatedFormVisible] = useState(false);
@@ -27,7 +26,7 @@ export function View() {
      const [taskNotWorkTime, setTaskNotWorkTime] = useState();
      const [isInputVisible, setIsInputVisible] = useState({});
      const [members, setMembers] = useState();
-
+      const [loading, setLoading] = useState(true);
      const [selectedProject, setSelectedProject] = useState('');
      const [filteredTasks, setFilteredTasks] = useState([]);
      const [filteredSprints, setFilteredSprints] = useState([]);
@@ -128,6 +127,7 @@ export function View() {
                     const formattedData = worktimes.map((worktime) => {
                          const startDate = new Date(worktime.start_date);
                          const endDate = new Date(worktime.end_date);
+                         const status = worktime.status;
 
                          const dateRange = `${startDate.toLocaleDateString('en-GB', {
                               day: '2-digit',
@@ -140,6 +140,7 @@ export function View() {
                          return {
                               id: worktime.id.toString(),
                               dateRange,
+                              status,
                               tasks: [],
                          };
                     });
@@ -408,7 +409,7 @@ export function View() {
                                    ))}
                               </select> */}
                               <button className="btn btn-secondary ms-3" onClick={handleResetFilter}>
-                                   Reset Filter
+                              Reset
                               </button>
                          </div>
                     </div>
@@ -452,7 +453,15 @@ export function View() {
                                                             {sprint.tasks.filter((task) => task.status === 'done').length}
                                                        </p>
                                                   </div>
-                                                  <div className="status__worktime">{t('Starts')}</div>
+                                                  <div className="status__worktime">
+                                                       {sprint?.status === 'runing'
+                                                            ? 'Đang chạy'
+                                                            : sprint?.status === 'not start'
+                                                            ? 'Chưa bắt đầu'
+                                                            : sprint?.status === 'conplete'
+                                                            ? 'Hoàn thành'
+                                                            : 'Không xác định'}
+                                                  </div>
                                              </div>
                                         </h4>
                                         {sprint.tasks?.map((task, index) => {
@@ -481,15 +490,17 @@ export function View() {
                                                                  </div>
                                                                  <div className="boardlist_time">{task ? task.task_time : '-'}</div>
                                                                  {/* Assigned Users */}
-                                                                 <div className="assigned_users">
-                                                                      {task.assigned_users.map((user) => (
+                                                                 <div className="assigned_users" style={{ display: 'flex', position: 'relative' }}>
+                                                                      {task.assigned_users.map((user, index) => (
                                                                            <div
                                                                                 key={user.user_id}
                                                                                 className="assigned_user"
                                                                                 style={{
                                                                                      position: 'relative',
                                                                                      display: 'inline-block',
-                                                                                     marginRight: '5px',
+                                                                                     marginRight: index === 0 ? '5px' : '0', // Thành viên đầu tiên có margin phải.
+                                                                                     zIndex: task.assigned_users.length - index, // Thành viên sau nằm dưới.
+                                                                                     marginLeft: index > 0 ? '-15px' : '0', // Avatar từ thứ hai dịch ngược lại.
                                                                                 }}>
                                                                                 <img
                                                                                      src={
@@ -504,6 +515,7 @@ export function View() {
                                                                                           height: '30px',
                                                                                           borderRadius: '50%',
                                                                                           cursor: 'pointer',
+                                                                                          border: '2px solid #fff', // Để tạo viền trắng rõ hơn giữa các avatar.
                                                                                      }}
                                                                                 />
                                                                                 <div
@@ -526,6 +538,7 @@ export function View() {
                                                                            </div>
                                                                       ))}
                                                                  </div>
+
                                                                  <div className="bi bi-trash menu-icon boardlist_trash"></div>
                                                             </div>
                                                        )}
@@ -568,52 +581,54 @@ export function View() {
                                                             </div>
                                                             <div className=" boardlist_time">{task ? task.task_time : '-'}</div>
                                                             {/* Assigned Users */}
-                                                            <div className="assigned_users">
-                                                                 {task.assigned_users.map((user) => (
-                                                                      <div
-                                                                           key={user.user_id}
-                                                                           className="assigned_user"
-                                                                           style={{
-                                                                                position: 'relative',
-                                                                                display: 'inline-block',
-                                                                                marginRight: '5px',
-                                                                           }}>
-                                                                           <img
-                                                                                src={
-                                                                                     user.avatar
-                                                                                          ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
-                                                                                          : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
-                                                                                }
-                                                                                alt={user.fullname}
-                                                                                title={user.fullname}
-                                                                                style={{
-                                                                                     width: '30px',
-                                                                                     height: '30px',
-                                                                                     borderRadius: '50%',
-                                                                                     cursor: 'pointer',
-                                                                                }}
-                                                                           />
-
+                                                            <div className="assigned_users" style={{ display: 'flex', position: 'relative' }}>
+                                                                      {task.assigned_users.map((user, index) => (
                                                                            <div
-                                                                                className="user_fullname"
+                                                                                key={user.user_id}
+                                                                                className="assigned_user"
                                                                                 style={{
-                                                                                     display: 'none',
-                                                                                     position: 'absolute',
-                                                                                     bottom: '-25px',
-                                                                                     left: '50%',
-                                                                                     transform: 'translateX(-50%)',
-                                                                                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                                                                     color: '#fff',
-                                                                                     padding: '5px',
-                                                                                     borderRadius: '3px',
-                                                                                     fontSize: '12px',
-                                                                                     whiteSpace: 'nowrap',
+                                                                                     position: 'relative',
+                                                                                     display: 'inline-block',
+                                                                                     marginRight: index === 0 ? '5px' : '0', // Thành viên đầu tiên có margin phải.
+                                                                                     zIndex: task.assigned_users.length - index, // Thành viên sau nằm dưới.
+                                                                                     marginLeft: index > 0 ? '-15px' : '0', // Avatar từ thứ hai dịch ngược lại.
                                                                                 }}>
-                                                                                {user.fullname}
+                                                                                <img
+                                                                                     src={
+                                                                                          user.avatar
+                                                                                               ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
+                                                                                               : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                                                     }
+                                                                                     alt={user.fullname}
+                                                                                     title={user.fullname}
+                                                                                     style={{
+                                                                                          width: '30px',
+                                                                                          height: '30px',
+                                                                                          borderRadius: '50%',
+                                                                                          cursor: 'pointer',
+                                                                                          border: '2px solid #fff', // Để tạo viền trắng rõ hơn giữa các avatar.
+                                                                                     }}
+                                                                                />
+                                                                                <div
+                                                                                     className="user_fullname"
+                                                                                     style={{
+                                                                                          display: 'none',
+                                                                                          position: 'absolute',
+                                                                                          bottom: '-25px',
+                                                                                          left: '50%',
+                                                                                          transform: 'translateX(-50%)',
+                                                                                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                                                                          color: '#fff',
+                                                                                          padding: '5px',
+                                                                                          borderRadius: '3px',
+                                                                                          fontSize: '12px',
+                                                                                          whiteSpace: 'nowrap',
+                                                                                     }}>
+                                                                                     {user.fullname}
+                                                                                </div>
                                                                            </div>
-                                                                      </div>
-                                                                 ))}
-                                                            </div>
+                                                                      ))}
+                                                                 </div>
 
                                                             <div className=" bi bi-trash menu-icon boardlist_trash"></div>
                                                        </div>

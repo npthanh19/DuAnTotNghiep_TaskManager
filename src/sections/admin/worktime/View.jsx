@@ -176,11 +176,11 @@ export const View = () => {
 
      const handleComplete = async (worktime_id) => {
           const tasks = await getTasksByWorktimeId(worktime_id);
-          const completedTasks = tasks.tasks.filter((task) => task.status === "to do").length;
+          const completedTasks = tasks.tasks.filter((task) => task.status === "done").length;
           const inProgressTasks = tasks.tasks.filter((task) => task.status === "in progress").length;
       
           // Chỉ tạo optionsHtml nếu có task "to do"
-          const optionsHtml = completedTasks > 0
+          const optionsHtml = inProgressTasks > 0
               ? `
                   <option value="no_worktime">${t("No worktime (Default)")}</option>
                   ${worktimes
@@ -193,7 +193,7 @@ export const View = () => {
               `
               : "";
       
-          const selectHtml = completedTasks > 0
+          const selectHtml = inProgressTasks > 0
               ? `
                   <p>${t("Choose a worktime to manage remaining tasks:")}</p>
                   <div style="text-align: center;">
@@ -218,17 +218,9 @@ export const View = () => {
               showCancelButton: true,
               confirmButtonText: t("Confirm"),
               cancelButtonText: t("Cancel"),
-              preConfirm: () => {
-                  if (completedTasks > 0) {
-                      const selectedWorktime = document.getElementById("task-action").value;
-                      return { selectedWorktime };
-                  }
-                  return null;
-              },
           })
               .then((result) => {
                   if (result.isConfirmed) {
-                      console.log("Selected worktime:", result.value?.selectedWorktime);
                       return result; // Trả về để sử dụng trong `then` tiếp theo
                   } else {
                       throw new Error("Action canceled");

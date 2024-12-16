@@ -142,3 +142,37 @@
     max-height: 150px;
     overflow-y: auto;  
 }
+
+
+.assigned_user {
+     position: relative;
+     display: inline-block;
+     margin-right: 5px;
+   }
+   
+   .assigned_user img {
+     width: 30px;
+     height: 30px;
+     border-radius: 50%;
+     border: 2px solid #fff;
+     cursor: pointer;
+   }
+   
+   .assigned_user:hover .user_fullname {
+     display: block;
+   }
+   
+   .user_fullname {
+     display: none;
+     position: absolute;
+     bottom: -25px;
+     left: 50%;
+     transform: translateX(-50%);
+     background-color: rgba(0, 0, 0, 0.8);
+     color: #fff;
+     padding: 5px;
+     border-radius: 3px;
+     font-size: 12px;
+     white-space: nowrap;
+   }
+   

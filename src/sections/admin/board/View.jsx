@@ -7,6 +7,7 @@ import { getAllProjects } from '../../../services/projectsService';
 import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllUsers, getUserById } from '../../../services/usersService';
 import { useTranslation } from 'react-i18next';
+import { getAllAssignments } from '../../../services/assignmentService';
 
 const users = [
      { id: 1, name: 'User 1', avatar: '/assets/admin/img/avatars/1.png' },
@@ -19,9 +20,15 @@ export const View = () => {
      const [showModal, setShowModal] = useState(false);
      const [selectedTask, setSelectedTask] = useState(null);
      const [projects, setProjects] = useState([]);
-     const [selectedUsers, setSelectedUsers] = useState([]);
      const [showDropdown, setShowDropdown] = useState(false);
      const { t } = useTranslation();
+
+     const [runningTask, setRunningTask] = useState();
+     const [members, setMembers] = useState();
+
+     const [selectedUsers, setSelectedUsers] = useState([]);
+     const [searchTerm, setSearchTerm] = useState('');
+     const [selectedProject, setSelectedProject] = useState('');
 
      const COLUMN_STATUS_MAP = {
           'to do': 1,
@@ -31,6 +38,15 @@ export const View = () => {
      };
 
      useEffect(() => {
+          const fetchMember = async () => {
+               try {
+                    const fetchMember = await getAllAssignments();
+                    setMembers(fetchMember);
+               } catch (error) {
+                    console.error('Error fetching projects:', error);
+               }
+          };
+          fetchMember();
           getDataTask();
 
           async function getDataTask() {
@@ -40,8 +56,6 @@ export const View = () => {
                     getAllWorktimes(),
                     getAllUsers(),
                ]);
-
-               console.log('tasks', tasks);
 
                const projectMap = fetchedProjects.reduce((acc, project) => {
                     acc[project.id] = project.project_name;
@@ -58,9 +72,23 @@ export const View = () => {
                }, {});
 
                setProjects(fetchedProjects);
-               console.log('Running tasks data:', tasks);
+
+               const filterTasks = () => {
+                    return tasks?.filter((task) => {
+                         const isUserMatched = selectedUsers.length > 0 ? task.assigned_users.some((user) => selectedUsers.includes(user.user_id)) : true;
+     
+                         const isProjectMatched = selectedProject ? task.project_id.toString() === selectedProject.toString() : true;
+
+                         const isSearchMatched = task?.task_name.toLowerCase().includes(searchTerm.toLowerCase());
+     
+                         return isUserMatched && isProjectMatched && isSearchMatched;
+                    });
+               }
+
+               const dataFilter = filterTasks()
+
                // Tạo các card từ dữ liệu tasks
-               const cards = tasks.reduce((acc, task) => {
+               const cards = dataFilter?.reduce((acc, task) => {
                     acc[`card-${task.id}`] = {
                          id: `card-${task.id}`,
                          task_name: task.task_name,
@@ -75,8 +103,11 @@ export const View = () => {
                     return acc;
                }, {});
 
+               console.log(cards)
+
+
                // Nhóm các card theo status
-               const groupedCards = tasks.reduce(
+               const groupedCards = dataFilter.reduce(
                     (acc, task) => {
                          const columnKey = getColumnKey(task.status); // Chuyển status thành column key
                          acc[columnKey] = acc[columnKey] || [];
@@ -121,7 +152,25 @@ export const View = () => {
                          return 'column-1';
                }
           }
-     }, []);
+     }, [selectedUsers, selectedProject, searchTerm]);
+
+     const handleUserChange = (event, member) => {
+          const { checked } = event.target;
+          setSelectedUsers((prev) => (checked ? [...prev, member.user.id] : prev.filter((id) => id !== member.user.id)));
+     };
+
+     const handleSearchChange = (event) => {
+          setSearchTerm(event.target.value);
+     };
+
+     const handleProjectChange = (event) => {
+          setSelectedProject(event.target.value);
+     };
+
+     const handleResetFilter = () => {
+          setSelectedUsers([]);
+          setSelectedProject('');
+     };
 
      const onDragEnd = async (result) => {
           const { destination, source, draggableId } = result;
@@ -228,6 +277,7 @@ export const View = () => {
           });
      };
 
+
      return (
           <>
                <h2 className="mb-4">
@@ -247,16 +297,25 @@ export const View = () => {
 
                                    {showDropdown && (
                                         <div className="dropdown-menu show" style={{ position: 'absolute', zIndex: 1000, top: '100%', left: '0' }}>
-                                             {users.slice(1).map((user) => (
-                                                  <div key={user.id} className="dropdown-item d-flex align-items-center">
+                                             {members?.slice(1).map((member) => (
+                                                  <div key={member.id} className="dropdown-item d-flex align-items-center">
                                                        <input
                                                             type="checkbox"
-                                                            checked={selectedUsers.includes(user.id)}
-                                                            onChange={() => handleSelectUser(user)}
+                                                            checked={selectedUsers.includes(member.user.id)}
+                                                            onChange={(event) => handleUserChange(event, member)}
                                                             className="me-2"
                                                        />
-                                                       <img src={user.avatar} alt={user.name} className="user-avatar me-2" />
-                                                       {user.name}
+
+                                                       <img
+                                                            src={
+                                                                 member.user.avatar
+                                                                      ? `${process.env.REACT_APP_BASE_URL}/avatar/${member.user.avatar}`
+                                                                      : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                            }
+                                                            alt={member.user.fullname}
+                                                            className="user-avatar me-2"
+                                                       />
+                                                       {member.user.fullname}
                                                   </div>
                                              ))}
                                         </div>
@@ -269,9 +328,15 @@ export const View = () => {
                                    className="form-control form-control-sm me-3"
                                    placeholder={t('Search...')}
                                    style={{ width: '150px' }}
+                                   value={searchTerm}
+                                   onChange={handleSearchChange}
                               />
 
-                              <select className="form-select form-select-sm me-3" aria-label="Select Project">
+                              <select
+                                   className="form-select form-select-sm me-3"
+                                   aria-label="Select Project"
+                                   value={selectedProject}
+                                   onChange={handleProjectChange}>
                                    <option value="">{t('Select Project')}</option>
                                    {projects.map((project) => (
                                         <option key={project.id} value={project.id}>
@@ -279,6 +344,10 @@ export const View = () => {
                                         </option>
                                    ))}
                               </select>
+
+                              <button className="btn btn-secondary ms-3" onClick={handleResetFilter}>
+                              Reset
+                              </button>
                          </div>
                     </div>
                </h2>
@@ -308,7 +377,7 @@ export const View = () => {
                                                                                 {...provided.dragHandleProps}
                                                                                 className="card">
                                                                                 <div className="card-header">
-                                                                                     <h4 className="task_name">{card.task_name || 'Unnamed Task'}</h4>
+                                                                                     <h4 className="task_name">{card?.task_name || 'Unnamed Task'}</h4>
                                                                                      <button
                                                                                           className="details-button"
                                                                                           onClick={() => handleShowDetails(card)}>
@@ -317,54 +386,62 @@ export const View = () => {
                                                                                 </div>
                                                                                 <div className="people">
                                                                                      <p>
-                                                                                          {t('Status')}: {card.status || '-'}
+                                                                                          {t('Status')}: {card?.status || '-'}
                                                                                      </p>
                                                                                      {/* Assigned Users */}
                                                                                      <div className="assigned_users">
-                                                                                          {card.assigned_users.map((user) => (
-                                                                                               <div
-                                                                                                    key={user.user_id}
-                                                                                                    className="assigned_user"
-                                                                                                    style={{
-                                                                                                         position: 'relative',
-                                                                                                         display: 'inline-block',
-                                                                                                         marginRight: '5px',
-                                                                                                    }}>
-                                                                                                    <img
-                                                                                                         src={
-                                                                                                              user.avatar
-                                                                                                                   ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
-                                                                                                                   : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
-                                                                                                         }
-                                                                                                         alt={user.fullname}
-                                                                                                         title={user.fullname}
-                                                                                                         style={{
-                                                                                                              width: '30px',
-                                                                                                              height: '30px',
-                                                                                                              borderRadius: '50%',
-                                                                                                              cursor: 'pointer',
-                                                                                                         }}
-                                                                                                    />
-
+                                                                                          <div
+                                                                                               className="assigned_users"
+                                                                                               style={{ display: 'flex', position: 'relative' }}>
+                                                                                               {card?.assigned_users?.map((user, index) => (
                                                                                                     <div
-                                                                                                         className="user_fullname"
+                                                                                                         key={user.user_id}
+                                                                                                         className="assigned_user"
                                                                                                          style={{
-                                                                                                              display: 'none',
-                                                                                                              position: 'absolute',
-                                                                                                              bottom: '-25px',
-                                                                                                              left: '50%',
-                                                                                                              transform: 'translateX(-50%)',
-                                                                                                              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                                                                                              color: '#fff',
-                                                                                                              padding: '5px',
-                                                                                                              borderRadius: '3px',
-                                                                                                              fontSize: '12px',
-                                                                                                              whiteSpace: 'nowrap',
+                                                                                                              position: 'relative',
+                                                                                                              display: 'inline-block',
+                                                                                                              marginRight: index === 0 ? '5px' : '0', // Thành viên đầu tiên có margin phải.
+                                                                                                              zIndex:
+                                                                                                                   card.assigned_users.length - index, // Thành viên sau nằm dưới.
+                                                                                                              marginLeft: index > 0 ? '-15px' : '0', // Avatar từ thứ hai dịch ngược lại.
                                                                                                          }}>
-                                                                                                         {user.fullname}
+                                                                                                         <img
+                                                                                                              src={
+                                                                                                                   user.avatar
+                                                                                                                        ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
+                                                                                                                        : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                                                                              }
+                                                                                                              alt={user.fullname}
+                                                                                                              title={user.fullname}
+                                                                                                              style={{
+                                                                                                                   width: '30px',
+                                                                                                                   height: '30px',
+                                                                                                                   borderRadius: '50%',
+                                                                                                                   cursor: 'pointer',
+                                                                                                                   border: '2px solid #fff', // Viền trắng giữa các avatar.
+                                                                                                              }}
+                                                                                                         />
+                                                                                                         <div
+                                                                                                              className="user_fullname"
+                                                                                                              style={{
+                                                                                                                   display: 'none',
+                                                                                                                   position: 'absolute',
+                                                                                                                   bottom: '-25px',
+                                                                                                                   left: '50%',
+                                                                                                                   transform: 'translateX(-50%)',
+                                                                                                                   backgroundColor:
+                                                                                                                        'rgba(0, 0, 0, 0.8)',
+                                                                                                                   color: '#fff',
+                                                                                                                   padding: '5px',
+                                                                                                                   borderRadius: '3px',
+                                                                                                                   fontSize: '12px',
+                                                                                                                   whiteSpace: 'nowrap',
+                                                                                                              }}>
+                                                                                                              {user.fullname}
+                                                                                                         </div>
                                                                                                     </div>
-                                                                                               </div>
-                                                                                          ))}
+                                                                                               ))}
+                                                                                          </div>
                                                                                      </div>
                                                                                 </div>
                                                                            </div>
