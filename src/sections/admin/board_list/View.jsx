@@ -14,6 +14,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { getAllDepartments } from '../../../services/deparmentsService';
 import { useTranslation } from 'react-i18next';
+import { getAllAssignments } from '../../../services/assignmentService';
 
 export function View() {
      const [newTask, setNewTask] = useState('');
@@ -25,6 +26,12 @@ export function View() {
      const [sprints, setSprints] = useState();
      const [taskNotWorkTime, setTaskNotWorkTime] = useState();
      const [isInputVisible, setIsInputVisible] = useState({});
+     const [members, setMembers] = useState();
+
+     const [selectedProject, setSelectedProject] = useState('');
+     const [filteredTasks, setFilteredTasks] = useState([]);
+     const [filteredSprints, setFilteredSprints] = useState([]);
+     const [searchQuery, setSearchQuery] = useState('');
 
      const { t } = useTranslation();
      const users = [
@@ -32,8 +39,68 @@ export function View() {
           { id: 2, name: 'User 2', avatar: '/assets/admin/img/avatars/2.png' },
           { id: 3, name: 'User 3', avatar: '/assets/admin/img/avatars/3.png' },
      ];
+     const handleUserChange = (event, member) => {
+          if (event.target.checked) {
+               setSelectedUsers([...selectedUsers, member.user.id]);
+          } else {
+               setSelectedUsers(selectedUsers.filter((userId) => userId !== member.user.id));
+          }
+     };
+
+     const handleProjectChange = (e) => {
+          setSelectedProject(e.target.value);
+     };
+
+     const handleResetFilter = () => {
+          setSelectedUsers([]);
+          setSelectedProject('');
+     };
 
      useEffect(() => {
+          console.log('selectedUsers', selectedUsers);
+
+          const filterTasks = () => {
+               return taskNotWorkTime?.filter((task) => {
+                    const isUserMatched = selectedUsers.length > 0 ? task.assigned_users.some((user) => selectedUsers.includes(user.user_id)) : true;
+
+                    const isProjectMatched = selectedProject ? task.project_id.toString() === selectedProject : true;
+
+                    const isSearchMatched = task?.task_name.toLowerCase().includes(searchQuery.toLowerCase());
+
+                    return isUserMatched && isProjectMatched && isSearchMatched;
+               });
+          };
+
+          const filterSprints = () => {
+               return sprints?.map((sprint) => ({
+                    ...sprint,
+                    tasks: sprint.tasks.filter((task) => {
+                         const isUserMatched =
+                              selectedUsers.length > 0 ? task.assigned_users.some((user) => selectedUsers.includes(user.user_id)) : true;
+
+                         const isProjectMatched = selectedProject ? task.project_id.toString() === selectedProject : true;
+
+                         const isSearchMatched = task?.task_name.toLowerCase().includes(searchQuery.toLowerCase());
+
+                         return isUserMatched && isProjectMatched && isSearchMatched;
+                    }),
+               }));
+          };
+
+          setFilteredTasks(filterTasks());
+          setFilteredSprints(filterSprints());
+     }, [selectedUsers, selectedProject, taskNotWorkTime, sprints]);
+
+     useEffect(() => {
+          const fetchMember = async () => {
+               try {
+                    const fetchMember = await getAllAssignments();
+                    setMembers(fetchMember);
+               } catch (error) {
+                    console.error('Error fetching projects:', error);
+               }
+          };
+          fetchMember();
           const fetchProjects = async () => {
                try {
                     const fetchedProjects = await getAllProjects();
@@ -280,31 +347,50 @@ export function View() {
                          <small className="mb-0">{t('Backlog')}</small>
                          <div className="d-flex align-items-center small">
                               <div className="users_img d-flex align-items-center position-relative me-3">
-                                   {/* <img src={users[0].avatar} alt={users[0].name} className="user-avatar" />
+                                   <img src={users[0].avatar} alt={users[0].name} className="user-avatar" />
                                    <span className="qty ms-2">+{users.length - 1}</span>
                                    <button className="btn btn-link btn-sm ms-2" onClick={handleToggleDropdown}>
                                         <i className="bi bi-plus-circle" />
-                                   </button> */}
+                                   </button>
 
                                    {showDropdown && (
                                         <div className="dropdown-menu show" style={{ position: 'absolute', zIndex: 1000, top: '100%', left: '0' }}>
-                                             {users.slice(1).map((user) => (
-                                                  <div key={user.id} className="dropdown-item d-flex align-items-center">
+                                             {members.slice(1).map((member) => (
+                                                  <div key={member.id} className="dropdown-item d-flex align-items-center">
                                                        <input
                                                             type="checkbox"
-                                                            checked={selectedUsers.includes(user.id)}
-                                                            onChange={() => handleSelectUser(user)}
+                                                            checked={selectedUsers.includes(member.user.id)} // Kiểm tra xem user đã được chọn chưa
+                                                            onChange={(event) => handleUserChange(event, member)} // Gọi hàm handleUserChange khi thay đổi
                                                             className="me-2"
                                                        />
-                                                       <img src={user.avatar} alt={user.name} className="user-avatar me-2" />
-                                                       {user.name}
+                                                       <img
+                                                            src={
+                                                                 member.user.avatar
+                                                                      ? `${process.env.REACT_APP_BASE_URL}/avatar/${member.user.avatar}`
+                                                                      : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                            }
+                                                            alt={member.user.fullname}
+                                                            className="user-avatar me-2"
+                                                       />
+                                                       {member.user.fullname}
                                                   </div>
                                              ))}
                                         </div>
                                    )}
                               </div>
-                              <input type="text" className="form-control form-control-sm me-3" placeholder="Tìm kiếm..." style={{ width: '150px' }} />
-                              <select className="form-select form-select-sm me-3" aria-label="Epic Dropdown">
+                              <input
+                                   type="text"
+                                   className="form-control form-control-sm me-3"
+                                   placeholder="Tìm kiếm..."
+                                   style={{ width: '150px' }}
+                                   value={searchQuery}
+                                   onChange={(e) => setSearchQuery(e.target.value)}
+                              />
+                              <select
+                                   className="form-select form-select-sm me-3"
+                                   aria-label="Epic Dropdown"
+                                   value={selectedProject}
+                                   onChange={handleProjectChange}>
                                    <option value="">{t('Epic')}</option>
                                    {projects.map((project) => (
                                         <option key={project.id} value={project.id}>
@@ -312,6 +398,18 @@ export function View() {
                                         </option>
                                    ))}
                               </select>
+
+                              {/* <select className="form-select form-select-sm me-3" aria-label="User Dropdown" onChange={handleUserChange}>
+                                   <option value="">Chọn thành viên</option>
+                                   {users.map((user) => (
+                                        <option key={user.user_id} value={user.user_id}>
+                                             {user.name}
+                                        </option>
+                                   ))}
+                              </select> */}
+                              <button className="btn btn-secondary ms-3" onClick={handleResetFilter}>
+                                   Reset Filter
+                              </button>
                          </div>
                     </div>
                </h2>
@@ -332,7 +430,7 @@ export function View() {
                     </div>
                )}
                <DragDropContext onDragEnd={handleDragEnd}>
-                    {sprints?.map((sprint) => (
+                    {filteredSprints?.map((sprint) => (
                          <Droppable key={sprint.id} droppableId={sprint.id}>
                               {(provided) => (
                                    <div {...provided.droppableProps} ref={provided.innerRef} className="list-group qtn-status mb-4">
@@ -358,7 +456,6 @@ export function View() {
                                              </div>
                                         </h4>
                                         {sprint.tasks?.map((task, index) => {
-                                             // Tìm project dựa trên project_id của task
                                              const project = task?.project_id ? projects.find((proj) => proj.id === task.project_id) : null;
 
                                              return (
@@ -369,8 +466,8 @@ export function View() {
                                                                  {...provided.dragHandleProps}
                                                                  ref={provided.innerRef}
                                                                  className="list__task-board align-items-center py-2 border-bottom">
-                                                                 <div className=" boardlist_name">{`${task.id} - ${task.task_name}`}</div>
-                                                                 <div className=" boardlist_project">{project ? project.project_name : 'N/A'}</div>
+                                                                 <div className="boardlist_name">{`${task.id} - ${task.task_name}`}</div>
+                                                                 <div className="boardlist_project">{project ? project.project_name : 'N/A'}</div>
                                                                  <div className="boardlist_status">
                                                                       <select
                                                                            className="form-select"
@@ -382,7 +479,7 @@ export function View() {
                                                                            <option value="done">{t('Done')}</option>
                                                                       </select>
                                                                  </div>
-                                                                 <div className=" boardlist_time">{task ? task.task_time : '-'}</div>
+                                                                 <div className="boardlist_time">{task ? task.task_time : '-'}</div>
                                                                  {/* Assigned Users */}
                                                                  <div className="assigned_users">
                                                                       {task.assigned_users.map((user) => (
@@ -409,7 +506,6 @@ export function View() {
                                                                                           cursor: 'pointer',
                                                                                      }}
                                                                                 />
-
                                                                                 <div
                                                                                      className="user_fullname"
                                                                                      style={{
@@ -430,7 +526,7 @@ export function View() {
                                                                            </div>
                                                                       ))}
                                                                  </div>
-                                                                 <div className=" bi bi-trash menu-icon boardlist_trash"></div>
+                                                                 <div className="bi bi-trash menu-icon boardlist_trash"></div>
                                                             </div>
                                                        )}
                                                   </Draggable>
@@ -441,11 +537,12 @@ export function View() {
                               )}
                          </Droppable>
                     ))}
+
                     <Droppable droppableId="unassignTasks">
                          {(provided) => (
                               <div {...provided.droppableProps} ref={provided.innerRef} className="list-group mb-4">
                                    <h4>{t('Unassigned Tasks')}</h4>
-                                   {taskNotWorkTime?.map((task, index) => {
+                                   {filteredTasks?.map((task, index) => {
                                         const project = task?.project_id ? projects.find((proj) => proj.id === task.project_id) : null;
 
                                         return (
