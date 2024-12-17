@@ -33,7 +33,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                if (storedFullName) {
                     setUserFullName(storedFullName);
                } else {
-                    console.error('User  is not logged in or fullname not available in localStorage');
+                    console.error(t('User  is not logged in or fullname not available in localStorage'));
                }
           };
           fetchUserFullName();
@@ -242,62 +242,65 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                     formData.append('comment', replyContent);
                     formData.append('task_id', taskId);
                     formData.append('parent_id', replyCommentId);
-     
+
                     if (selectedFile) {
                          formData.append('files[]', selectedFile);
                     }
-     
+
                     const response = await createComment(formData);
-     
+
                     // Hàm đệ quy để cập nhật comments
                     const updateCommentsWithNewReply = (comments) => {
-                         return comments.map(comment => {
+                         return comments.map((comment) => {
                               if (comment.id === replyCommentId) {
                                    return {
                                         ...comment,
-                                        replies: [...(comment.replies || []), {
-                                             id: response.comment.id,
-                                             comment: response.comment.comment,
-                                             created_at: response.comment.created_at,
-                                             user: response.comment.user,
-                                             files: response.comment.files || [],
-                                             replies: [] // Thêm mảng replies rỗng cho comment mới
-                                        }]
+                                        replies: [
+                                             ...(comment.replies || []),
+                                             {
+                                                  id: response.comment.id,
+                                                  comment: response.comment.comment,
+                                                  created_at: response.comment.created_at,
+                                                  user: response.comment.user,
+                                                  files: response.comment.files || [],
+                                                  replies: [], // Thêm mảng replies rỗng cho comment mới
+                                             },
+                                        ],
                                    };
                               }
                               if (comment.replies && comment.replies.length > 0) {
                                    return {
                                         ...comment,
-                                        replies: updateCommentsWithNewReply(comment.replies)
+                                        replies: updateCommentsWithNewReply(comment.replies),
                                    };
                               }
                               return comment;
                          });
                     };
-     
+
                     // Cập nhật cả hai state
                     const updatedComments = updateCommentsWithNewReply(filteredComments);
                     setFilteredComments(updatedComments);
                     setComments(updatedComments);
-     
+
                     // Tự động hiển thị replies sau khi thêm
-                    setRepliesVisibility(prev => ({
+                    setRepliesVisibility((prev) => ({
                          ...prev,
-                         [replyCommentId]: true
+                         [replyCommentId]: true,
                     }));
-     
+
                     // Reset form
                     setReplyContent('');
                     setReplyCommentId(null);
                     setSelectedFile(null);
-     
+
                     Swal.fire({
                          icon: 'success',
-                         text: t('Reply added successfully'),
+                         text: t('Comment response successful'),
                          position: 'top-right',
                          toast: true,
                          timer: 3000,
-                         showConfirmButton: false
+                         showConfirmButton: false,
                     });
                } catch (error) {
                     console.error('Error submitting reply:', error);
@@ -317,14 +320,20 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
           return (
                replyCommentId === comment.id && (
                     <div className="reply-form ms-3">
-                         <textarea className="mb-2" value={replyContent} onChange={handleReplyChange} placeholder="Viết câu trả lời..." rows="3" />
+                         <textarea
+                              className="mb-2"
+                              value={replyContent}
+                              onChange={handleReplyChange}
+                              placeholder={t('Write the answer...')}
+                              rows="3"
+                         />
                          <input type="file" id="file-upload" onChange={handleFileChange} accept="image/*, .pdf, .docx" />
                          <div className="button-group mt-2">
                               <button className="btn btn-primary" onClick={handleSubmitReply}>
-                                   Gửi
+                                   {t('To Do')}
                               </button>
                               <button className="btn btn-secondary" onClick={handleCancelReply}>
-                                   Hủy
+                                   {t('Cancel')}
                               </button>
                          </div>
                     </div>
@@ -363,6 +372,19 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
           const replies = Array.isArray(comment.replies) ? comment.replies : [];
           const hasReplies = replies.length > 0;
 
+          // Thêm xử lý format ngày giờ
+          const formatDateTime = (dateString) => {
+               const date = new Date(dateString);
+               return new Intl.DateTimeFormat('vi-VN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+               }).format(date);
+          };
+
           return (
                <li
                     key={`comment-${comment.id}`}
@@ -394,8 +416,12 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                                                   </span>
                                              ))
                                         ) : (
-                                             <span>{t('Không có file đính kèm')}</span>
+                                             <span>{t('No attachments')}</span>
                                         )}
+                                        <br />
+                                        {/* Thêm hiển thị ngày giờ */}
+                                        <strong>{t('Time')}: </strong>
+                                        {formatDateTime(comment.created_at)}
                                    </small>
                               </span>
                          </div>
@@ -406,7 +432,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                               {t('Delete')}
                          </a>
                          <a className="ms-3 text-primary" onClick={() => handleReplyClick(comment.id)}>
-                              {t('Phản hồi')}
+                              {t('Feedback')}
                          </a>
                          {hasReplies && (
                               <a className="ms-3 text-info" onClick={() => handleViewMoreClick(comment.id)}>
@@ -476,7 +502,7 @@ export const CommentForm = ({ taskId, showModal, handleCloseModal }) => {
                console.error('Error saving comment:', error);
                Swal.fire({
                     icon: 'error',
-                    text: t('An error occurred while adding the comment.'),
+                    text: t('An error occurred.'),
                     position: 'top-right',
                     toast: true,
                     timer: 3000,
