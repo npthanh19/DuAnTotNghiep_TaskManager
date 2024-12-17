@@ -385,7 +385,7 @@ const resources = {
                'Phone number is required': 'Số điện thoại không được để trống',
                'Fullname is required': 'Họ và tên không được để trống',
                Backlog: 'Tồn động',
-               Epic: 'Sử thi',
+               Epic: 'Chọn dự án',
                'Unassigned Tasks': 'Nhiêm vụ chưa được giao',
                'Update status': 'Cập nhật trạng thái',
                'You will not be able to undo this action!': 'Bạn sẽ không thể hoàn tác hành động này!',
@@ -487,9 +487,13 @@ const resources = {
                'An error occurred.': 'Đã xảy ra lỗi.',
                'Write the answer...': 'Viết câu trả lời',
                'Feedback': 'Phản hồi',
-               'Active sprints': 'Đang tiến hành chạy'
-
-
+               'Active sprints': 'Đang tiến hành chạy',
+               'Tasks Summary': 'Tóm tắt',
+               'Completed tasks:': 'Nhiệm vụ hoàn thành:',
+               'Preview tasks': 'Nhiệm vụ xem lại:',
+               'In-progress tasks:': 'Nhiệm vụ đang thực hiện:',
+               'Todo tasks:': 'Nhiệm vụ chưa xử lý:',
+               'Choose a worktime to manage remaining tasks:': 'Chọn thời gian làm việc để quản lý các công việc còn lại:'
           },
      },
 };

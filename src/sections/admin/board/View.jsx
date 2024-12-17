@@ -30,7 +30,7 @@ export const View = () => {
      const [selectedUsers, setSelectedUsers] = useState([]);
      const [searchTerm, setSearchTerm] = useState('');
      const [selectedProject, setSelectedProject] = useState('');
-     const [stateEdit, setStateEdit] = useState(false)
+     const [stateEdit, setStateEdit] = useState(false);
 
      const COLUMN_STATUS_MAP = {
           'to do': 1,
@@ -398,8 +398,18 @@ export const View = () => {
                                                                                 </div>
                                                                                 <div className="people">
                                                                                      <p>
-                                                                                          {t('Status')}: {card?.status || '-'}
+                                                                                          {t('Status')}:{' '}
+                                                                                          {card?.status === 'to do'
+                                                                                               ? 'Chờ xử lý'
+                                                                                               : card?.status === 'in progress'
+                                                                                               ? 'Đang thực hiện'
+                                                                                               : card?.status === 'preview'
+                                                                                               ? 'Xem xét'
+                                                                                               : card?.status === 'done'
+                                                                                               ? 'Hoàn thành'
+                                                                                               : '-'}
                                                                                      </p>
+
                                                                                      {/* Assigned Users */}
                                                                                      <div className="assigned_users">
                                                                                           <div
@@ -471,7 +481,13 @@ export const View = () => {
                          )}
                     </Droppable>
                </DragDropContext>
-               <TaskDetail showModal={showModal} setShowModal={setShowModal} selectedTask={selectedTask} stateEdit={stateEdit} setStateEdit={setStateEdit}/>
+               <TaskDetail
+                    showModal={showModal}
+                    setShowModal={setShowModal}
+                    selectedTask={selectedTask}
+                    stateEdit={stateEdit}
+                    setStateEdit={setStateEdit}
+               />
           </>
      );
 };
