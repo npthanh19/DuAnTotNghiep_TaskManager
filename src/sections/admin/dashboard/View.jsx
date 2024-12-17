@@ -157,11 +157,11 @@ export const View = () => {
           const myChart = new Chart(ctx, {
                type: 'bar',
                data: {
-                    labels: chartData.map((project) => project.project_name), 
+                    labels: chartData.map((project) => project.project_name),
                     datasets: [
                          {
                               label: 'Tổng Giờ Thực Hiện',
-                              data: chartData.map((project) => project.total_task_time), 
+                              data: chartData.map((project) => project.total_task_time),
                               backgroundColor: '#007bff',
                               borderColor: '#0056b3',
                               borderWidth: 1,
@@ -271,13 +271,19 @@ export const View = () => {
      //  activity
      const activityCount = activitys.length;
      if (loading) {
-          return <p>Đang tải dữ liệu...</p>;
-      }
+          return (
+               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-70px' }}>
+                    <div className="spinner-border" role="status">
+                         <span className="visually-hidden">{t('Loading...')}</span>
+                    </div>
+               </div>
+          );
+     }
      return (
           <MainContainer>
                <Header>
                     <Title>{t('Dashboard')}</Title>
-                    <div className="btn-toolbar mb-2 mb-md-0">
+                    {/* <div className="btn-toolbar mb-2 mb-md-0">
                          <ButtonGroup>
                               <Button>{t('Share')}</Button>
                               <Button>{t('Export')}</Button>
@@ -297,7 +303,7 @@ export const View = () => {
                                    </div>
                               </DateRangePicker>
                          </ButtonGroup>
-                    </div>
+                    </div> */}
                </Header>
                <div className="row row-cols-1 row-cols-md-3 g-4 mb-4">
                     {/* Card 1 */}
@@ -583,11 +589,11 @@ export const View = () => {
                     </Row>
                </div>
                <div className="mt-4">
-                    <UserStatistics/>
+                    <UserStatistics />
                </div>
 
                <div className="mt-4">
-                    <WorktimesDashboardComponent/>
+                    <WorktimesDashboardComponent />
                </div>
           </MainContainer>
      );

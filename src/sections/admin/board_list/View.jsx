@@ -26,7 +26,7 @@ export function View() {
      const [taskNotWorkTime, setTaskNotWorkTime] = useState();
      const [isInputVisible, setIsInputVisible] = useState({});
      const [members, setMembers] = useState();
-      const [loading, setLoading] = useState(true);
+     const [loading, setLoading] = useState(true);
      const [selectedProject, setSelectedProject] = useState('');
      const [filteredTasks, setFilteredTasks] = useState([]);
      const [filteredSprints, setFilteredSprints] = useState([]);
@@ -358,36 +358,36 @@ export function View() {
 
                                    {showDropdown && (
                                         <div className="dropdown-menu show" style={{ position: 'absolute', zIndex: 1000, top: '100%', left: '0' }}>
-                                        {members.slice(1).map((member) => {
-                                            // Kiểm tra nếu thành viên đã xuất hiện rồi, nếu chưa thì hiển thị và thêm vào Set
-                                            if (!memberIds.has(member.user.id)) {
-                                                memberIds.add(member.user.id);
-                                                uniqueMembers.push(member);
-                                            }
-                                            return null; // Không render ở đây, chỉ thêm vào uniqueMembers
-                                        })}
-                                
-                                        {uniqueMembers.map((member) => (
-                                            <div key={member.id} className="dropdown-item d-flex align-items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedUsers.includes(member.user.id)} // Kiểm tra xem user đã được chọn chưa
-                                                    onChange={(event) => handleUserChange(event, member)} // Gọi hàm handleUserChange khi thay đổi
-                                                    className="me-2"
-                                                />
-                                                <img
-                                                    src={
-                                                        member.user.avatar
-                                                            ? `${process.env.REACT_APP_BASE_URL}/avatar/${member.user.avatar}`
-                                                            : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
-                                                    }
-                                                    alt={member.user.fullname}
-                                                    className="user-avatar me-2"
-                                                />
-                                                {member.user.fullname}
-                                            </div>
-                                        ))}
-                                    </div>
+                                             {members.slice(1).map((member) => {
+                                                  // Kiểm tra nếu thành viên đã xuất hiện rồi, nếu chưa thì hiển thị và thêm vào Set
+                                                  if (!memberIds.has(member.user.id)) {
+                                                       memberIds.add(member.user.id);
+                                                       uniqueMembers.push(member);
+                                                  }
+                                                  return null; // Không render ở đây, chỉ thêm vào uniqueMembers
+                                             })}
+
+                                             {uniqueMembers.map((member) => (
+                                                  <div key={member.id} className="dropdown-item d-flex align-items-center">
+                                                       <input
+                                                            type="checkbox"
+                                                            checked={selectedUsers.includes(member.user.id)} // Kiểm tra xem user đã được chọn chưa
+                                                            onChange={(event) => handleUserChange(event, member)} // Gọi hàm handleUserChange khi thay đổi
+                                                            className="me-2"
+                                                       />
+                                                       <img
+                                                            src={
+                                                                 member.user.avatar
+                                                                      ? `${process.env.REACT_APP_BASE_URL}/avatar/${member.user.avatar}`
+                                                                      : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                            }
+                                                            alt={member.user.fullname}
+                                                            className="user-avatar me-2"
+                                                       />
+                                                       {member.user.fullname}
+                                                  </div>
+                                             ))}
+                                        </div>
                                    )}
                               </div>
                               <input
@@ -419,8 +419,8 @@ export function View() {
                                         </option>
                                    ))}
                               </select> */}
-                              <button className="btn btn-secondary ms-3" onClick={handleResetFilter}>
-                              Reset
+                              <button className="btn btn-primary ms-3" onClick={handleResetFilter}>
+                                   <i className="bi bi-arrow-counterclockwise me-2"></i>
                               </button>
                          </div>
                     </div>
@@ -593,53 +593,53 @@ export function View() {
                                                             <div className=" boardlist_time">{task ? task.task_time : '-'}</div>
                                                             {/* Assigned Users */}
                                                             <div className="assigned_users" style={{ display: 'flex', position: 'relative' }}>
-                                                                      {task.assigned_users.map((user, index) => (
-                                                                           <div
-                                                                                key={user.user_id}
-                                                                                className="assigned_user"
+                                                                 {task.assigned_users.map((user, index) => (
+                                                                      <div
+                                                                           key={user.user_id}
+                                                                           className="assigned_user"
+                                                                           style={{
+                                                                                position: 'relative',
+                                                                                display: 'inline-block',
+                                                                                marginRight: index === 0 ? '5px' : '0', // Thành viên đầu tiên có margin phải.
+                                                                                zIndex: task.assigned_users.length - index, // Thành viên sau nằm dưới.
+                                                                                marginLeft: index > 0 ? '-15px' : '0', // Avatar từ thứ hai dịch ngược lại.
+                                                                           }}>
+                                                                           <img
+                                                                                src={
+                                                                                     user.avatar
+                                                                                          ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
+                                                                                          : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
+                                                                                }
+                                                                                alt={user.fullname}
+                                                                                title={user.fullname}
                                                                                 style={{
-                                                                                     position: 'relative',
-                                                                                     display: 'inline-block',
-                                                                                     marginRight: index === 0 ? '5px' : '0', // Thành viên đầu tiên có margin phải.
-                                                                                     zIndex: task.assigned_users.length - index, // Thành viên sau nằm dưới.
-                                                                                     marginLeft: index > 0 ? '-15px' : '0', // Avatar từ thứ hai dịch ngược lại.
+                                                                                     width: '30px',
+                                                                                     height: '30px',
+                                                                                     borderRadius: '50%',
+                                                                                     cursor: 'pointer',
+                                                                                     border: '2px solid #fff', // Để tạo viền trắng rõ hơn giữa các avatar.
+                                                                                }}
+                                                                           />
+                                                                           <div
+                                                                                className="user_fullname"
+                                                                                style={{
+                                                                                     display: 'none',
+                                                                                     position: 'absolute',
+                                                                                     bottom: '-25px',
+                                                                                     left: '50%',
+                                                                                     transform: 'translateX(-50%)',
+                                                                                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                                                                     color: '#fff',
+                                                                                     padding: '5px',
+                                                                                     borderRadius: '3px',
+                                                                                     fontSize: '12px',
+                                                                                     whiteSpace: 'nowrap',
                                                                                 }}>
-                                                                                <img
-                                                                                     src={
-                                                                                          user.avatar
-                                                                                               ? `${process.env.REACT_APP_BASE_URL}/avatar/${user.avatar}`
-                                                                                               : 'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg'
-                                                                                     }
-                                                                                     alt={user.fullname}
-                                                                                     title={user.fullname}
-                                                                                     style={{
-                                                                                          width: '30px',
-                                                                                          height: '30px',
-                                                                                          borderRadius: '50%',
-                                                                                          cursor: 'pointer',
-                                                                                          border: '2px solid #fff', // Để tạo viền trắng rõ hơn giữa các avatar.
-                                                                                     }}
-                                                                                />
-                                                                                <div
-                                                                                     className="user_fullname"
-                                                                                     style={{
-                                                                                          display: 'none',
-                                                                                          position: 'absolute',
-                                                                                          bottom: '-25px',
-                                                                                          left: '50%',
-                                                                                          transform: 'translateX(-50%)',
-                                                                                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                                                                          color: '#fff',
-                                                                                          padding: '5px',
-                                                                                          borderRadius: '3px',
-                                                                                          fontSize: '12px',
-                                                                                          whiteSpace: 'nowrap',
-                                                                                     }}>
-                                                                                     {user.fullname}
-                                                                                </div>
+                                                                                {user.fullname}
                                                                            </div>
-                                                                      ))}
-                                                                 </div>
+                                                                      </div>
+                                                                 ))}
+                                                            </div>
 
                                                             <div className=" bi bi-trash menu-icon boardlist_trash"></div>
                                                        </div>

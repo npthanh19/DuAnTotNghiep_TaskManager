@@ -47,7 +47,7 @@ const ConfirmDepartment = () => {
                          <h2 className="alert-heading">Xác nhận thành công!</h2>
                          <p>Bạn đã tham gia phòng ban thành công.</p>
                          <button className="btn btn-primary mt-3" onClick={handleRedirect}>
-                              Quay lại danh sách phòng ban
+                              Quay lại
                          </button>
                     </div>
                )}
@@ -56,7 +56,7 @@ const ConfirmDepartment = () => {
                          <h2 className="alert-heading">Xác nhận thất bại!</h2>
                          <p>Liên kết xác nhận không hợp lệ hoặc đã hết hạn.</p>
                          <button className="btn btn-secondary mt-3" onClick={handleRedirect}>
-                              Quay lại danh sách phòng ban
+                              Quay lại
                          </button>
                     </div>
                )}

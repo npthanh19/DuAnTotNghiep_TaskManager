@@ -113,27 +113,35 @@ export default function Update_profile() {
 
      const onSubmit = async (data) => {
           setIsSaving(true);
+
+          const updatedData = {
+               fullname: data.fullname.trim(),
+               email: data.email.trim(),
+               phone_number: data.phoneNumber.trim(),
+               password: data.password ? data.password.trim() : undefined,
+          };
+
+          // Check if there are any changes
+          const hasChanges =
+               updatedData.fullname !== user.fullname ||
+               updatedData.email !== user.email ||
+               updatedData.phone_number !== user.phone_number ||
+               (updatedData.password && updatedData.password !== user.password);
+
+          if (!hasChanges) {
+               Swal.fire({
+                    icon: 'info',
+                    text: t('No changes detected.'),
+                    position: 'top-right',
+                    toast: true,
+                    timer: 3000,
+                    showConfirmButton: false,
+               });
+               setIsSaving(false);
+               return;
+          }
+
           try {
-               const updatedData = {
-                    fullname: data.fullname.trim(),
-                    email: data.email.trim(),
-                    phone_number: data.phoneNumber.trim(),
-                    password: data.password ? data.password.trim() : undefined,
-               };
-
-               if (Object.keys(updatedData).length === 0) {
-                    Swal.fire({
-                         icon: 'info',
-                         text: t('No changes detected.'),
-                         position: 'top-right',
-                         toast: true,
-                         timer: 3000,
-                         showConfirmButton: false,
-                    });
-                    setIsSaving(false);
-                    return;
-               }
-
                await updateUser(userId, updatedData, token);
 
                setUser((prevUser) => ({
@@ -156,7 +164,18 @@ export default function Update_profile() {
           } catch (error) {
                if (error.response && error.response.data.errors) {
                     const errors = error.response.data.errors;
-                    Object.keys(errors).forEach((field) => {
+                    if (errors.phone_number) {
+                         Swal.fire({
+                              icon: 'error',
+                              html: `${t('The phone number')} <strong>${updatedData.phone_number}</strong> ${t(
+                                   'is already taken. Please try another one.',
+                              )}`,
+                              position: 'top-right',
+                              toast: true,
+                              timer: 5000,
+                              showConfirmButton: false,
+                         });
+                    } else {
                          Swal.fire({
                               icon: 'error',
                               text: t('Failed to update the user.'),
@@ -165,7 +184,7 @@ export default function Update_profile() {
                               timer: 3000,
                               showConfirmButton: false,
                          });
-                    });
+                    }
                } else {
                     Swal.fire({
                          icon: 'error',
@@ -271,6 +290,8 @@ export default function Update_profile() {
                                                                                 type="email"
                                                                                 className="form-control form-control-sm"
                                                                                 defaultValue={user.email}
+                                                                                readOnly
+                                                                                disabled
                                                                            />
                                                                            {errors.email && <div className="text-danger">{errors.email.message}</div>}
                                                                       </div>

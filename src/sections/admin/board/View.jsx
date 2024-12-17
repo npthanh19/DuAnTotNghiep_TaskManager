@@ -355,8 +355,8 @@ export const View = () => {
                                    ))}
                               </select>
 
-                              <button className="btn btn-secondary ms-3" onClick={handleResetFilter}>
-                                   Reset
+                              <button className="btn btn-primary ms-3" onClick={handleResetFilter}>
+                                   <i className="bi bi-arrow-counterclockwise me-2"></i>
                               </button>
                          </div>
                     </div>

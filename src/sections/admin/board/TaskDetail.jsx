@@ -55,10 +55,10 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask, stateEdit, s
           }
 
           let dataMapping;
-          if (status === 'to do') dataMapping = 1;
-          if (status === 'in progress') dataMapping = 2;
-          if (status === 'preview') dataMapping = 3;
-          if (status === 'done') dataMapping = 4;
+          if (status === t('To Do')) dataMapping = 1;
+          if (status === t('In Progress')) dataMapping = 2;
+          if (status === t('Preview')) dataMapping = 3;
+          if (status === t('Done')) dataMapping = 4;
 
           try {
                const updatedTask = await updateTaskStatus(selectedTask.id, dataMapping);
@@ -145,7 +145,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask, stateEdit, s
 
                // Đặt trạng thái chỉnh sửa về null
                setEditComment(null);
-               setStateEdit(!stateEdit)
+               setStateEdit(!stateEdit);
           } catch (error) {
                console.error('Error updating task description:', error);
           }
@@ -232,22 +232,6 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask, stateEdit, s
                                         <p className="ms-2 mb-0 small">{t('Cancel')}</p>
                                    </div>
 
-                                   <div className="d-flex align-items-center mt-3">
-                                        <strong className="ms-1">{t('Activity')}</strong>
-                                   </div>
-                                   <div className="d-flex align-items-center mt-2">
-                                        <p className="mb-0 small me-2">{t('Show')}:</p>
-                                        <span className="badge bg-secondary me-2" onClick={() => {}}>
-                                             {t('All')}
-                                        </span>
-                                        <span className="badge bg-secondary me-2" onClick={() => {}}>
-                                             {t('Comment')}
-                                        </span>
-                                        <span className="badge bg-secondary" onClick={() => {}}>
-                                             {t('History')}
-                                        </span>
-                                   </div>
-
                                    <div className="comment-section mt-4">
                                         <h5>{t('Comment')}</h5>
                                         <div className="input-group mb-3">
@@ -279,22 +263,22 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask, stateEdit, s
                                              </button>
                                              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                   <li>
-                                                       <a className="dropdown-item" onClick={() => handleStatusChange('to do')}>
+                                                       <a className="dropdown-item" onClick={() => handleStatusChange(t('To Do'))}>
                                                             {t('To Do')}
                                                        </a>
                                                   </li>
                                                   <li>
-                                                       <a className="dropdown-item" onClick={() => handleStatusChange('in progress')}>
+                                                       <a className="dropdown-item" onClick={() => handleStatusChange(t('in Progress'))}>
                                                             {t('In Progress')}
                                                        </a>
                                                   </li>
                                                   <li>
-                                                       <a className="dropdown-item" onClick={() => handleStatusChange('review')}>
+                                                       <a className="dropdown-item" onClick={() => handleStatusChange(t('Review'))}>
                                                             {t('Review')}
                                                        </a>
                                                   </li>
                                                   <li>
-                                                       <a className="dropdown-item" onClick={() => handleStatusChange('done')}>
+                                                       <a className="dropdown-item" onClick={() => handleStatusChange(t('Done'))}>
                                                             {t('Done')}
                                                        </a>
                                                   </li>
