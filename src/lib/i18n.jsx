@@ -398,7 +398,7 @@ const resources = {
                All: 'Tất cả',
                History: 'Lịch sử',
                Detail: 'Chi tiết',
-               Assignee: 'Người được chuyển nhượng',
+               Assignee: 'Phân công',
                'Score estimate': 'Ước tính điểm',
                'Add Comment': 'Thêm bình luận',
                'Failed to update the user.': 'Lỗi cập nhật người dùng',
@@ -487,7 +487,7 @@ const resources = {
                'An error occurred.': 'Đã xảy ra lỗi.',
                'Write the answer...': 'Viết câu trả lời',
                'Feedback': 'Phản hồi',
-               
+               'Active sprints': 'Đang tiến hành chạy'
 
 
           },

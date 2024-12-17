@@ -30,6 +30,7 @@ export const View = () => {
      const [selectedUsers, setSelectedUsers] = useState([]);
      const [searchTerm, setSearchTerm] = useState('');
      const [selectedProject, setSelectedProject] = useState('');
+     const [stateEdit, setStateEdit] = useState(false)
 
      const COLUMN_STATUS_MAP = {
           'to do': 1,
@@ -154,7 +155,7 @@ export const View = () => {
                          return 'column-1';
                }
           }
-     }, [selectedUsers, selectedProject, searchTerm]);
+     }, [selectedUsers, selectedProject, searchTerm, stateEdit]);
 
      const handleUserChange = (event, member) => {
           const { checked } = event.target;
@@ -284,7 +285,7 @@ export const View = () => {
                <h2 className="mb-4">
                     <div className="d-flex align-items-center justify-content-between">
                          {/* Project name nằm bên trái */}
-                         <small className="mb-0 ms-4">{t('Project Name')}</small>
+                         <small className="mb-0 ms-4">{t('Active sprints')}</small>
 
                          {/* Các phần còn lại nằm bên phải */}
                          <div className="d-flex align-items-center small">
@@ -470,7 +471,7 @@ export const View = () => {
                          )}
                     </Droppable>
                </DragDropContext>
-               <TaskDetail showModal={showModal} setShowModal={setShowModal} selectedTask={selectedTask} />
+               <TaskDetail showModal={showModal} setShowModal={setShowModal} selectedTask={selectedTask} stateEdit={stateEdit} setStateEdit={setStateEdit}/>
           </>
      );
 };

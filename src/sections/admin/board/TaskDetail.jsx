@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import { getAllUsers, getUserById } from '../../../services/usersService';
 import { useTranslation } from 'react-i18next';
 
-export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
+export const TaskDetail = ({ showModal, setShowModal, selectedTask, stateEdit, setStateEdit }) => {
      const [isClosing, setIsClosing] = useState(false);
      const [editorData, setEditorData] = useState('');
      const [comments, setComments] = useState([]);
@@ -145,6 +145,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask }) => {
 
                // Đặt trạng thái chỉnh sửa về null
                setEditComment(null);
+               setStateEdit(!stateEdit)
           } catch (error) {
                console.error('Error updating task description:', error);
           }

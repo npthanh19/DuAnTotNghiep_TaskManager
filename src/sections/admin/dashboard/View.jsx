@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import styled from 'styled-components';
 import BarChartComponent from './BarChartComponent';
+import WorktimesDashboardComponent from './WorktimesDashboardComponent';
+import UserStatistics from './UserWorkComponent';
 import { getAllUsers } from '../../../services/usersService';
 import { getAllRoles } from '../../../services/rolesService';
 import { getAllProjects } from '../../../services/projectsService';
@@ -10,6 +12,7 @@ import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllDepartments } from '../../../services/deparmentsService';
 // import { getAllActivityLogs } from '../../../services/activityService';
 import { useTranslation } from 'react-i18next';
+import { getTaskCountsByStatusGrouped, getTotalTaskTime } from '../../../services/dashboardService';
 const role = localStorage.getItem('role');
 
 const MainContainer = styled.main`
@@ -125,83 +128,40 @@ const DateRangePicker = styled.div`
 
 export const View = () => {
      const { t } = useTranslation();
-
-     const taskData = [
-          {
-               name: 'Dự Án Alpha1',
-               completed: 15,
-               ongoing: 7,
-               overdue: 2,
-               tasks: [
-                    { id: '001', title: 'Nhiệm vụ A', date: '01/01/2024', time: '2 giờ', assignee: 'Nguyễn Văn A', status: 'Đang Thực Hiện' },
-                    { id: '002', title: 'Nhiệm vụ B', date: '02/01/2024', time: '3 giờ', assignee: 'Nguyễn Văn B', status: 'Hoàn Thành' },
-               ],
-          },
-          {
-               name: 'Dự Án Alpha2',
-               completed: 15,
-               ongoing: 7,
-               overdue: 2,
-               tasks: [
-                    { id: '001', title: 'Nhiệm vụ A', date: '01/01/2024', time: '2 giờ', assignee: 'Nguyễn Văn A', status: 'Đang Thực Hiện' },
-                    { id: '002', title: 'Nhiệm vụ B', date: '02/01/2024', time: '3 giờ', assignee: 'Nguyễn Văn B', status: 'Hoàn Thành' },
-               ],
-          },
-          {
-               name: 'Dự Án Alpha1',
-               completed: 15,
-               ongoing: 7,
-               overdue: 2,
-               tasks: [
-                    { id: '001', title: 'Nhiệm vụ A', date: '01/01/2024', time: '2 giờ', assignee: 'Nguyễn Văn A', status: 'Đang Thực Hiện' },
-                    { id: '002', title: 'Nhiệm vụ B', date: '02/01/2024', time: '3 giờ', assignee: 'Nguyễn Văn B', status: 'Hoàn Thành' },
-               ],
-          },
-          {
-               name: 'Dự Án Alpha2',
-               completed: 15,
-               ongoing: 7,
-               overdue: 2,
-               tasks: [
-                    { id: '001', title: 'Nhiệm vụ A', date: '01/01/2024', time: '2 giờ', assignee: 'Nguyễn Văn A', status: 'Đang Thực Hiện' },
-                    { id: '002', title: 'Nhiệm vụ B', date: '02/01/2024', time: '3 giờ', assignee: 'Nguyễn Văn B', status: 'Hoàn Thành' },
-               ],
-          },
-          {
-               name: 'Dự Án Alpha1',
-               completed: 15,
-               ongoing: 7,
-               overdue: 2,
-               tasks: [
-                    { id: '001', title: 'Nhiệm vụ A', date: '01/01/2024', time: '2 giờ', assignee: 'Nguyễn Văn A', status: 'Đang Thực Hiện' },
-                    { id: '002', title: 'Nhiệm vụ B', date: '02/01/2024', time: '3 giờ', assignee: 'Nguyễn Văn B', status: 'Hoàn Thành' },
-               ],
-          },
-          {
-               name: 'Dự Án Alpha2',
-               completed: 15,
-               ongoing: 7,
-               overdue: 2,
-               tasks: [
-                    { id: '001', title: 'Nhiệm vụ A', date: '01/01/2024', time: '2 giờ', assignee: 'Nguyễn Văn A', status: 'Đang Thực Hiện' },
-                    { id: '002', title: 'Nhiệm vụ B', date: '02/01/2024', time: '3 giờ', assignee: 'Nguyễn Văn B', status: 'Hoàn Thành' },
-               ],
-          },
-     ];
      const [openProjects, setOpenProjects] = useState({});
      const [openDepartments, setOpenDepartments] = useState({});
      const chartRef = useRef(null);
+     const [chartData, setChartData] = useState([]); // Lưu trữ dữ liệu chart từ API
+     const [loading, setLoading] = useState(true); // Theo dõi trạng thái loading
 
      useEffect(() => {
+          // Fetch dữ liệu từ API
+          async function fetchDataTotalTaskTime() {
+               try {
+                    const response = await getTotalTaskTime(); // Giả định hàm này đã được định nghĩa
+                    setChartData(response.projects_task_time); // Lưu dữ liệu vào state
+                    setLoading(false); // Hoàn tất tải dữ liệu
+               } catch (error) {
+                    console.error('Lỗi khi fetch dữ liệu:', error);
+                    setLoading(false);
+               }
+          }
+          fetchDataTotalTaskTime();
+     }, []);
+
+     useEffect(() => {
+          if (!chartData.length || !chartRef.current) return;
+
           const ctx = chartRef.current.getContext('2d');
+
           const myChart = new Chart(ctx, {
                type: 'bar',
                data: {
-                    labels: taskData.map((project) => project.name),
+                    labels: chartData.map((project) => project.project_name), 
                     datasets: [
                          {
-                              label: 'Giờ Thực Hiện',
-                              data: taskData.map((project) => project.completed + project.ongoing + project.overdue),
+                              label: 'Tổng Giờ Thực Hiện',
+                              data: chartData.map((project) => project.total_task_time), 
                               backgroundColor: '#007bff',
                               borderColor: '#0056b3',
                               borderWidth: 1,
@@ -220,7 +180,7 @@ export const View = () => {
           return () => {
                myChart.destroy();
           };
-     }, [taskData]);
+     }, [chartData]);
 
      const handleDateRangeApply = () => {
           const startDate = document.getElementById('startDate').value;
@@ -310,7 +270,9 @@ export const View = () => {
 
      //  activity
      const activityCount = activitys.length;
-
+     if (loading) {
+          return <p>Đang tải dữ liệu...</p>;
+      }
      return (
           <MainContainer>
                <Header>
@@ -609,33 +571,6 @@ export const View = () => {
                          </table>
                     </div>
                )}
-               {/* activity */}
-               {showUserInfo['activitys'] && (
-                    <div className="table-responsive mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                         <table className="table table-bordered table-hover table-striped">
-                              <thead className="table-light">
-                                   <tr>
-                                        <th className="col-1">STT</th>
-                                        <th className="col-2">{t('User ID')}</th>
-                                        <th className="col-2">{t('Actions')}</th>
-                                        <th className="col-2">Loggable ID</th>
-                                   </tr>
-                              </thead>
-                              <tbody>
-                                   {activitys.map((activity, index) => {
-                                        const user = users.find((user) => user.id === activity.user_id);
-                                        return (
-                                             <tr key={activity.id}>
-                                                  <td>{index + 1}</td>
-                                                  <td>{user ? user.fullname : 'N/A'}</td> <td>{activity.action}</td>
-                                                  <td>{activity.created_at}</td>
-                                             </tr>
-                                        );
-                                   })}
-                              </tbody>
-                         </table>
-                    </div>
-               )}
                <div className="mt-4">
                     <h3 className="">{t('Statistics Total Hours Executed')}</h3>
                     <Row>
@@ -646,6 +581,13 @@ export const View = () => {
                               <canvas ref={chartRef} className="ms-10" />
                          </div>
                     </Row>
+               </div>
+               <div className="mt-4">
+                    <UserStatistics/>
+               </div>
+
+               <div className="mt-4">
+                    <WorktimesDashboardComponent/>
                </div>
           </MainContainer>
      );
