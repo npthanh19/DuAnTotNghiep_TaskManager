@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { getUserTaskStatistics } from '../../../services/dashboardService';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import * as XLSX from 'xlsx';
+import { BiExport } from 'react-icons/bi';
 
 const StatsContainer = styled.div`
      max-width: 100%;
@@ -90,6 +92,22 @@ const HighlightText = styled.span`
      color: #007bff;
 `;
 
+const ExportButton = styled.button`
+     background-color: #0d6efd;
+     color: white;
+     border: none;
+     padding: 9px 17px;
+     border-radius: 8px;
+     cursor: pointer;
+     margin-left: auto;
+     font-size: 14px;
+     margin-left: 5px;
+
+     &:hover {
+          background-color: #0b5ed7;
+     }
+`;
+
 const UserStatistics = () => {
      const [users, setUsers] = useState([]);
      const [searchTerm, setSearchTerm] = useState('');
@@ -123,11 +141,29 @@ const UserStatistics = () => {
           setFilteredUsers(filtered);
      };
 
+     const handleExport = () => {
+          const ws = XLSX.utils.json_to_sheet(
+               filteredUsers.map((user) => ({
+                    'Họ và tên': user.fullname,
+                    'Số nhiệm vụ': user.task_count,
+                    'Tổng thời gian': `${user.total_task_time} giờ`,
+               })),
+          );
+
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'User Stats');
+
+          XLSX.writeFile(wb, 'thongkenguoidung.xlsx');
+     };
+
      return (
           <StatsContainer>
                <HeaderContainer>
                     <StatsHeader>Thống kê người dùng</StatsHeader>
                     <SearchInput type="text" placeholder={t('Search...')} value={searchTerm} onChange={handleSearch} />
+                    <ExportButton onClick={handleExport}>
+                         <BiExport />
+                    </ExportButton>
                </HeaderContainer>
 
                <UserStats>

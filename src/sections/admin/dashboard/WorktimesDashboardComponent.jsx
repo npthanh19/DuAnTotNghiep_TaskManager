@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { getWorktimeWithTasks } from '../../../services/dashboardService';
 import { FaClock } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import * as XLSX from 'xlsx';
+import { BiExport } from 'react-icons/bi';
 
 const StatsContainer = styled.div`
      max-width: 100%;
@@ -164,6 +166,21 @@ const StatusSelect = styled.select`
      }
 `;
 
+const ExportButton = styled.button`
+     background-color: #0d6efd;
+     color: white;
+     border: none;
+     padding: 15px 17px;
+     border-radius: 8px;
+     cursor: pointer;
+     margin-left: auto;
+     font-size: 14px;
+
+     &:hover {
+          background-color: #0b5ed7;
+     }
+`;
+
 const WorktimesDashboardComponent = () => {
      const [worktimes, setWorktimes] = useState([]);
      const [loading, setLoading] = useState(true);
@@ -202,6 +219,32 @@ const WorktimesDashboardComponent = () => {
           setSelectedStatus(e.target.value);
      };
 
+     const handleExport = () => {
+          const ws = XLSX.utils.json_to_sheet(
+               filteredWorktimes.map((worktime, index) => ({
+                    STT: index + 1,
+                    'Tên công việc': worktime.name,
+                    'Tên dự án': worktime.tasks.map((task) => task.project_name || 'Không xác định').join(', '),
+                    'Tên nhiệm vụ': worktime.tasks.map((task) => task.task_name).join(', '),
+                    'Trạng thái':
+                         worktime.status === 'runing'
+                              ? 'Đang chạy'
+                              : worktime.status === 'not start'
+                              ? 'Chưa bắt đầu'
+                              : worktime.status === 'conplete'
+                              ? 'Hoàn thành'
+                              : 'Không xác định',
+                    'Tổng giờ': `${worktime.total_task_time}h`,
+                    'Số nhiệm vụ': worktime.tasks.length,
+               })),
+          );
+
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Worktime Stats');
+
+          XLSX.writeFile(wb, 'thongkecongviec.xlsx');
+     };
+
      return (
           <StatsContainer>
                <StatsHeader>
@@ -219,6 +262,9 @@ const WorktimesDashboardComponent = () => {
                                    <option value="running">{t('In Progress')}</option>
                                    <option value="not start">{t('Not Started')}</option>
                               </StatusSelect>
+                              <ExportButton onClick={handleExport}>
+                                   <BiExport />
+                              </ExportButton>
                          </HeaderContent>
                     </div>
                </StatsHeader>
