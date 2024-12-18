@@ -407,7 +407,7 @@ export const View = () => {
                                                             worktime.end_date
                                                        )}
                                                   </td>
-                                                  <td>{worktime.status}</td>
+                                                  <td>{t(worktime.status)}</td>
                                                   <td>
                                                        <div className="dropdown">
                                                             <button

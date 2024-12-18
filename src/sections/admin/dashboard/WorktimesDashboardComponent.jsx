@@ -2,41 +2,28 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getWorktimeWithTasks } from '../../../services/dashboardService';
 import { FaClock } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
-// Các styled-components
 const StatsContainer = styled.div`
      max-width: 100%;
      margin: 20px auto;
      padding: 30px;
-`;
-
-const StatsHeader = styled.header`
-     text-align: center;
-     margin-bottom: 50px;
-`;
-
-const HeaderTitle = styled.h1`
-     font-size: 2.5rem;
-     font-weight: bold;
-     color: #3498db;
-`;
-
-const HeaderSubtitle = styled.p`
-     font-size: 1.1rem;
-     color: #7f8c8d;
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 `;
 
 const WorktimeStats = styled.div`
-     display: flex;
-     flex-wrap: wrap;
+     display: grid;
+     grid-template-columns: repeat(3, 1fr);
      gap: 20px;
+     max-height: 600px;
+     overflow-y: auto;
+     padding-right: 10px;
 `;
 
 const WorktimeCard = styled.div`
      background: #fff;
      border-radius: 12px;
      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-     width: calc(33.33% - 20px);
      transition: transform 0.3s ease;
      &:hover {
           transform: translateY(-5px);
@@ -119,10 +106,71 @@ const ErrorText = styled.p`
      color: red;
 `;
 
+const StatsHeader = styled.header`
+     text-align: center;
+     margin-bottom: 30px;
+     padding: 20px 0;
+     border-radius: 8px;
+`;
+
+const HeaderTitle = styled.h1`
+     font-size: 2.5rem;
+     font-weight: bold;
+     color: #3498db;
+     margin-bottom: 8px;
+`;
+
+const HeaderSubtitle = styled.p`
+     font-size: 1.1rem;
+     color: #7f8c8d;
+     margin-bottom: 20px;
+`;
+
+const HeaderContent = styled.div`
+     display: flex;
+     justify-content: flex-end;
+     align-items: center;
+     gap: 15px;
+     margin-top: 20px;
+     padding: 0 10px;
+`;
+
+const SearchInput = styled.input`
+     padding: 12px 20px;
+     font-size: 16px;
+     border-radius: 8px;
+     border: 1px solid #ddd;
+     width: 250px;
+     transition: border-color 0.3s ease;
+
+     &:focus {
+          outline: none;
+          border-color: #3498db;
+     }
+`;
+
+const StatusSelect = styled.select`
+     padding: 12px 20px;
+     font-size: 16px;
+     border-radius: 8px;
+     border: 1px solid #ddd;
+     width: 180px;
+     background-color: white;
+     transition: border-color 0.3s ease;
+
+     &:focus {
+          outline: none;
+          border-color: #3498db;
+     }
+`;
+
 const WorktimesDashboardComponent = () => {
      const [worktimes, setWorktimes] = useState([]);
      const [loading, setLoading] = useState(true);
      const [error, setError] = useState(null);
+     const [searchTerm, setSearchTerm] = useState('');
+     const [selectedStatus, setSelectedStatus] = useState('all');
+     const { t } = useTranslation();
 
      useEffect(() => {
           const fetchData = async () => {
@@ -139,17 +187,47 @@ const WorktimesDashboardComponent = () => {
           fetchData();
      }, []);
 
+     const filteredWorktimes = worktimes
+          .filter((worktime) => worktime.name.toLowerCase().includes(searchTerm.toLowerCase()))
+          .filter((worktime) => {
+               if (selectedStatus === 'all') return true;
+               return worktime.status === selectedStatus;
+          });
+
+     const handleSearchChange = (e) => {
+          setSearchTerm(e.target.value);
+     };
+
+     const handleStatusChange = (e) => {
+          setSelectedStatus(e.target.value);
+     };
+
      return (
           <StatsContainer>
                <StatsHeader>
-                    <HeaderTitle>Thống kê thời gian làm việc</HeaderTitle>
-                    <HeaderSubtitle>Theo dõi và phân tích số liệu</HeaderSubtitle>
+                    <div className="card-header d-flex justify-content-between align-items-center py-3">
+                         <div>
+                              <HeaderTitle>Thống kê thời gian làm việc</HeaderTitle>
+                              <HeaderSubtitle>Theo dõi và phân tích số liệu</HeaderSubtitle>
+                         </div>
+
+                         <HeaderContent>
+                              <SearchInput type="text" placeholder={t('Search...')} value={searchTerm} onChange={handleSearchChange} />
+                              <StatusSelect onChange={handleStatusChange} value={selectedStatus}>
+                                   <option value="all">{t('All Statuses')}</option>
+                                   <option value="conplete">{t('Completed')}</option>
+                                   <option value="running">{t('In Progress')}</option>
+                                   <option value="not start">{t('Not Started')}</option>
+                              </StatusSelect>
+                         </HeaderContent>
+                    </div>
                </StatsHeader>
+
                <WorktimeStats>
                     {loading && <LoadingText>Đang tải dữ liệu...</LoadingText>}
                     {error && <ErrorText>{error}</ErrorText>}
-                    {worktimes.length > 0 && !loading && !error
-                         ? worktimes.map((worktime) => (
+                    {filteredWorktimes.length > 0 && !loading && !error
+                         ? filteredWorktimes.map((worktime) => (
                                 <WorktimeCard key={worktime.id_worktime}>
                                      <CardBody>
                                           <CardHeader>
@@ -179,7 +257,7 @@ const WorktimesDashboardComponent = () => {
                                      </CardBody>
                                 </WorktimeCard>
                            ))
-                         : !loading && !error && <p>Không có dữ liệu công việc.</p>}
+                         : !loading && !error && <p>{t('No matching data found.')}</p>}
                </WorktimeStats>
           </StatsContainer>
      );

@@ -1,33 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import { getUserTaskStatistics } from '../../../services/dashboardService';
-import styled from 'styled-components'; // Import styled-components
+import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
-// Styled-components
 const StatsContainer = styled.div`
      max-width: 100%;
      margin: 20px auto;
      background: #fff;
      padding: 20px;
      border-radius: 8px;
-     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+     max-height: 80vh;
+     overflow: hidden; /* Ẩn cuộn cho toàn bộ container */
+`;
+
+const HeaderContainer = styled.div`
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     padding-bottom: 20px;
 `;
 
 const StatsHeader = styled.h2`
-     text-align: center;
+     flex: 8;
+     text-align: left;
      font-size: 2.5rem;
      font-weight: bold;
      color: #3498db;
      padding-bottom: 20px;
 `;
 
+const SearchInput = styled.input`
+     flex: 2;
+     padding: 6px;
+     border: 1px solid #ccc;
+     border-radius: 8px;
+     font-size: 14px;
+
+     &:focus {
+          outline: none;
+          border-color: #3498db;
+     }
+`;
+
 const UserStats = styled.div`
-     display: flex;
-     flex-wrap: wrap;
+     display: grid;
+     grid-template-columns: repeat(3, 1fr);
      gap: 20px;
+     overflow-y: auto;
+     max-height: calc(80vh - 120px);
+     padding-right: 15px;
 `;
 
 const UserCard = styled.div`
-     flex: 1 1 calc(33.333% - 20px);
      background: #f1f4f9;
      padding: 15px;
      border-radius: 8px;
@@ -66,35 +91,48 @@ const HighlightText = styled.span`
 `;
 
 const UserStatistics = () => {
-     const [users, setUsers] = useState([]); // Luôn là mảng
+     const [users, setUsers] = useState([]);
+     const [searchTerm, setSearchTerm] = useState('');
+     const [filteredUsers, setFilteredUsers] = useState([]);
+     const { t } = useTranslation();
 
-     // Fetch data từ API
      useEffect(() => {
           const fetchData = async () => {
                try {
                     const data = await getUserTaskStatistics();
-                    console.log('Dữ liệu thống kê người dùng:', data); // Log ra dữ liệu
 
-                    // Kiểm tra nếu mảng users có dữ liệu và set state
                     if (data && Array.isArray(data.users)) {
                          setUsers(data.users);
+                         setFilteredUsers(data.users);
                     } else {
-                         console.error('Dữ liệu người dùng không đúng định dạng');
+                         console.error('Invalid user data format');
                     }
                } catch (error) {
-                    console.error('Lỗi khi lấy thống kê người dùng:', error);
+                    console.error('Error fetching user statistics:', error);
                }
           };
 
           fetchData();
-     }, []);
+     }, [t]);
+
+     const handleSearch = (e) => {
+          const value = e.target.value.toLowerCase();
+          setSearchTerm(value);
+
+          const filtered = users.filter((user) => user.fullname.toLowerCase().includes(value));
+          setFilteredUsers(filtered);
+     };
 
      return (
           <StatsContainer>
-               <StatsHeader>Thống kê người dùng</StatsHeader>
+               <HeaderContainer>
+                    <StatsHeader>Thống kê người dùng</StatsHeader>
+                    <SearchInput type="text" placeholder={t('Search...')} value={searchTerm} onChange={handleSearch} />
+               </HeaderContainer>
+
                <UserStats>
-                    {users.length > 0 ? (
-                         users.map((user, index) => (
+                    {filteredUsers.length > 0 ? (
+                         filteredUsers.map((user, index) => (
                               <UserCard key={index}>
                                    <UserInfo>
                                         <UserFullname>{user.fullname}</UserFullname>
@@ -108,7 +146,7 @@ const UserStatistics = () => {
                               </UserCard>
                          ))
                     ) : (
-                         <p>Đang tải dữ liệu...</p>
+                         <p>Không tìm thấy người dùng phù hợp.</p>
                     )}
                </UserStats>
           </StatsContainer>

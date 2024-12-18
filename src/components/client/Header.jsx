@@ -33,40 +33,26 @@ export default function Header() {
                                    aria-label="Toggle navigation">
                                    <i className="tf-icons ri-close-fill"></i>
                               </button>
-                              <ul className="navbar-nav me-auto p-4 p-lg-0 ">
+                              <ul className="navbar-nav me-auto p-4 p-lg-0 d-flex justify-content-center w-100">
                                    <li className="nav-item">
                                         <a href="#" className="nav-link fw-medium" aria-current="page">
                                              Trang chủ
                                         </a>
                                    </li>
                                    <li className="nav-item">
-                                        <a href="#" className="nav-link fw-medium">
+                                        <Link to="/taskmaneger/login" className="nav-link fw-medium">
                                              Dự án của tôi
-                                        </a>
+                                        </Link>
                                    </li>
                                    <li className="nav-item">
-                                        <a href="#" className="nav-link fw-medium">
-Tạo công việc
-                                        </a>
-                                   </li>
-                                   <li className="nav-item">
-                                        <a href="#" className="nav-link fw-medium">
-                                             Báo cáo
-                                        </a>
+                                        <Link to="/taskmaneger/login" className="nav-link fw-medium">
+                                             Tạo công việc
+                                        </Link>
                                    </li>
                               </ul>
                          </div>
                          <div className="landing-menu-overlay d-lg-none"></div>
                          <ul className="navbar-nav flex-row align-items-center ms-auto">
-                              <li className="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
-                                   <a
-                                        href="#"
-                                        id="iconClick"
-                                        className="nav-link btn btn-text-secondary rounded-pill btn-icon hide-arrow me-sm-4 waves-effect waves-light show"
-                                        aria-expanded="false">
-                                        <i className="ri-24px text-heading ri-sun-line"></i>
-                                   </a>
-                              </li>
                               <li>
                                    <Link
                                         to="/taskmaneger"

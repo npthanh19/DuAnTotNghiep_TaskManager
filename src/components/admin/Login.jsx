@@ -46,7 +46,7 @@ const Login = () => {
                          if (response.role === 'Admin' || response.role === 'Manager') {
                               navigate('/taskmaneger');
                          } else {
-                              navigate('/taskmaneger/departments');
+                              navigate('/taskmaneger');
                          }
                     }, 1000);
                }
@@ -98,7 +98,7 @@ const Login = () => {
                     localStorage.setItem('token', response.data.access_token);
                     localStorage.setItem('role', response.data.role);
                     localStorage.setItem('user_id', response.data.user_id);
-                    localStorage.setItem('email', decoded.email); 
+                    localStorage.setItem('email', decoded.email);
                     localStorage.setItem('user_name', response.data.user_name);
                     axiosi.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
@@ -113,7 +113,7 @@ const Login = () => {
                          if (response.data.role === 'Admin' || response.data.role === 'Manager') {
                               navigate('/taskmaneger');
                          } else {
-                              navigate('/taskmaneger/departments');
+                              navigate('/taskmaneger');
                          }
                     });
                }
