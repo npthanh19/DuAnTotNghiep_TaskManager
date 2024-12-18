@@ -97,8 +97,6 @@ export const getFilesByTaskId = async (taskId) => {
      }
 };
 
-
-
 // Xóa file
 export const deleteFile = async (id) => {
      try {
@@ -128,6 +126,30 @@ export const updateFile = async (id, fileData) => {
      }
 };
 
+// Xem nội dung file
+export const viewFile = async (fileId) => {
+     try {
+          const response = await axiosi.get(`${apiEndpoint}/${fileId}/view`, {
+               responseType: 'blob',
+          });
+          return response.data;
+     } catch (error) {
+          console.error(`Error viewing file with ID ${fileId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
+// Lấy URL xem trước file
+export const getFilePreviewUrl = async (fileId) => {
+     try {
+          const response = await axiosi.get(`${apiEndpoint}/${fileId}/preview`);
+          return response.data.previewUrl;
+     } catch (error) {
+          console.error(`Error getting preview URL for file ID ${fileId}:`, error);
+          throw error.response ? error.response.data : new Error('Network error');
+     }
+};
+
 export default {
      getTaskFiles,
      uploadFiles,
@@ -138,4 +160,6 @@ export default {
      deleteFile,
      updateFile,
      getFilesByTaskId,
+     viewFile,
+     getFilePreviewUrl,
 };

@@ -476,7 +476,8 @@ const resources = {
                'Notification deleted successfully.': 'Thông báo xoá thành công.',
                'Failed to delete notification.': 'Có lỗi khi xoá thông báo',
                'Role is required!': 'Vai trò không để trống!',
-               'User  is not logged in or fullname not available in localStorage': 'Người dùng chưa đăng nhập hoặc tên đầy đủ không có sẵn trong localStorage',
+               'User  is not logged in or fullname not available in localStorage':
+                    'Người dùng chưa đăng nhập hoặc tên đầy đủ không có sẵn trong localStorage',
                'The comment has been moved to the trash!': 'Bình luận đã được chuyển vào thùng rác!',
                'An error occurred while deleting the comment.': 'Đã xảy ra lỗi khi xóa bình luận.',
                'Delete Comments': 'Xóa bình luận',
@@ -486,14 +487,26 @@ const resources = {
                'Comment added successfully': 'Thêm bình luận thành công',
                'An error occurred.': 'Đã xảy ra lỗi.',
                'Write the answer...': 'Viết câu trả lời',
-               'Feedback': 'Phản hồi',
+               Feedback: 'Phản hồi',
                'Active sprints': 'Đang tiến hành chạy',
                'Tasks Summary': 'Tóm tắt',
                'Completed tasks:': 'Nhiệm vụ hoàn thành:',
                'Preview tasks': 'Nhiệm vụ xem lại:',
                'In-progress tasks:': 'Nhiệm vụ đang thực hiện:',
                'Todo tasks:': 'Nhiệm vụ chưa xử lý:',
-               'Choose a worktime to manage remaining tasks:': 'Chọn thời gian làm việc để quản lý các công việc còn lại:'
+               'Choose a worktime to manage remaining tasks:': 'Chọn thời gian làm việc để quản lý các công việc còn lại:',
+               'List of files': 'Danh sách tập tin',
+               'All Statuses': 'Tất cả trạng thái',
+               Completed: 'Hoàn thành',
+               'In Progress': 'Đang chạy',
+               'Not Started': 'Chưa bắt đầu',
+               "No matching data found.": "Không có dữ liệu phù hợp.",
+               runing: 'Đang chạy',
+               'The worktime has been updated.': 'Thời gian làm việc đã cập nhật thành công!',
+               
+
+
+               
           },
      },
 };

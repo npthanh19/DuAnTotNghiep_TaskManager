@@ -61,6 +61,7 @@ export default function Update_profile() {
           fetchUserData();
      }, [userId, token, setValue, t]);
 
+     // Xử lý sự kiện thay đổi avatar
      const handleAvatarChange = (event) => {
           const file = event.target.files[0];
           if (file) {
@@ -71,9 +72,8 @@ export default function Update_profile() {
                     .then((response) => {
                          if (response && response.data && response.data.avatar) {
                               const avatarUrl = `${process.env.REACT_APP_BASE_URL}/avatar/${response.data.avatar}`;
-
                               setAvatar(response.data.avatar);
-
+                              // Cập nhật avatar mới
                               const imgElement = document.getElementById('uploadedAvatar');
                               if (imgElement) {
                                    imgElement.src = avatarUrl;
@@ -181,13 +181,12 @@ export default function Update_profile() {
           }
      };
 
+     // Xử lý sự kiện thay đổi số điện thoại thêm mã quốc gia
      const handlePhoneNumberChange = (event) => {
           let phoneNumber = event.target.value;
-
           if (phoneNumber.startsWith('0')) {
                phoneNumber = '84' + phoneNumber.slice(1);
           }
-
           setValue('phoneNumber', phoneNumber);
      };
 
