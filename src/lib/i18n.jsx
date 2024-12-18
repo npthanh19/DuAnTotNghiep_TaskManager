@@ -494,13 +494,20 @@ const resources = {
                'Preview tasks:': 'Nhiệm vụ xem lại:',
                'No remaining tasks to transfer.': 'Không còn nhiệm vụ nào để chuyển.',
                'In-progress tasks:': 'Nhiệm vụ đang thực hiện:',
-               'To do tasks:': 'Nhiệm vụ chưa xử lý:',
+               'Todo tasks:': 'Nhiệm vụ chưa xử lý:',
                'Choose a worktime to manage remaining tasks:': 'Chọn thời gian làm việc để quản lý các công việc còn lại:',
-               'No changes detected.': 'Không có thay đổi gì.',
-               'The phone number': 'Số điện thoại',
-               'is already taken. Please try another one.': 'đã được sử dụng. Vui lòng thử số khác.',
-               'An error occurred while deleting the users.': 'Có lỗi xảy ra vui lòng kiểm tra lại người dùng có thuộc phòng ban nào không.',
-               Review: 'Xem xét',
+               'List of files': 'Danh sách tập tin',
+               'All Statuses': 'Tất cả trạng thái',
+               Completed: 'Hoàn thành',
+               'In Progress': 'Đang chạy',
+               'Not Started': 'Chưa bắt đầu',
+               "No matching data found.": "Không có dữ liệu phù hợp.",
+               runing: 'Đang chạy',
+               'The worktime has been updated.': 'Thời gian làm việc đã cập nhật thành công!',
+               
+
+
+               
           },
      },
 };
