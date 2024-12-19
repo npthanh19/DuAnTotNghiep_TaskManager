@@ -3,6 +3,8 @@ import './board_log.css';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllProjects } from '../../../services/projectsService';
+import Swal from 'sweetalert2';
+
 import {
      getAllTasks,
      getTasksByWorktimeId,
@@ -217,22 +219,42 @@ export function View() {
           if (status === 'preview') dataMapping = 3;
           if (status === 'done') dataMapping = 4;
 
-          try {
-               const updatedTask = await updateTaskStatus(taskId, dataMapping);
-               console.log(`Task updated successfully:`, updatedTask);
+          // Hiển thị hộp thoại xác nhận trước khi cập nhật
+          const result = await Swal.fire({
+               title: 'Xác nhận cập nhật trạng thái',
+               text: `Bạn có chắc chắn muốn cập nhật trạng thái task sang "${status}"?`,
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonText: 'Có',
+               cancelButtonText: 'Không',
+          });
 
-               // Cập nhật lại danh sách sprints
-               setSprints((prevSprints) =>
-                    prevSprints.map((sprint) => ({
-                         ...sprint,
-                         tasks: sprint.tasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
-                    })),
-               );
+          // Nếu người dùng chọn "Có", tiếp tục cập nhật trạng thái
+          if (result.isConfirmed) {
+               try {
+                    const updatedTask = await updateTaskStatus(taskId, dataMapping);
+                    console.log('Task updated successfully:', updatedTask);
 
-               // Nếu task nằm trong `taskNotWorkTime`, cập nhật nó
-               setTaskNotWorkTime((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, status } : task)));
-          } catch (error) {
-               console.error(`Failed to update task status:`, error);
+                    // Cập nhật lại danh sách sprints
+                    setSprints((prevSprints) =>
+                         prevSprints.map((sprint) => ({
+                              ...sprint,
+                              tasks: sprint.tasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
+                         })),
+                    );
+
+                    // Nếu task nằm trong taskNotWorkTime, cập nhật nó
+                    setTaskNotWorkTime((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, status } : task)));
+
+                    // Hiển thị thông báo thành công
+                    Swal.fire('Cập nhật thành công!', '', 'success');
+               } catch (error) {
+                    console.error('Failed to update task status:', error);
+                    Swal.fire('Cập nhật thất bại', 'Có lỗi xảy ra trong quá trình cập nhật trạng thái.', 'error');
+               }
+          } else {
+               // Nếu người dùng chọn "Không", không làm gì
+               console.log('Cập nhật trạng thái bị hủy');
           }
      };
 
@@ -262,46 +284,81 @@ export function View() {
           setIsInputVisible(false);
      };
 
-     const handleDragEnd = async (result) => {
-          const { source, destination } = result;
+     const handleDragEnd = async (dragResult) => {
+          const { source, destination } = dragResult;
+
           if (!destination) return;
 
           const updatedSprints = [...sprints];
           const updatedUnassignTasks = [...taskNotWorkTime];
 
-          if (source.droppableId === 'unassignTasks') {
-               const movedTask = taskNotWorkTime[source.index];
-               updatedUnassignTasks.splice(source.index, 1);
+          const movedTask =
+               source.droppableId === 'unassignTasks'
+                    ? taskNotWorkTime[source.index]
+                    : updatedSprints.find((sprint) => sprint.id === source.droppableId)?.tasks[source.index];
 
-               if (destination.droppableId === 'unassignTasks') {
-                    updatedUnassignTasks.splice(destination.index, 0, movedTask);
+          // Find the names of source and destination worktimes
+          const sourceWorktime = updatedSprints.find((sprint) => sprint.id === source.droppableId);
+          const destinationWorktime = updatedSprints.find((sprint) => sprint.id === destination.droppableId);
+
+          const sourceName = sourceWorktime ? sourceWorktime.dateRange : 'unassigned';
+          const destinationName = destinationWorktime ? destinationWorktime.dateRange : 'unassigned';
+
+          // Confirmation message with worktime name instead of id
+          const confirmMessage =
+               source.droppableId === 'unassignTasks'
+                    ? `Bạn muốn di chuyển nhiệm vụ '${movedTask.task_name}' vào worktime '${destinationName}'?`
+                    : destination.droppableId === 'unassignTasks'
+                    ? `Bạn muốn dời nhiệm vụ '${movedTask.task_name}' ra ngoài worktime?`
+                    : `Bạn muốn di chuyển nhiệm vụ '${movedTask.task_name}' từ worktime '${sourceName}' sang worktime '${destinationName}'?`;
+
+          // Hiển thị hộp thoại xác nhận
+          const confirmation = await Swal.fire({
+               title: 'Xác nhận di chuyển nhiệm vụ',
+               text: confirmMessage,
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonText: 'Xác nhận',
+               cancelButtonText: 'Hủy bỏ',
+          });
+
+          if (confirmation.isConfirmed) {
+               // Tiến hành cập nhật nếu xác nhận
+               if (source.droppableId === 'unassignTasks') {
+                    updatedUnassignTasks.splice(source.index, 1);
+
+                    if (destination.droppableId === 'unassignTasks') {
+                         updatedUnassignTasks.splice(destination.index, 0, movedTask);
+                    } else {
+                         const destinationSprint = updatedSprints.find((sprint) => sprint.id === destination.droppableId);
+                         if (destinationSprint) {
+                              destinationSprint.tasks.splice(destination.index, 0, movedTask);
+                         }
+                    }
+
+                    setTaskNotWorkTime(updatedUnassignTasks);
+                    setSprints(updatedSprints);
+                    await updateWorktimeTask(movedTask.id, destination.droppableId === 'unassignTasks' ? null : Number(destination.droppableId));
                } else {
+                    const sourceSprint = updatedSprints.find((sprint) => sprint.id === source.droppableId);
                     const destinationSprint = updatedSprints.find((sprint) => sprint.id === destination.droppableId);
-                    if (destinationSprint) {
+
+                    if (sourceSprint && destinationSprint) {
+                         sourceSprint.tasks.splice(source.index, 1);
                          destinationSprint.tasks.splice(destination.index, 0, movedTask);
+                         setSprints(updatedSprints);
+                         await updateWorktimeTask(movedTask.id, Number(destination.droppableId));
+                    } else if (!destinationSprint) {
+                         sourceSprint.tasks.splice(source.index, 1);
+                         updatedUnassignTasks.splice(destination.index, 0, movedTask);
+                         setSprints(updatedSprints);
+                         setTaskNotWorkTime(updatedUnassignTasks);
+                         await updateWorktimeTask(movedTask.id, null);
                     }
                }
-               setTaskNotWorkTime(updatedUnassignTasks);
-               setSprints(updatedSprints);
-               await updateWorktimeTask(movedTask.id, destination.droppableId === 'unassignTasks' ? null : Number(destination.droppableId));
           } else {
-               const sourceSprint = updatedSprints.find((sprint) => sprint.id === source.droppableId);
-               const destinationSprint = updatedSprints.find((sprint) => sprint.id === destination.droppableId);
-
-               if (sourceSprint && destinationSprint) {
-                    const movedTask = sourceSprint.tasks[source.index];
-                    sourceSprint.tasks.splice(source.index, 1);
-                    destinationSprint.tasks.splice(destination.index, 0, movedTask);
-                    setSprints(updatedSprints);
-                    await updateWorktimeTask(movedTask.id, Number(destination.droppableId));
-               } else if (!destinationSprint) {
-                    const movedTask = sourceSprint.tasks[source.index];
-                    sourceSprint.tasks.splice(source.index, 1);
-                    updatedUnassignTasks.splice(destination.index, 0, movedTask);
-                    setSprints(updatedSprints);
-                    setTaskNotWorkTime(updatedUnassignTasks);
-                    await updateWorktimeTask(movedTask.id, null);
-               }
+               // Nếu hủy bỏ, không làm gì cả
+               return;
           }
      };
 
@@ -411,14 +468,6 @@ export function View() {
                                    ))}
                               </select>
 
-                              {/* <select className="form-select form-select-sm me-3" aria-label="User Dropdown" onChange={handleUserChange}>
-                                   <option value="">Chọn thành viên</option>
-                                   {users.map((user) => (
-                                        <option key={user.user_id} value={user.user_id}>
-                                             {user.name}
-                                        </option>
-                                   ))}
-                              </select> */}
                               <button className="btn btn-primary ms-3" onClick={handleResetFilter}>
                                    <i className="bi bi-arrow-counterclockwise me-2"></i>
                               </button>
