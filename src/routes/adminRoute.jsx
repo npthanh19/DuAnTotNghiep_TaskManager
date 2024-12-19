@@ -64,6 +64,8 @@ import RecentlyDeleteWorkTime from '../sections/admin/worktime/RecentlyDeleteWor
 // Admin Permissions
 import ViewPer from '../pages/admin/Permission/List';
 import TrashPer from '../sections/admin/permissions/RecentlyDeletePermissions'
+// Calender
+import Calendar from '../pages/admin/Calendar/Calendar';
 
 export const AdminRoutes = () => (
      <Routes>
@@ -135,5 +137,7 @@ export const AdminRoutes = () => (
           {/* Permission Management */}
           {/* <Route path="permissions" element={<PrivateRoute><AdminLayout><ViewPer /></AdminLayout></PrivateRoute>} />
           <Route path="permissions/trash" element={<PrivateRoute><AdminLayout><TrashPer /></AdminLayout></PrivateRoute>} /> */}
+
+          <Route path="calendar" element={<PrivateRoute><AdminLayout><Calendar/></AdminLayout></PrivateRoute>} />
      </Routes>
 );

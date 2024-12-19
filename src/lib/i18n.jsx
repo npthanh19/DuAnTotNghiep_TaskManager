@@ -491,7 +491,7 @@ const resources = {
                'Active sprints': 'Đang tiến hành chạy',
                'Tasks Summary': 'Tóm tắt',
                'Completed tasks:': 'Nhiệm vụ hoàn thành:',
-               'Preview tasks:': 'Nhiệm vụ xem lại:',
+               'Preview tasks:': 'Nhiệm vụ xem xét:',
                'No remaining tasks to transfer.': 'Không còn nhiệm vụ nào để chuyển.',
                'In-progress tasks:': 'Nhiệm vụ đang thực hiện:',
                'Todo tasks:': 'Nhiệm vụ chưa xử lý:',
@@ -500,14 +500,12 @@ const resources = {
                'All Statuses': 'Tất cả trạng thái',
                Completed: 'Hoàn thành',
                'In Progress': 'Đang chạy',
-               'Not Started': 'Chưa bắt đầu',
-               "No matching data found.": "Không có dữ liệu phù hợp.",
+               'Not Start': 'Chưa bắt đầu',
+               'No matching data found.': 'Không có dữ liệu phù hợp.',
                runing: 'Đang chạy',
                'The worktime has been updated.': 'Thời gian làm việc đã cập nhật thành công!',
-               
-
-
-               
+               'To do tasks:': 'Chờ xử lý:',
+               'Calendar': 'Lịch',
           },
      },
 };
