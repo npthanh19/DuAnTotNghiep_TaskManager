@@ -180,12 +180,7 @@ export const Add = () => {
                                    <label htmlFor="description" className="form-label">
                                         {t('Description')}
                                    </label>
-                                   <textarea
-                                        id="description"
-                                        className={`form-control form-control-sm ${errors.description ? 'is-invalid' : ''}`}
-                                        {...register('description', { required: t('Description cannot be empty!') })}
-                                        rows="3"></textarea>
-                                   {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+                                   <textarea id="description" className={`form-control form-control-sm `} rows="3"></textarea>
                               </div>
                               <div className="col">
                                    <label htmlFor="department_id" className="form-label">
@@ -229,7 +224,6 @@ export const Add = () => {
                                         type="date"
                                         id="end_date"
                                         className={`form-control form-control-sm ${errors.end_date ? 'is-invalid' : ''}`}
-                                        {...register('end_date', { required: t('End date is required!') })}
                                    />
                                    {errors.endDate && <div className="invalid-feedback">{errors.endDate.message}</div>}
                               </div>

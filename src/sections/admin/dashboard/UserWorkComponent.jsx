@@ -87,6 +87,12 @@ const UserTotalTime = styled.p`
      color: #555;
 `;
 
+const UserDepartments = styled.p`
+     font-size: 14px;
+     color: #555;
+     font-weight: bold;
+`;
+
 const HighlightText = styled.span`
      font-weight: bold;
      color: #007bff;
@@ -113,6 +119,7 @@ const UserStatistics = () => {
      const [searchTerm, setSearchTerm] = useState('');
      const [filteredUsers, setFilteredUsers] = useState([]);
      const { t } = useTranslation();
+     const [selectedUser, setSelectedUser] = useState(null);
 
      useEffect(() => {
           const fetchData = async () => {
@@ -147,6 +154,7 @@ const UserStatistics = () => {
                     'Họ và tên': user.fullname,
                     'Số nhiệm vụ': user.task_count,
                     'Tổng thời gian': `${user.total_task_time} giờ`,
+                    'Phòng ban': user.departments || 'N/A',
                })),
           );
 
@@ -178,6 +186,13 @@ const UserStatistics = () => {
                                         <UserTotalTime>
                                              Tổng thời gian: <HighlightText>{user.total_task_time} giờ</HighlightText>
                                         </UserTotalTime>
+                                        <UserTasks>
+                                             Số phòng ban: <HighlightText>{user.department_count || 0}</HighlightText>
+                                        </UserTasks>
+                                        <UserDepartments>
+                                             Phòng ban: <HighlightText>{user.departments || '-'}</HighlightText>
+                                        </UserDepartments>
+                                        <ExportButton onClick={() => setSelectedUser(user)}>Xem thêm</ExportButton>
                                    </UserInfo>
                               </UserCard>
                          ))
@@ -185,6 +200,41 @@ const UserStatistics = () => {
                          <p>Không tìm thấy người dùng phù hợp.</p>
                     )}
                </UserStats>
+
+               {/* Hiển thị chi tiết người dùng */}
+               {selectedUser && (
+                    <div
+                         className="modal fade show"
+                         tabIndex="-1"
+                         role="dialog"
+                         style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                         onClick={() => setSelectedUser(null)}>
+                         <div
+                              className="modal-dialog modal-dialog-centered"
+                              role="document"
+                              onClick={(e) => e.stopPropagation()} 
+                         >
+                              <div className="modal-content">
+                                   <div className="modal-header">
+                                        <h5 className="modal-title">Thông tin chi tiết</h5>
+                                        <button type="button" className="btn-close" aria-label="Close" onClick={() => setSelectedUser(null)}></button>
+                                   </div>
+                                   <div className="modal-body">
+                                        <p>Họ và tên: {selectedUser.fullname}</p>
+                                        <p>Số nhiệm vụ: {selectedUser.task_count}</p>
+                                        <p>Tổng thời gian: {selectedUser.total_task_time} giờ</p>
+                                        <p>Phòng ban: {selectedUser.departments || '-'}</p>
+                                        <p>Số phòng ban: {selectedUser.department_count || 0}</p>
+                                   </div>
+                                   <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" onClick={() => setSelectedUser(null)}>
+                                             Đóng
+                                        </button>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               )}
           </StatsContainer>
      );
 };

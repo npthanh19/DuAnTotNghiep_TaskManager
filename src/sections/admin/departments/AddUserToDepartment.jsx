@@ -17,6 +17,10 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
      const [currentUserRole, setCurrentUserRole] = useState(null);
      const [isLoading, setIsLoading] = useState(false);
 
+     const role = localStorage.getItem('role');
+     const isAdminOrManager = role === 'Admin' || role === 'Manager';
+     const isStaff = role === 'Staff';
+
      useEffect(() => {
           const fetchDepartment = async () => {
                try {
@@ -28,7 +32,6 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
                }
           };
 
-          // Fetch all users
           const fetchUsers = async () => {
                try {
                     const data = await getAllUsers();
@@ -39,7 +42,7 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
           };
 
           const fetchRoles = async () => {
-               if (currentUserRole !== 3) {
+               if (!isStaff) {
                     try {
                          const allRoles = await getAllRoles();
                          setRoles(allRoles);
@@ -69,7 +72,6 @@ const AddUserToDepartment = ({ departmentId, onClose, onRemoveSuccess = () => {}
           fetchUsersWithStatus();
           fetchRoles();
      }, [departmentId, currentUserRole]);
-
      const handleUserChange = (selectedOptions) => {
           const values = selectedOptions ? selectedOptions.map((option) => option.value) : [];
           setSelectedUserIds(values);
