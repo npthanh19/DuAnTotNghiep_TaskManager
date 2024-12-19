@@ -277,7 +277,7 @@ const WorktimesDashboardComponent = () => {
                                 <WorktimeCard key={worktime.id_worktime}>
                                      <CardBody>
                                           <CardHeader>
-                                               <CardTitle>{worktime.name}</CardTitle>
+                                               <CardTitle>{worktime.name.length > 30 ? `${worktime.name.slice(0, 30)}...` : worktime.name}</CardTitle>
                                                <Badge status={worktime.status}>
                                                     {worktime.status === 'runing'
                                                          ? 'Đang chạy'
@@ -295,7 +295,9 @@ const WorktimesDashboardComponent = () => {
                                           <TaskList>
                                                {worktime.tasks.map((task) => (
                                                     <TaskItem key={task.id}>
-                                                         <TaskName>{task.task_name}</TaskName>
+                                                         <TaskName>
+                                                              {task.task_name.length > 30 ? `${task.task_name.slice(0, 30)}...` : task.task_name}
+                                                         </TaskName>
                                                          <TaskDuration>{task.task_time}h</TaskDuration>
                                                     </TaskItem>
                                                ))}

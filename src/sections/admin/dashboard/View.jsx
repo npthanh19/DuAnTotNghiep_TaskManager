@@ -6,11 +6,10 @@ import WorktimesDashboardComponent from './WorktimesDashboardComponent';
 import UserStatistics from './UserWorkComponent';
 import { getAllUsers } from '../../../services/usersService';
 import { getAllRoles } from '../../../services/rolesService';
-import { getAllProjects } from '../../../services/projectsService';
-import { getAllTasks } from '../../../services/tasksService';
+import { getProjects } from '../../../services/dashboardService';
+import { getUserAssignedTasks } from '../../../services/dashboardService';
 import { getAllWorktimes } from '../../../services/worktimeService';
-import { getAllDepartments } from '../../../services/deparmentsService';
-// import { getAllActivityLogs } from '../../../services/activityService';
+import { getDepartments } from '../../../services/dashboardService';
 import { useTranslation } from 'react-i18next';
 import { getTaskCountsByStatusGrouped, getTotalTaskTime } from '../../../services/dashboardService';
 const role = localStorage.getItem('role');
@@ -131,16 +130,15 @@ export const View = () => {
      const [openProjects, setOpenProjects] = useState({});
      const [openDepartments, setOpenDepartments] = useState({});
      const chartRef = useRef(null);
-     const [chartData, setChartData] = useState([]); // Lưu trữ dữ liệu chart từ API
-     const [loading, setLoading] = useState(true); // Theo dõi trạng thái loading
+     const [chartData, setChartData] = useState([]);
+     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
-          // Fetch dữ liệu từ API
           async function fetchDataTotalTaskTime() {
                try {
-                    const response = await getTotalTaskTime(); // Giả định hàm này đã được định nghĩa
-                    setChartData(response.projects_task_time); // Lưu dữ liệu vào state
-                    setLoading(false); // Hoàn tất tải dữ liệu
+                    const response = await getTotalTaskTime();
+                    setChartData(response.projects_task_time);
+                    setLoading(false);
                } catch (error) {
                     console.error('Lỗi khi fetch dữ liệu:', error);
                     setLoading(false);
@@ -196,40 +194,51 @@ export const View = () => {
           setOpenDepartments((prev) => ({ ...prev, [index]: !prev[index] }));
      };
 
+     const role = localStorage.getItem('role');
+     const isAdminOrManager = role === 'Admin' || role === 'Manager';
+     const isStaff = role === 'Staff';
+
      const [showUserInfo, setShowUserInfo] = useState({ admin: false });
      const [users, setUsers] = useState([]);
      const [roles, setRoles] = useState([]);
      const [projects, setProjects] = useState([]);
+     const [projectsCount, setProjectsCount] = useState(0);
      const [tasks, setTasks] = useState([]);
+     const [tasksCount, setTasksCount] = useState(0);
      const [worktimes, setWorktimes] = useState([]);
      const [departments, setDepartments] = useState([]);
-     const [activitys, setActivitys] = useState([]);
+     const [departmentsCount, setDepartmentsCount] = useState(0);
 
      useEffect(() => {
           const fetchData = async () => {
                try {
-                    const usersData = await getAllUsers();
-                    const rolesData = await getAllRoles();
-                    const projectsData = await getAllProjects();
-                    const tasksData = await getAllTasks();
-                    const worktimesData = await getAllWorktimes();
-                    const departmentsData = await getAllDepartments();
-                    // const activityData = await getAllActivityLogs();
+                    // Chỉ gọi API getAllUsers và getAllRoles nếu không phải role Staff
+                    if (isAdminOrManager) {
+                         const usersData = await getAllUsers();
+                         const rolesData = await getAllRoles();
+                         setUsers(usersData);
+                         setRoles(rolesData);
+                    }
 
-                    setUsers(usersData);
-                    setRoles(rolesData);
-                    setProjects(projectsData);
-                    setTasks(tasksData);
+                    const projectsData = await getProjects();
+                    const tasksData = await getUserAssignedTasks();
+                    const worktimesData = await getAllWorktimes();
+                    const departmentsData = await getDepartments();
+
+                    setProjects(projectsData.projects);
+                    setProjectsCount(projectsData.total_projects);
+                    setTasks(tasksData.tasks);
+                    setTasksCount(tasksData.total_assigned_tasks);
                     setWorktimes(worktimesData);
-                    setDepartments(departmentsData);
-                    // setActivitys(activityData);
+                    setDepartments(departmentsData.departments);
+                    setDepartmentsCount(departmentsData.total_departments);
                } catch (error) {
                     console.error('Failed to fetch data:', error);
                }
           };
 
           fetchData();
-     }, []);
+     }, [isAdminOrManager]);
 
      const handleShowInfoClick = (id) => {
           setShowUserInfo((prevState) => ({
@@ -243,33 +252,16 @@ export const View = () => {
           return role ? role.name : 'N/A';
      };
 
-     // users
      const role1Count = users.filter((user) => user.role_id === 1).length;
      const otherRolesCount = users.filter((user) => user.role_id !== 1).length;
 
-     // project
-     const projectsCount = projects.length;
-
-     //task
-     const tasksCount = tasks.length;
-
-     // Hàm lấy tên của worktime dựa trên worktime_id
-     const getWorktimeName = (worktimeId) => {
-          const worktime = worktimes.find((wt) => wt.id === worktimeId);
-          return worktime ? worktime.name : 'N/A';
+     const statusTranslation = {
+          'to do': t('Not yet implemented'),
+          'in progress': t('Ongoing'),
+          preview: t('Complete'),
+          done: t('Destroy'),
      };
 
-     // Hàm lấy tên của project dựa trên project_id
-     const getProjectName = (projectId) => {
-          const project = projects.find((proj) => proj.id === projectId);
-          return project ? project.project_name : 'N/A';
-     };
-
-     // department
-     const departmentsCount = departments.length;
-
-     //  activity
-     const activityCount = activitys.length;
      if (loading) {
           return (
                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-70px' }}>
@@ -283,31 +275,10 @@ export const View = () => {
           <MainContainer>
                <Header>
                     <Title>{t('Dashboard')}</Title>
-                    {/* <div className="btn-toolbar mb-2 mb-md-0">
-                         <ButtonGroup>
-                              <Button>{t('Share')}</Button>
-                              <Button>{t('Export')}</Button>
-                              <DropdownButton data-bs-toggle="dropdown" aria-expanded="false">
-                                   <i className="bi bi-calendar"></i>
-                                   {t('Choose a time period')}
-                              </DropdownButton>
-                              <DateRangePicker>
-                                   <div className="dropdown-menu" id="dateRangePicker">
-                                        <label htmlFor="startDate">{t('From date:')}</label>
-                                        <input type="date" id="startDate" className="form-control mb-2" />
-                                        <label htmlFor="endDate">{t('To date:')}</label>
-                                        <input type="date" id="endDate" className="form-control mb-2" />
-                                        <button type="button" className="btn btn-primary" onClick={handleDateRangeApply}>
-                                             {t('Apply')}
-                                        </button>
-                                   </div>
-                              </DateRangePicker>
-                         </ButtonGroup>
-                    </div> */}
                </Header>
                <div className="row row-cols-1 row-cols-md-3 g-4 mb-4">
-                    {/* Card 1 */}
-                    {role !== 'Staff' && (
+                    {/* Card 1 - Website Administration */}
+                    {isAdminOrManager && (
                          <div className="col-12 col-md-6 col-lg-4">
                               <Card>
                                    <CardHeader>
@@ -328,8 +299,8 @@ export const View = () => {
                          </div>
                     )}
 
-                    {/* Card 2 */}
-                    {role !== 'Staff' && (
+                    {/* Card 2 - User */}
+                    {isAdminOrManager && (
                          <div className="col-12 col-md-6 col-lg-4">
                               <Card>
                                    <CardHeader>
@@ -349,82 +320,72 @@ export const View = () => {
                               </Card>
                          </div>
                     )}
-                    {/* Card 3 */}
-                    <div className="col-12 col-md-6 col-lg-4">
-                         <Card>
-                              <CardHeader>
-                                   <div>
-                                        <Number>{projectsCount}</Number>
-                                        <Label>{t('Projects')}</Label>
-                                   </div>
-                                   <div>
-                                        <Icon className="bi bi-briefcase text-info" />
-                                   </div>
-                              </CardHeader>
-                              <CardBody>
-                                   <ShowInfoLink href="#" onClick={() => handleShowInfoClick('projects')}>
-                                        {showUserInfo['projects'] ? t('Hide Info') : t('Show info')}
-                                   </ShowInfoLink>
-                              </CardBody>
-                         </Card>
-                    </div>
-                    {/* Card 4 */}
-                    <div className="col-12 col-md-6 col-lg-4">
-                         <Card>
-                              <CardHeader>
-                                   <div>
-                                        <Number>{tasksCount}</Number>
-                                        <Label>{t('Tasks')}</Label>
-                                   </div>
-                                   <div>
-                                        <Icon className="bi bi-list-check text-danger" />
-                                   </div>
-                              </CardHeader>
-                              <CardBody>
-                                   <ShowInfoLink href="#" onClick={() => handleShowInfoClick('tasks')}>
-                                        {showUserInfo['tasks'] ? t('Hide Info') : t('Show info')}
-                                   </ShowInfoLink>
-                              </CardBody>
-                         </Card>
-                    </div>
-                    {/* Card 5 */}
-                    <div className="col-12 col-md-6 col-lg-4">
-                         <Card>
-                              <CardHeader>
-                                   <div>
-                                        <Number>{departmentsCount}</Number>
-                                        <Label>{t('Departments')}</Label>
-                                   </div>
-                                   <div>
-                                        <Icon className="bi bi-building text-primary" />
-                                   </div>
-                              </CardHeader>
-                              <CardBody>
-                                   <ShowInfoLink href="#" onClick={() => handleShowInfoClick('departments')}>
-                                        {showUserInfo['departments'] ? t('Hide Info') : t('Show info')}
-                                   </ShowInfoLink>
-                              </CardBody>
-                         </Card>
-                    </div>
-                    {/* Card 6 */}
-                    <div className="col-12 col-md-6 col-lg-4">
-                         <Card>
-                              <CardHeader>
-                                   <div>
-                                        <Number>{activityCount}</Number>
-                                        <Label>{t('Activity Log')}</Label>
-                                   </div>
-                                   <div>
-                                        <Icon className="bi bi-clock-history text-success" />
-                                   </div>
-                              </CardHeader>
-                              <CardBody>
-                                   <ShowInfoLink href="#" onClick={() => handleShowInfoClick('activitys')}>
-                                        {showUserInfo['activitys'] ? t('Hide Info') : t('Show info')}
-                                   </ShowInfoLink>
-                              </CardBody>
-                         </Card>
-                    </div>
+
+                    {/* Card 3 - Projects */}
+                    {(isAdminOrManager || isStaff) && (
+                         <div className="col-12 col-md-6 col-lg-4">
+                              <Card>
+                                   <CardHeader>
+                                        <div>
+                                             <Number>{projectsCount}</Number>
+                                             <Label>{t('Projects')}</Label>
+                                        </div>
+                                        <div>
+                                             <Icon className="bi bi-briefcase text-info" />
+                                        </div>
+                                   </CardHeader>
+                                   <CardBody>
+                                        <ShowInfoLink href="#" onClick={() => handleShowInfoClick('projects')}>
+                                             {showUserInfo['projects'] ? t('Hide Info') : t('Show info')}
+                                        </ShowInfoLink>
+                                   </CardBody>
+                              </Card>
+                         </div>
+                    )}
+
+                    {/* Card 4 - Tasks */}
+                    {(isAdminOrManager || isStaff) && (
+                         <div className="col-12 col-md-6 col-lg-4">
+                              <Card>
+                                   <CardHeader>
+                                        <div>
+                                             <Number>{tasksCount}</Number>
+                                             <Label>{t('Tasks')}</Label>
+                                        </div>
+                                        <div>
+                                             <Icon className="bi bi-list-check text-danger" />
+                                        </div>
+                                   </CardHeader>
+                                   <CardBody>
+                                        <ShowInfoLink href="#" onClick={() => handleShowInfoClick('tasks')}>
+                                             {showUserInfo['tasks'] ? t('Hide Info') : t('Show info')}
+                                        </ShowInfoLink>
+                                   </CardBody>
+                              </Card>
+                         </div>
+                    )}
+
+                    {/* Card 5 - Departments */}
+                    {(isAdminOrManager || isStaff) && (
+                         <div className="col-12 col-md-6 col-lg-4">
+                              <Card>
+                                   <CardHeader>
+                                        <div>
+                                             <Number>{departmentsCount}</Number>
+                                             <Label>{t('Departments')}</Label>
+                                        </div>
+                                        <div>
+                                             <Icon className="bi bi-building text-primary" />
+                                        </div>
+                                   </CardHeader>
+                                   <CardBody>
+                                        <ShowInfoLink href="#" onClick={() => handleShowInfoClick('departments')}>
+                                             {showUserInfo['departments'] ? t('Hide Info') : t('Show info')}
+                                        </ShowInfoLink>
+                                   </CardBody>
+                              </Card>
+                         </div>
+                    )}
                </div>
                {/* admin */}
                {showUserInfo['admin'] && role1Count > 0 && (
@@ -507,19 +468,19 @@ export const View = () => {
                                                                  done: 'bg-success',
                                                             }[project.status]
                                                        } d-flex justify-content-center`}>
-                                                       {project.status.replace(' ', '_')}
+                                                       {statusTranslation[project.status]}
                                                   </span>
                                              </td>
-                                             <td>{users.find((user) => user.id === project.user_id)?.fullname || 'N/A'}</td>
+                                             <td>{project.user}</td>
                                         </tr>
                                    ))}
                               </tbody>
                          </table>
                     </div>
                )}
-               {/* Tassk */}
+               {/* Tasks Table */}
                {showUserInfo['tasks'] && (
-                    <div className="table-responsive mt-3">
+                    <div className="table-responsive mt-3" style={{ maxHeight: '300px', overflowY: 'auto', display: 'block', height: '300px' }}>
                          <table className="table table-bordered table-hover table-striped">
                               <thead className="table-light">
                                    <tr>
@@ -534,7 +495,9 @@ export const View = () => {
                                    {tasks.map((task, index) => (
                                         <tr key={task.id}>
                                              <td>{index + 1}</td>
-                                             <td>{task.task_name}</td>
+                                             <td title={task.task_name}>
+                                                  {task.task_name.length > 30 ? `${task.task_name.slice(0, 30)}...` : task.task_name}
+                                             </td>
                                              <td>
                                                   <span
                                                        className={`badge ${
@@ -545,25 +508,30 @@ export const View = () => {
                                                                  done: 'bg-success',
                                                             }[task.status]
                                                        } d-flex justify-content-center`}>
-                                                       {task.status.replace(' ', '_')}
+                                                       {t(`${task.status.replace(' ', '_')}`)}
                                                   </span>
                                              </td>
-                                             <td>{getWorktimeName(task.worktime_id)}</td>
-                                             <td>{getProjectName(task.project_id)}</td>
+                                             <td title={task.worktime_name}>
+                                                  {task.worktime_name.length > 30 ? `${task.worktime_name.slice(0, 30)}...` : task.worktime_name}
+                                             </td>
+                                             <td title={task.project_name}>
+                                                  {task.project_name.length > 30 ? `${task.project_name.slice(0, 30)}...` : task.project_name}
+                                             </td>
                                         </tr>
                                    ))}
                               </tbody>
                          </table>
                     </div>
                )}
-               {/* department */}
+               {/* Departments Table */}
                {showUserInfo['departments'] && (
                     <div className="table-responsive mt-3">
                          <table className="table table-bordered table-hover table-striped">
                               <thead className="table-light">
                                    <tr>
-                                        <th className="col-3">STT</th>
+                                        <th>STT</th>
                                         <th>{t('Department Name')}</th>
+                                        <th>{t('Description')}</th>
                                    </tr>
                               </thead>
                               <tbody>
@@ -571,6 +539,7 @@ export const View = () => {
                                         <tr key={department.id}>
                                              <td>{index + 1}</td>
                                              <td>{department.department_name}</td>
+                                             <td>{department.description}</td>
                                         </tr>
                                    ))}
                               </tbody>
@@ -578,7 +547,7 @@ export const View = () => {
                     </div>
                )}
                <div className="mt-4">
-                    <h3 className="">{t('Statistics Total Hours Executed')}</h3>
+                    <Title>{t('Statistics Total Hours Executed')}</Title>
                     <Row>
                          <div className="col-md-6">
                               <BarChartComponent />
@@ -591,7 +560,6 @@ export const View = () => {
                <div className="mt-4">
                     <UserStatistics />
                </div>
-
                <div className="mt-4">
                     <WorktimesDashboardComponent />
                </div>

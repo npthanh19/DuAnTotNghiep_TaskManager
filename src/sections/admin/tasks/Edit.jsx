@@ -20,6 +20,7 @@ export const Edit = () => {
           formState: { errors },
           setValue,
           reset,
+          getValues,
      } = useForm();
      const navigate = useNavigate();
 
@@ -230,11 +231,10 @@ export const Edit = () => {
                                         id="end_date"
                                         className={`form-control form-control-sm ${errors.end_date ? 'is-invalid' : ''}`}
                                         {...register('end_date', {
-                                             required: t('End date is required!'),
                                              validate: {
-                                                  isAfterToday: (value) => {
-                                                       const today = new Date().toISOString().split('T')[0];
-                                                       if (value < today) {
+                                                  isAfterStartDate: (value) => {
+                                                       const startDate = getValues('start_date');
+                                                       if (value && value < startDate) {
                                                             return t('End date cannot be earlier than start date');
                                                        }
                                                        return true;

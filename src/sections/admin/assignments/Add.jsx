@@ -26,7 +26,7 @@ export const Add = () => {
      const [selectedProjectId, setSelectedProjectId] = useState(null);
      const [selectedTaskId, setSelectedTaskId] = useState(null);
      const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
-     const [status, setStatus] = useState(1);
+     const [status] = useState(1);
 
      useEffect(() => {
           const fetchData = async () => {
@@ -116,7 +116,7 @@ export const Add = () => {
                user_ids: [data.userId],
                department_id: selectedDepartmentId,
                project_id: data.projectId,
-               status: data.status,
+               status: status,
                note: data.note,
           };
 
@@ -229,22 +229,11 @@ export const Add = () => {
                                    {errors.userId && <div className="invalid-feedback">{errors.userId.message}</div>}
                               </div>
 
-                              <div className="col">
-                                   <label htmlFor="status" className="form-label">
+                              <div className="col ">
+                                   <label htmlFor="status" className="form-label orm-label-sm">
                                         {t('Status')}
                                    </label>
-                                   <select
-                                        id="status"
-                                        className={`form-select form-select-sm ${errors.status ? 'is-invalid' : ''}`}
-                                        {...register('status', { required: t('Status is required') })}
-                                        onChange={(e) => setStatus(e.target.value)}>
-                                        <option value="">{t('Select Status')}</option>
-                                        <option value="1">{t('Pending')}</option>
-                                        <option value="2">{t('In Progress')}</option>
-                                        <option value="3">{t('Preview')}</option>
-                                        <option value="4">{t('Done')}</option>
-                                   </select>
-                                   {errors.status && <div className="invalid-feedback">{errors.status.message}</div>}
+                                   <input type="text" className="form-control form-control-sm" value={t('Pending')} readOnly disabled />
                               </div>
                          </div>
 
