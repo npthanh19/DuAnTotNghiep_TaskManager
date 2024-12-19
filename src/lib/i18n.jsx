@@ -477,8 +477,7 @@ const resources = {
                'Failed to delete notification.': 'Có lỗi khi xoá thông báo',
                'Role is required!': 'Vai trò không để trống!',
                'User  is not logged in or fullname not available in localStorage':
-                    'Người dùng chưa đăng nhập hoặc tên đầy đủ không có sẵn trong localStorage',
-               'The comment has been moved to the trash!': 'Bình luận đã được chuyển vào thùng rác!',
+               'Người dùng chưa đăng nhập hoặc tên đầy đủ không có sẵn trong localStorage',
                'An error occurred while deleting the comment.': 'Đã xảy ra lỗi khi xóa bình luận.',
                'Delete Comments': 'Xóa bình luận',
                'Are you sure you want to delete this comment?': 'Bạn có chắc chắn muốn xóa bình luận này không?',

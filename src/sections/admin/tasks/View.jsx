@@ -439,14 +439,18 @@ export const View = () => {
                                                        <li
                                                             key={file.id}
                                                             className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href={file.url} target="_blank" rel="noopener noreferrer">
-                                                                 {file.file_name}
-                                                            </a>
+                                                            <span
+                                                                 className="text-truncate"
+                                                                 style={{ maxWidth: '80%' }}
+                                                                 title={file.file_name} // Hiển thị tên đầy đủ khi hover
+                                                            >
+                                                                 {file.file_name.length > 100
+                                                                      ? `${file.file_name.substring(0, 97)}...`
+                                                                      : file.file_name}
+                                                            </span>
                                                             <button
                                                                  className="btn btn-link"
                                                                  onClick={() => handleDownloadFile(file.id, file.file_name)}>
-                                                                 {' '}
-                                                                 {/* Sử dụng file.id thay vì file.url */}
                                                                  <i className="bi bi-file-earmark-arrow-down"></i>
                                                             </button>
                                                        </li>
@@ -457,7 +461,7 @@ export const View = () => {
                                         )}
                                    </div>
                                    <div className="modal-footer">
-                                        <button type="button" className="btn btn-secondary  mt-2" onClick={() => setShowFilePopup(false)}>
+                                        <button type="button" className="btn btn-secondary mt-2" onClick={() => setShowFilePopup(false)}>
                                              {t('Close')}
                                         </button>
                                    </div>
