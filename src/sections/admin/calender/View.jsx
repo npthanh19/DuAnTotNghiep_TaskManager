@@ -84,9 +84,10 @@ export const View = () => {
           <div style={{ margin: '20px' }}>
                <h1>{t('Calendar')}</h1>
                {loading ? (
-                    <div style={{ textAlign: 'center', padding: '20px' }}>
-                         <p>Loading Calendar...</p>
-                         <div className="spinner" />
+                    <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+                         <div className="spinner-border" role="status">
+                              <span className="visually-hidden">{t('Loading...')}</span>
+                         </div>
                     </div>
                ) : (
                     <Calendar
