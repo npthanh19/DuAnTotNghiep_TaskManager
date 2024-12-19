@@ -8,7 +8,7 @@ import { getAllWorktimes } from '../../../services/worktimeService';
 import { getAllUsers, getUserById } from '../../../services/usersService';
 import { useTranslation } from 'react-i18next';
 import { getAllAssignments } from '../../../services/assignmentService';
-
+import Swal from 'sweetalert2';
 const users = [
      { id: 1, name: 'User 1', avatar: '/assets/admin/img/avatars/1.png' },
      { id: 2, name: 'User 2', avatar: '/assets/admin/img/avatars/2.png' },
@@ -177,86 +177,112 @@ export const View = () => {
 
      const onDragEnd = async (result) => {
           const { destination, source, draggableId } = result;
-
+      
           if (!destination) {
-               return;
+              return;
           }
-
+      
           if (destination.droppableId === source.droppableId && destination.index === source.index) {
-               return;
+              return;
           }
-
+      
           const startColumn = data.columns[source.droppableId];
           const finishColumn = data.columns[destination.droppableId];
-
-          if (startColumn === finishColumn) {
-               const newCardIds = Array.from(startColumn.cardIds);
-               newCardIds.splice(source.index, 1);
-               newCardIds.splice(destination.index, 0, draggableId);
-
-               const newColumn = {
-                    ...startColumn,
-                    cardIds: newCardIds,
-               };
-
-               setData((prevData) => ({
-                    ...prevData,
-                    columns: {
-                         ...prevData.columns,
-                         [newColumn.id]: newColumn,
-                    },
-               }));
-               return;
+      
+          // Ngăn di chuyển task từ cột "Done" sang cột khác
+          if (startColumn.title.toLowerCase() === 'done' && finishColumn.title.toLowerCase() !== 'done') {
+              Swal.fire({
+                  title: 'Không thể di chuyển!',
+                  text: 'Tasks trong cột "Done" không thể được kéo sang cột khác.',
+                  icon: 'error',
+                  confirmButtonText: 'OK',
+              });
+              return;
           }
-
+      
+          if (startColumn === finishColumn) {
+              const newCardIds = Array.from(startColumn.cardIds);
+              newCardIds.splice(source.index, 1);
+              newCardIds.splice(destination.index, 0, draggableId);
+      
+              const newColumn = {
+                  ...startColumn,
+                  cardIds: newCardIds,
+              };
+      
+              setData((prevData) => ({
+                  ...prevData,
+                  columns: {
+                      ...prevData.columns,
+                      [newColumn.id]: newColumn,
+                  },
+              }));
+              return;
+          }
+      
+          // Hiển thị hộp thoại xác nhận nếu không phải cột "Done"
+          const confirmation = await Swal.fire({
+              title: 'Xác nhận cập nhật',
+              text: `Bạn có chắc chắn muốn di chuyển task sang cột "${finishColumn.title}"?`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Có, cập nhật',
+              cancelButtonText: 'Hủy',
+          });
+      
+          if (!confirmation.isConfirmed) {
+              return; // Nếu người dùng nhấn hủy, không thực hiện bất kỳ thay đổi nào
+          }
+      
           // Update card position between different columns
           const startCardIds = Array.from(startColumn.cardIds);
           startCardIds.splice(source.index, 1);
           const newStart = {
-               ...startColumn,
-               cardIds: startCardIds,
+              ...startColumn,
+              cardIds: startCardIds,
           };
-
+      
           const finishCardIds = Array.from(finishColumn.cardIds);
           finishCardIds.splice(destination.index, 0, draggableId);
           const newFinish = {
-               ...finishColumn,
-               cardIds: finishCardIds,
+              ...finishColumn,
+              cardIds: finishCardIds,
           };
-
+      
           // Update state to reflect new card order
           setData((prevData) => ({
-               ...prevData,
-               columns: {
-                    ...prevData.columns,
-                    [newStart.id]: newStart,
-                    [newFinish.id]: newFinish,
-               },
+              ...prevData,
+              columns: {
+                  ...prevData.columns,
+                  [newStart.id]: newStart,
+                  [newFinish.id]: newFinish,
+              },
           }));
-
+      
           // Get task ID and new status
           const taskId = draggableId.replace('card-', '');
           const newStatus = COLUMN_STATUS_MAP[finishColumn.title.toLowerCase()];
-
+      
           // Update task status via API
           try {
-               await updateTaskStatus(taskId, newStatus);
-               console.log(`Task ${taskId} status updated to ${newStatus}`);
-
-               // Sau khi cập nhật status, cập nhật lại dữ liệu card trong state để re-render giao diện
-               setData((prevData) => {
-                    const updatedCards = { ...prevData.cards };
-                    updatedCards[draggableId].status = finishColumn.title.toLowerCase(); // Cập nhật status của task
-
-                    return {
-                         ...prevData,
-                         cards: updatedCards,
-                    };
-               });
+              await updateTaskStatus(taskId, newStatus);
+              console.log(`Task ${taskId} status updated to ${newStatus}`);
+      
+              // Sau khi cập nhật status, cập nhật lại dữ liệu card trong state để re-render giao diện
+              setData((prevData) => {
+                  const updatedCards = { ...prevData.cards };
+                  updatedCards[draggableId].status = finishColumn.title.toLowerCase(); // Cập nhật status của task
+      
+                  return {
+                      ...prevData,
+                      cards: updatedCards,
+                  };
+              });
           } catch (error) {
-               console.error(`Failed to update task ${taskId} status`, error);
+              console.error(`Failed to update task ${taskId} status`, error);
           }
-     };
+      };
+      
 
      const handleShowDetails = (card) => {
           const processedCard = {

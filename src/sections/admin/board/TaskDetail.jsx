@@ -232,7 +232,7 @@ export const TaskDetail = ({ showModal, setShowModal, selectedTask, stateEdit, s
                                         <p className="ms-2 mb-0 small">{t('Cancel')}</p>
                                    </div>
 
-                                   <div className="comment-section mt-4">
+                                   <div className="comment-section mt-4 d-none">
                                         <h5>{t('Comment')}</h5>
                                         <div className="input-group mb-3">
                                              <input

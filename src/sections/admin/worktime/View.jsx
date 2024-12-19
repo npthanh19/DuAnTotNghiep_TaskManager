@@ -319,7 +319,7 @@ export const View = () => {
                                    <th>{t('STT')}</th>
                                    <th>{t('ID')}</th>
                                    <th>{t('Name')}</th>
-                                   <th>{t('Projects')}</th>
+                                   {/* <th>{t('Projects')}</th> */}
                                    <th>{t('User Create')}</th>
                                    <th>{t('Start Date')}</th>
                                    <th>{t('End Date')}</th>
@@ -354,7 +354,7 @@ export const View = () => {
                                                             worktime.name
                                                        )}
                                                   </td>
-                                                  <td>
+                                                  {/* <td>
                                                        {editingWorktime && editingWorktime.id === worktime.id ? (
                                                             <select
                                                                  value={editingWorktime.project_id}
@@ -372,7 +372,7 @@ export const View = () => {
                                                        ) : (
                                                             '-'
                                                        )}
-                                                  </td>
+                                                  </td> */}
                                                   <td>{user ? user.fullname : '-'}</td>
                                                   <td>
                                                        {editingWorktime && editingWorktime.id === worktime.id ? (
