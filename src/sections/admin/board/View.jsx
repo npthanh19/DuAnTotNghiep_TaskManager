@@ -127,10 +127,10 @@ export const View = () => {
 
                // Cập nhật columns với cardIds tương ứng
                const updatedColumns = {
-                    'column-1': { id: 'column-1', title: t('To Do'), cardIds: groupedCards['column-1'] },
-                    'column-2': { id: 'column-2', title: t('In Progress'), cardIds: groupedCards['column-2'] },
-                    'column-3': { id: 'column-3', title: t('Preview'), cardIds: groupedCards['column-3'] },
-                    'column-4': { id: 'column-4', title: t('Done'), cardIds: groupedCards['column-4'] },
+                    'column-1': { id: 'column-1', title: 'to do', cardIds: groupedCards['column-1'] },
+                    'column-2': { id: 'column-2', title: 'in progress', cardIds: groupedCards['column-2'] },
+                    'column-3': { id: 'column-3', title: 'preview', cardIds: groupedCards['column-3'] },
+                    'column-4': { id: 'column-4', title: 'done', cardIds: groupedCards['column-4'] },
                };
 
                setData((prev) => ({
